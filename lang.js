@@ -301,6 +301,8 @@ function setLang(lang) {
     var key = el.getAttribute('data-i18n');
     if (tmap[key] !== undefined) el.innerHTML = tmap[key];
   });
+  var heroLogo = document.querySelector('.hero-logo');
+  if (heroLogo) heroLogo.src = lang === 'es' ? 'wcsc-logo-spanish.png' : 'westcoast sleep clinic logo - Editedv2.png';
   try { localStorage.setItem('wcsc_lang', lang); } catch(e) {}
 }
 
