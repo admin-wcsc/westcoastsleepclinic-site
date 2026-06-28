@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>West Coast Sleep Clinic — Largo, Florida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══════ HEADER ══════ -->
+<header class="site-header">
+  <div class="nav-wrap">
+    <nav>
+      <ul class="main-nav">
+        <li><a href="#">Home</a></li>
+        <li><a href="registration.html">Patient Registration</a></li>
+      </ul>
+    </nav>
+    <a href="tel:7274729112" class="nav-phone" style="margin-left:auto">&#128222; 727-472-9112</a>
+    <button class="hamburger" aria-label="Menu" onclick="document.getElementById('mobNav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+<div class="mob-nav" id="mobNav">
+  <a href="tel:7274729112" class="mob-phone">&#128222; 727-472-9112</a>
+  <a href="#">Home</a>
+  <a href="registration.html">Patient Registration</a>
+</div>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="hero-top-left">
+    <div class="hero-badge" style="font-size:12px;padding:5px 14px"><span class="dot"></span> Now Accepting New Patients</div>
+    <a class="btn-pri" href="registration.html" style="padding:12px 24px;font-size:13px">Start Registration</a>
+  </div>
+  <img src="westcoast sleep clinic logo - Editedv2.png" alt="West Coast Sleep Clinic" class="hero-logo">
+</section>
+
+<div style="height:160px;background:linear-gradient(to bottom,#f7f6f3 0%,var(--dg) 100%)"></div>
+
+<!-- ══════ SERVICES & INSURANCE TABS ══════ -->
+<section class="tab-section">
+  <div class="tab-header">
+    <div class="tab-header-in">
+      <div class="sec-lbl">What We Offer</div>
+      <h2 class="sec-ttl">Services &amp; Insurance Coverage</h2>
+      <p class="tab-header-desc">Explore our full range of physician-supervised services and verify your insurance coverage below.</p>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'services')">Services Offered</button>
+        <button class="tab-btn" onclick="switchTab(this,'insurance')">Insurances Accepted</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES TAB -->
+  <div class="tab-content active" id="tab-services">
+    <div class="sec-wrap">
+      <div class="svc-table-wrap">
+        <table class="svc-main-table">
+          <thead>
+            <tr>
+              <th style="width:22%">Service</th>
+              <th style="width:54%">Description &amp; Highlights</th>
+              <th style="width:24%">Pricing / Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="svc-name">
+                  <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+                  Sleep Medicine
+                </div>
+              </td>
+              <td class="svc-desc-cell">
+                Board-certified physicians diagnosing and treating the full spectrum of sleep disorders. State-of-the-art diagnostics with personalized treatment plans to restore healthy, restorative sleep.
+                <div class="svc-tags">
+                  <span class="svc-tag">Sleep Apnea (OSA &amp; CSA)</span>
+                  <span class="svc-tag">CPAP / BiPAP</span>
+                  <span class="svc-tag">In-Lab Sleep Study</span>
+                  <span class="svc-tag">Home Sleep Testing</span>
+                  <span class="svc-tag">Insomnia</span>
+                  <span class="svc-tag">Narcolepsy</span>
+                  <span class="svc-tag">Restless Legs Syndrome</span>
+                  <span class="svc-tag">Parasomnias</span>
+                  <span class="svc-tag">Circadian Rhythm</span>
+                  <span class="svc-tag">Pediatric Sleep</span>
+                </div>
+              </td>
+              <td><span style="font-size:13px;color:var(--tl)">Most major insurance plans accepted. Call to verify.</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="svc-name">
+                  <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
+                  Weight Loss Program
+                </div>
+              </td>
+              <td class="svc-desc-cell">
+                Our Tirzepatide program combines clinically proven GLP-1/GIP receptor agonist injections with physician oversight, nutritional guidance, and lifestyle coaching for sustainable, real results.
+                <div class="svc-tags">
+                  <span class="svc-tag">Tirzepatide Injections</span>
+                  <span class="svc-tag">Medical Evaluation &amp; Labs</span>
+                  <span class="svc-tag">Personalized Plan</span>
+                  <span class="svc-tag">Monthly Monitoring</span>
+                  <span class="svc-tag">Nutrition Coaching</span>
+                  <span class="svc-tag">Physician Supervised</span>
+                </div>
+              </td>
+              <td>
+                <span class="svc-price-badge">$275 / Month</span>
+                <div style="font-size:11.5px;color:var(--tl);margin-top:10px;line-height:1.5">Price locked 6&nbsp;months if you book now for June!</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="svc-name">
+                  <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg></div>
+                  IV Therapy
+                </div>
+              </td>
+              <td class="svc-desc-cell">
+                Vitamins, minerals, and hydration delivered directly into the bloodstream for maximum absorption and fast results. Each infusion is customized by our clinical team to meet your specific needs.
+                <div class="svc-tags">
+                  <span class="svc-tag">Hydration Therapy</span>
+                  <span class="svc-tag">Vitamin C Infusion</span>
+                  <span class="svc-tag">B-Complex &amp; B12</span>
+                  <span class="svc-tag">Immunity Support</span>
+                  <span class="svc-tag">Myers' Cocktail</span>
+                  <span class="svc-tag">NAD+ Therapy</span>
+                  <span class="svc-tag">Custom Wellness Blends</span>
+                </div>
+              </td>
+              <td><span style="font-size:13px;color:var(--tl)">Call for current pricing</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="svc-name">
+                  <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                  Wellness &amp; More
+                </div>
+              </td>
+              <td class="svc-desc-cell">
+                Whole-person care beyond our core services &mdash; a growing range of wellness treatments and consultations designed to support your long-term health journey.
+                <div class="svc-tags">
+                  <span class="svc-tag">Wellness Consultations</span>
+                  <span class="svc-tag">Longevity Medicine</span>
+                  <span class="svc-tag">Hormone Evaluation</span>
+                  <span class="svc-tag">Annual Wellness Exams</span>
+                  <span class="svc-tag">Preventive Screenings</span>
+                  <span class="svc-tag">Telehealth Visits</span>
+                </div>
+              </td>
+              <td><span style="font-size:13px;color:var(--tl)">Call for availability and pricing</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSURANCE TAB -->
+  <div class="tab-content" id="tab-insurance">
+    <div class="sec-wrap">
+      <div class="ins-split">
+        <div>
+          <div class="ins-table-wrap">
+            <table class="ins-table">
+              <thead>
+                <tr><th colspan="2">Currently Accepted Insurance Carriers</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Medicare</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Florida Medicaid</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Florida Blue (BCBS)</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Aetna</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Cigna</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>UnitedHealthcare</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Humana</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Tricare</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Tricare for Life</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Sunshine Health</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>WellCare</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Simply Healthcare</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Ambetter</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Oscar Health</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>AvMed</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Coventry Health Care</div></td>
+                </tr>
+                <tr>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>MultiPlan / PHCS</div></td>
+                  <td><div class="ins-check-cell"><div class="ins-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>Self-Pay / Uninsured</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="ins-note-box">
+            <h4>Questions About Your Coverage?</h4>
+            <p>We accept most major insurance plans. Coverage and benefits vary by plan. Our billing team is happy to verify your insurance benefits before your visit.</p>
+            <p style="margin-top:12px">Contact us at <strong style="color:var(--dg)">727-472-9112</strong> and we will work with you to understand your coverage, co-pays, and out-of-pocket costs.</p>
+            <p style="margin-top:12px;font-style:italic;color:var(--tl);font-size:13px">We believe finances should never be a barrier to good health.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════ ABOUT ══════ -->
+<section class="about-section">
+  <div class="about-inner">
+    <div>
+      <div class="sec-lbl">Who We Are</div>
+      <h2 class="sec-ttl">About West Coast Sleep Clinic</h2>
+      <p class="about-text">At West Coast Sleep Clinic, we are committed to improving the lives of our patients through expert sleep medicine, innovative wellness programs, and compassionate, personalized care.</p>
+      <p class="about-text">Sleep is the foundation of good health. When you sleep better, you feel better, think more clearly, and live more fully. Our team of board-certified physicians and dedicated clinical staff work together to ensure every patient receives the individualized attention and care they deserve.</p>
+      <p class="about-text">Founded in 2023 and located in Largo, Florida, West Coast Sleep Clinic is proud to serve patients throughout Pinellas County and the surrounding Tampa Bay region.</p>
+    </div>
+    <div>
+      <div class="info-card">
+        <div class="info-card-header"><h4>Practice Information</h4></div>
+        <div class="irow"><span class="ilbl">Location</span><span class="ival">11200 Seminole Blvd Suite 303, Largo, FL 33778</span></div>
+        <div class="irow"><span class="ilbl">Phone / Text</span><span class="ival"><a href="tel:7274729112">727-472-9112</a></span></div>
+        <div class="irow"><span class="ilbl">Hours</span><span class="ival">Mon &ndash; Fri: 8 AM &ndash; 5 PM</span></div>
+        <div class="irow"><span class="ilbl">Founded</span><span class="ival">2023</span></div>
+        <div class="irow"><span class="ilbl">Telehealth</span><span class="ival"><span class="info-accent">Available</span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="height:160px;background:linear-gradient(to bottom,#c8e4f2,#1d566e)"></div>
+
+<!-- ══════ OUR PROMISE ══════ -->
+<section class="promise-section">
+  <div class="promise-inner">
+    <div class="promise-head">
+      <span class="sec-lbl">Our Promise</span>
+      <h2 class="sec-ttl">Why Choose West Coast Sleep Clinic?</h2>
+    </div>
+    <div class="promise-grid">
+      <div class="promise-card">
+        <div class="promise-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>Expert Care</h4>
+        <p>Board-certified physicians providing the highest standard of evidence-based clinical care for every patient, every visit.</p>
+      </div>
+      <div class="promise-card">
+        <div class="promise-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h4>Personalized Solutions</h4>
+        <p>Every patient is unique. We design individualized treatment plans tailored to your specific needs, goals, and lifestyle.</p>
+      </div>
+      <div class="promise-card">
+        <div class="promise-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <h4>Your Health, Our Priority</h4>
+        <p>Your long-term health, comfort, and wellbeing are at the center of every decision we make. We are committed to real, lasting results.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════ FOOTER ══════ -->
+<footer>
+  <div class="foot-in">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="f-logo">West Coast Sleep Clinic</span>
+        <span class="f-sub">Largo &nbsp;&middot;&nbsp; Florida</span>
+        <div class="foot-socials">
+          <a href="" class="foot-social-btn" aria-label="Instagram">
+            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="ig-grad" cx="30%" cy="107%" r="120%">
+                  <stop offset="0%" stop-color="#fdf497"/>
+                  <stop offset="10%" stop-color="#fdf497"/>
+                  <stop offset="25%" stop-color="#fd5949"/>
+                  <stop offset="50%" stop-color="#d6249f"/>
+                  <stop offset="100%" stop-color="#285aeb"/>
+                </radialGradient>
+              </defs>
+              <rect x="1" y="1" width="34" height="34" rx="9" ry="9" fill="url(#ig-grad)"/>
+              <rect x="9" y="9" width="18" height="18" rx="5" ry="5" fill="none" stroke="#fff" stroke-width="2"/>
+              <circle cx="18" cy="18" r="4.5" fill="none" stroke="#fff" stroke-width="2"/>
+              <circle cx="24" cy="12" r="1.3" fill="#fff"/>
+            </svg>
+          </a>
+          <a href="" class="foot-social-btn" aria-label="Facebook">
+            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="34" height="34" rx="9" ry="9" fill="#1877F2"/>
+              <path d="M20.5 18.5h2.8l.5-3H20.5v-1.8c0-.84.41-1.7 1.7-1.7h1.6V9.4s-1.45-.25-2.84-.25c-2.9 0-4.8 1.76-4.8 4.94V15.5H13v3h3.1V27h3.9v-8.5z" fill="#fff"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

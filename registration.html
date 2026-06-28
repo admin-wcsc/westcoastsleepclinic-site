@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Registration — West Coast Sleep Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dg:#1d566e;
+  --mg:#2C7DA0;
+  --lg:#5ba3c9;
+  --gold:#b08754;
+  --gold2:#c9a425;
+  --gold3:#d4b069;
+  --cream:#FAFAF8;
+  --border:#E2E0DE;
+  --td:#1a2a3a;
+  --tm:#2c5878;
+  --tl:#5b8fa0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-height:1.6;color:var(--td);background:#f4f8fb;overflow-x:hidden}
+
+/* ── NAV ── */
+.site-header{position:sticky;top:0;z-index:100;background:#fff;box-shadow:0 2px 12px rgba(29,86,110,.1)}
+.nav-wrap{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:76px;gap:12px}
+.main-nav{display:flex;align-items:center;gap:4px;list-style:none}
+.main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
+.main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
+.nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.nav-phone:hover{color:var(--td)}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
+.mob-nav{display:none;position:fixed;top:76px;left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
+.mob-nav.open{display:block}
+.mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08)}
+.mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
+@media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}}
+
+/* ── REG HEADER ── */
+.reg-hdr{background:linear-gradient(180deg,var(--dg) 0%,var(--mg) 100%);padding:56px 24px 42px;text-align:center;color:#fff}
+.reg-hdr h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:8px;color:#fff}
+.reg-hdr p{font-size:15px;color:rgba(255,255,255,.78)}
+
+/* ── STEPPER ── */
+.stepper{background:#fff;border-bottom:1px solid var(--border);padding:18px 24px;position:sticky;top:76px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stepper-in{max-width:860px;margin:0 auto}
+.step-row{display:flex;align-items:center;gap:3px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px}
+.step-row::-webkit-scrollbar{display:none}
+.step-item{flex:0 0 auto;display:flex;align-items:center;gap:3px}
+.step-circ{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--tl);background:#fff;transition:all .3s;flex-shrink:0}
+.step-circ.active{border-color:var(--dg);background:var(--dg);color:#fff}
+.step-circ.done{border-color:var(--gold);background:var(--gold);color:#fff}
+.step-lbl{font-size:10px;font-weight:500;color:var(--tl);white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
+.step-lbl.active{color:var(--dg);font-weight:700}
+.step-lbl.done{color:var(--gold)}
+.step-conn{flex:1;height:2px;background:var(--border);min-width:12px;max-width:36px;transition:background .3s}
+.step-conn.done{background:var(--gold)}
+.step-prog{font-size:12px;color:var(--tl);margin-top:9px;text-align:center}
+
+/* ── FORM ── */
+.form-wrap{max-width:780px;margin:0 auto;padding:44px 24px 0}
+.fstep{display:none}
+.fstep.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fstep-ttl{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:500;color:var(--dg);margin-bottom:4px}
+.fstep-sub{font-size:14px;color:var(--tl);margin-bottom:32px}
+.fsec{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.fsec:last-of-type{border-bottom:none}
+.fsec-ttl{font-size:10.5px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.fsec-ttl::after{content:'';flex:1;height:1px;background:var(--border)}
+.fg{display:grid;gap:16px}
+.fg2{grid-template-columns:1fr 1fr}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:580px){.fg2,.fg3{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
+.fld label .req{color:#c0392b;margin-left:2px}
+.fld input,.fld select,.fld textarea{width:100%;padding:13px 14px;font-size:16px;font-family:'Montserrat',sans-serif;color:var(--td);background:#fff;border:1.5px solid var(--border);border-radius:6px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--mg);box-shadow:0 0 0 3px rgba(44,125,160,.1)}
+.fld textarea{resize:vertical;min-height:90px}
+.fld input::placeholder{color:rgba(107,127,116,.5)}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+.rlbl{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--td);cursor:pointer}
+.rlbl input{width:20px;height:20px;cursor:pointer;accent-color:var(--dg)}
+.chk-col{display:flex;flex-direction:column;gap:11px}
+.clbl{display:flex;align-items:flex-start;gap:11px;font-size:15px;color:var(--td);cursor:pointer;line-height:1.5}
+.clbl input{width:20px;height:20px;cursor:pointer;accent-color:var(--dg);flex-shrink:0;margin-top:2px}
+.policy-box{background:#f9f9f7;border:1px solid var(--border);border-radius:6px;padding:22px 26px;font-size:14.5px;color:var(--tm);line-height:1.8;margin-bottom:22px;max-height:260px;overflow-y:auto}
+.policy-box h4{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:var(--dg);margin-bottom:10px}
+.policy-box p{margin-bottom:10px}
+.policy-box p:last-child{margin-bottom:0}
+.policy-box ul{margin:10px 0 10px 18px}
+.policy-box ul li{margin-bottom:6px}
+.sig-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;margin-top:18px}
+@media(max-width:480px){.sig-row{grid-template-columns:1fr}}
+.ess-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+.ess-table th{background:var(--dg);color:#fff;padding:12px 14px;text-align:left;font-size:12px;letter-spacing:.05em;font-weight:600}
+.ess-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ess-table tr:last-child td{border-bottom:none}
+.ess-table tr:hover td{background:rgba(176,135,84,.06)}
+.ess-radios{display:flex;gap:18px;justify-content:center}
+.ess-radios label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--tl);cursor:pointer}
+.ess-radios input{width:18px;height:18px;accent-color:var(--dg);cursor:pointer}
+.form-nav{display:flex;justify-content:space-between;align-items:center;padding:26px 0 56px;margin-top:10px;border-top:1px solid var(--border)}
+.btn-back{background:var(--cream);color:var(--tm);border:1.5px solid var(--border);padding:14px 28px;font-size:15px;font-weight:500;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;display:flex;align-items:center;gap:8px;font-family:'Montserrat',sans-serif}
+.btn-back:hover{border-color:var(--tm);color:var(--td)}
+.btn-nxt{background:var(--dg);color:#fff;border:none;padding:16px 40px;font-size:16px;font-weight:600;letter-spacing:.04em;border-radius:6px;cursor:pointer;transition:background .2s,transform .2s;display:flex;align-items:center;gap:10px;font-family:'Montserrat',sans-serif}
+.btn-nxt:hover{background:var(--mg);transform:translateX(2px)}
+.btn-sub{background:var(--gold);color:#fff;border:none;padding:16px 44px;font-size:16px;font-weight:600;border-radius:6px;cursor:pointer;transition:background .2s;font-family:'Montserrat',sans-serif}
+.btn-sub:hover{background:var(--gold2)}
+.req-note{font-size:13px;color:var(--tl);margin-bottom:24px}
+.req-note span{color:#c0392b;font-weight:600}
+.ibox{background:rgba(44,125,160,.06);border:1px solid rgba(44,125,160,.14);border-left:3px solid var(--mg);border-radius:4px;padding:14px 18px;font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:18px}
+
+/* ── DONE PAGE ── */
+.done-wrap{display:none;padding:70px 24px 80px;text-align:center;max-width:680px;margin:0 auto}
+.done-wrap.active{display:block;animation:fadeUp .5s ease}
+.done-icon{width:96px;height:96px;background:linear-gradient(135deg,var(--dg),var(--mg));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 26px}
+.done-icon svg{width:46px;height:46px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.done-wrap h2{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,5vw,54px);font-weight:500;color:var(--dg);margin-bottom:12px}
+.done-wrap p{font-size:16px;color:var(--tm);max-width:520px;margin:0 auto 10px;line-height:1.65}
+
+/* ── FOOTER ── */
+footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top:1px solid var(--border)}
+.foot-in{max-width:1100px;margin:0 auto}
+.foot-brand .f-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--gold3);display:block;margin-bottom:3px}
+.foot-brand .f-sub{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:rgba(44,125,160,.6);display:block;margin-bottom:12px}
+.foot-brand p{font-size:13px;color:rgba(29,54,78,.6);line-height:1.7;margin-bottom:14px}
+.foot-socials{display:flex;gap:10px;margin-top:14px}
+.foot-social-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;transition:opacity .2s,transform .2s}
+.foot-social-btn:hover{opacity:.82;transform:translateY(-2px)}
+.foot-social-btn svg{width:36px;height:36px}
+.foot-bot{border-top:1px solid rgba(176,135,84,.22);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:rgba(29,54,78,.4);letter-spacing:.04em;margin-top:32px}
+</style>
+</head>
+<body>
+
+<!-- ══════ HEADER ══════ -->
+<header class="site-header">
+  <div class="nav-wrap">
+    <nav>
+      <ul class="main-nav">
+        <li><a href="test2.html">Home</a></li>
+        <li><a href="registration.html">Patient Registration</a></li>
+      </ul>
+    </nav>
+    <a href="tel:7274729112" class="nav-phone" style="margin-left:auto">&#128222; 727-472-9112</a>
+    <button class="hamburger" aria-label="Menu" onclick="document.getElementById('mobNav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+<div class="mob-nav" id="mobNav">
+  <a href="test2.html">Home</a>
+  <a href="registration.html">Patient Registration</a>
+</div>
+
+<!-- ══════ REG HEADER ══════ -->
+<div class="reg-hdr">
+  <h1>Patient Registration</h1>
+  <p>Please complete all forms below. Use the Next button to proceed through each step.</p>
+</div>
+
+<!-- ══════ STEPPER ══════ -->
+<div class="stepper">
+  <div class="stepper-in">
+    <div class="step-row">
+      <div class="step-item"><div class="step-circ active" id="sc1">1</div><div class="step-lbl active" id="sl1">Patient Reg</div></div>
+      <div class="step-conn" id="conn1"></div>
+      <div class="step-item"><div class="step-circ" id="sc2">2</div><div class="step-lbl" id="sl2">Consent to Treat</div></div>
+      <div class="step-conn" id="conn2"></div>
+      <div class="step-item"><div class="step-circ" id="sc3">3</div><div class="step-lbl" id="sl3">Financial Policy</div></div>
+      <div class="step-conn" id="conn3"></div>
+      <div class="step-item"><div class="step-circ" id="sc4">4</div><div class="step-lbl" id="sl4">HIPAA Notice</div></div>
+      <div class="step-conn" id="conn4"></div>
+      <div class="step-item"><div class="step-circ" id="sc5">5</div><div class="step-lbl" id="sl5">Text/Tele Consent</div></div>
+      <div class="step-conn" id="conn5"></div>
+      <div class="step-item"><div class="step-circ" id="sc6">6</div><div class="step-lbl" id="sl6">Auth to Release</div></div>
+      <div class="step-conn" id="conn6"></div>
+      <div class="step-item"><div class="step-circ" id="sc7">7</div><div class="step-lbl" id="sl7">Questionnaire</div></div>
+    </div>
+    <div class="step-prog" id="stepProg">Step 1 of 7 — Patient Registration</div>
+  </div>
+</div>
+
+<!-- ══════ FORM AREA ══════ -->
+<div id="regFormArea">
+  <div class="form-wrap">
+
+    <!-- STEP 1: Patient Registration -->
+    <div class="fstep active" id="fstep1">
+      <h2 class="fstep-ttl">Patient Registration</h2>
+      <p class="fstep-sub">Please fill in your personal and insurance information completely.</p>
+      <p class="req-note"><span>*</span> Indicates a required field</p>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Patient Demographics</div>
+        <div class="fg fg3">
+          <div class="fld"><label>First Name <span class="req">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
+          <div class="fld"><label>Last Name <span class="req">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
+          <div class="fld"><label>Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Date of Birth <span class="req">*</span></label><input type="date" name="dob" required></div>
+          <div class="fld"><label>Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
+        </div>
+        <div class="fld" style="margin-top:16px">
+          <label>Sex</label>
+          <div class="radio-row">
+            <label class="rlbl"><input type="radio" name="sex" value="Male"> Male</label>
+            <label class="rlbl"><input type="radio" name="sex" value="Female"> Female</label>
+            <label class="rlbl"><input type="radio" name="sex" value="Other"> Other</label>
+          </div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Social Security #</label><input type="text" name="ssn" placeholder="XXX-XX-XXXX" maxlength="11"></div>
+          <div class="fld"><label>Driver's License #</label><input type="text" name="dl" placeholder="License number"></div>
+        </div>
+        <div class="fld" style="margin-top:16px"><label>Street Address</label><input type="text" name="address" placeholder="Street address"></div>
+        <div class="fg fg3" style="margin-top:16px">
+          <div class="fld"><label>City</label><input type="text" name="city" placeholder="City"></div>
+          <div class="fld"><label>State</label><input type="text" name="state" placeholder="FL" maxlength="2"></div>
+          <div class="fld"><label>Zip Code</label><input type="text" name="zip" placeholder="00000" maxlength="10"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Home Phone</label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label>Cell Phone</label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
+        </div>
+        <div class="fld" style="margin-top:16px"><label>Email Address <span class="req">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
+        <div class="fld" style="margin-top:16px">
+          <label>Marital Status</label>
+          <div class="radio-row">
+            <label class="rlbl"><input type="radio" name="marital" value="Single"> Single</label>
+            <label class="rlbl"><input type="radio" name="marital" value="Married"> Married</label>
+            <label class="rlbl"><input type="radio" name="marital" value="Divorced"> Divorced</label>
+            <label class="rlbl"><input type="radio" name="marital" value="Widowed"> Widowed</label>
+          </div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Employer</label><input type="text" name="employer" placeholder="Employer name"></div>
+          <div class="fld"><label>Occupation</label><input type="text" name="occupation" placeholder="Your occupation"></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Emergency Contact</div>
+        <div class="fg fg3">
+          <div class="fld"><label>Contact Name</label><input type="text" name="ec_name" placeholder="Full name"></div>
+          <div class="fld"><label>Relationship</label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc."></div>
+          <div class="fld"><label>Contact Phone</label><input type="tel" name="ec_phone" placeholder="(000) 000-0000"></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Insurance Information</div>
+        <div class="fg fg2">
+          <div class="fld"><label>Primary Insurance Company</label><input type="text" name="ins1" placeholder="Insurance company name"></div>
+          <div class="fld"><label>Policy Holder Name</label><input type="text" name="ph_name" placeholder="Policy holder full name"></div>
+        </div>
+        <div class="fg fg3" style="margin-top:16px">
+          <div class="fld"><label>Relationship to Patient</label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc."></div>
+          <div class="fld"><label>Member ID #</label><input type="text" name="member_id" placeholder="Member ID"></div>
+          <div class="fld"><label>Group #</label><input type="text" name="group_num" placeholder="Group number"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Secondary Insurance (if any)</label><input type="text" name="ins2" placeholder="Secondary insurance"></div>
+          <div class="fld"><label>Secondary Member ID #</label><input type="text" name="member_id2" placeholder="Secondary member ID"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Primary Care Provider (PCP)</label><input type="text" name="pcp" placeholder="PCP name"></div>
+          <div class="fld"><label>Referring Provider</label><input type="text" name="ref_prov" placeholder="Referring provider name"></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Preferred Pharmacy</div>
+        <div class="fg fg3">
+          <div class="fld"><label>Pharmacy Name</label><input type="text" name="pharm_name" placeholder="Pharmacy name"></div>
+          <div class="fld"><label>Pharmacy Address</label><input type="text" name="pharm_addr" placeholder="Pharmacy address"></div>
+          <div class="fld"><label>Pharmacy Phone</label><input type="tel" name="pharm_phone" placeholder="(000) 000-0000"></div>
+        </div>
+      </div>
+
+      <div class="form-nav">
+        <span></span>
+        <button class="btn-nxt" onclick="goStep(2)">Next: Consent to Treat &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Consent to Treat -->
+    <div class="fstep" id="fstep2">
+      <h2 class="fstep-ttl">Consent to Treat</h2>
+      <p class="fstep-sub">Please read carefully and sign below.</p>
+      <div class="policy-box">
+        <h4>Consent to Treatment</h4>
+        <p>I hereby consent to and authorize West Coast Sleep Clinic and its physicians, nurses, and medical staff to provide medical evaluation, diagnosis, and treatment that they deem appropriate for my care. I understand that the practice of medicine is not an exact science, and that no guarantees or assurances have been made regarding the outcome of any treatment or procedure.</p>
+        <p>I consent to physical examinations, diagnostic tests (including blood draws, sleep studies, imaging, and other procedures), medical treatments, and the administration of medications as deemed necessary by the treating physician.</p>
+        <p>I understand that I may refuse any treatment or procedure at any time, and that I have the right to ask questions about any recommended treatment before consenting to it. I have the right to be informed about my diagnosis, the nature and purpose of any proposed treatment, the risks and benefits, and any alternative treatments available.</p>
+        <p>I acknowledge that I have received and reviewed the Notice of Privacy Practices describing how my protected health information may be used and disclosed. I authorize West Coast Sleep Clinic to use my health information as described in that notice.</p>
+        <p>I authorize West Coast Sleep Clinic to bill my insurance company or other third-party payer on my behalf for services rendered. I understand that I am ultimately responsible for any charges not covered by my insurance.</p>
+      </div>
+      <div class="chk-col">
+        <label class="clbl"><input type="checkbox" name="consent_treat" required> I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</label>
+      </div>
+      <div class="sig-row">
+        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig2" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label>Date</label><input type="date" name="date2" required></div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(1)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(3)">Next: Financial Policy &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Financial Policy -->
+    <div class="fstep" id="fstep3">
+      <h2 class="fstep-ttl">Financial Policy</h2>
+      <p class="fstep-sub">Please read our financial policy and acknowledge below.</p>
+      <div class="policy-box">
+        <h4>Patient Financial Policy</h4>
+        <p><strong>Co-pays, Deductibles &amp; Co-insurance:</strong> All co-pays, deductibles, and co-insurance amounts are due at the time of service. We accept cash, check, and major credit/debit cards.</p>
+        <p><strong>Insurance Billing:</strong> We will bill your insurance company as a courtesy. You are responsible for ensuring that we have current and accurate insurance information. If your insurance does not pay within 60 days, the balance will become your responsibility.</p>
+        <p><strong>Non-Covered Services:</strong> Some services may not be covered by your insurance plan. You will be financially responsible for these services. We will make every effort to inform you of potentially non-covered services prior to providing them.</p>
+        <p><strong>Referrals &amp; Prior Authorizations:</strong> If your insurance requires a referral or prior authorization, it is your responsibility to obtain this before your visit. Failure to do so may result in non-payment by your insurance, and you will be responsible for the full balance.</p>
+        <p><strong>Self-Pay Patients:</strong> Payment is due in full at the time of service. Please contact our billing office to discuss payment arrangements if needed.</p>
+        <p><strong>Returned Checks:</strong> A fee of $35.00 will be charged for any returned checks.</p>
+        <p><strong>Delinquent Accounts:</strong> Accounts with an outstanding balance more than 90 days past due may be referred to a collection agency. Collection costs and attorney fees will be added to your balance.</p>
+        <p><strong>Cancellations:</strong> We require 24 hours notice for appointment cancellations. Repeated late cancellations or no-shows may result in a fee.</p>
+      </div>
+      <div class="chk-col">
+        <label class="clbl"><input type="checkbox" name="consent_financial" required> I have read and understand the Financial Policy above, and I agree to abide by its terms.</label>
+      </div>
+      <div class="sig-row">
+        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig3" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label>Date</label><input type="date" name="date3" required></div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(2)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(4)">Next: HIPAA Notice &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: HIPAA Notice -->
+    <div class="fstep" id="fstep4">
+      <h2 class="fstep-ttl">HIPAA Notice of Privacy Practices</h2>
+      <p class="fstep-sub">Your privacy is important to us. Please review our Notice of Privacy Practices.</p>
+      <div class="policy-box">
+        <h4>Notice of Privacy Practices — Acknowledgment</h4>
+        <p>This notice describes how medical information about you may be used and disclosed and how you can get access to this information. Please review it carefully.</p>
+        <p><strong>Our Commitment to Your Privacy:</strong> West Coast Sleep Clinic is dedicated to maintaining the privacy of your protected health information (PHI). We are required by law to maintain the privacy of your PHI and to provide you with this notice regarding our legal duties and privacy practices.</p>
+        <p><strong>How We May Use Your Information:</strong> We may use or disclose your PHI for treatment purposes (such as sharing information with other providers involved in your care), payment purposes (such as billing your insurance company), and healthcare operations (such as quality assessment and improvement activities).</p>
+        <p><strong>Your Rights:</strong> You have the right to:<ul><li>Request a restriction on uses and disclosures of your PHI</li><li>Request confidential communications</li><li>Inspect and copy your PHI</li><li>Request an amendment to your PHI</li><li>Receive an accounting of disclosures</li><li>Receive a copy of this notice</li></ul></p>
+        <p><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer at the contact information on file, or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
+      </div>
+      <div class="chk-col">
+        <label class="clbl"><input type="checkbox" name="consent_hipaa" required> I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</label>
+      </div>
+      <div class="fld" style="margin-top:18px">
+        <label>If you are signing on behalf of the patient, please explain your relationship:</label>
+        <input type="text" name="hipaa_rep" placeholder="Leave blank if signing for yourself">
+      </div>
+      <div class="sig-row">
+        <div class="fld"><label>Patient (or Representative) Signature <span class="req">*</span></label><input type="text" name="sig4" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label>Date</label><input type="date" name="date4" required></div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(3)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(5)">Next: Text &amp; Tele Consent &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Text and Telehealth Consent -->
+    <div class="fstep" id="fstep5">
+      <h2 class="fstep-ttl">Text &amp; Telehealth Consent</h2>
+      <p class="fstep-sub">Please read and agree to the following communication consents.</p>
+      <div class="fsec">
+        <div class="fsec-ttl">Text Message Consent</div>
+        <div class="policy-box">
+          <h4>Consent to Receive Text Messages</h4>
+          <p>By signing below, you consent to receive text messages (SMS) from West Coast Sleep Clinic at the mobile phone number(s) you have provided. These messages may include appointment reminders, health information, billing notifications, and other practice communications.</p>
+          <p><strong>Message and data rates may apply.</strong> Message frequency varies. You may opt out at any time by replying STOP to any text message. Reply HELP for help. Carriers are not liable for delayed or undelivered messages.</p>
+          <p>Text messaging is not a secure form of communication. By consenting, you understand and accept the risk that text messages may be intercepted. Do not send sensitive medical information via text message.</p>
+        </div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="consent_text"> I consent to receive text messages from West Coast Sleep Clinic as described above.</label>
+        </div>
+        <div class="fld" style="margin-top:14px"><label>Best Cell Phone for Texts</label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-ttl">Telehealth Consent</div>
+        <div class="policy-box">
+          <h4>Consent to Telehealth Services</h4>
+          <p>Telehealth involves the use of electronic communications to enable healthcare providers to provide clinical services to patients using interactive audio, video, or data communications. I understand that telehealth services involve the communication of my personal medical information, both orally and visually, to healthcare practitioners located in other areas.</p>
+          <p><strong>Risks &amp; Benefits:</strong> I understand there are potential risks with telehealth including interruptions, unauthorized access, and technical difficulties. I understand that my healthcare provider may determine that the transmitted information is of insufficient quality to make medical or health decisions, and that I may need an in-person visit.</p>
+          <p><strong>Confidentiality:</strong> I understand that the laws that protect the privacy and security of my health information apply to telehealth services. West Coast Sleep Clinic will take steps to ensure my information is secure.</p>
+          <p>I understand I may refuse telehealth services at any time without affecting my right to future care or treatment.</p>
+        </div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="consent_telehealth"> I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</label>
+        </div>
+      </div>
+      <div class="sig-row">
+        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label>Date</label><input type="date" name="date5" required></div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(4)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(6)">Next: Authorization to Release &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Authorization to Release -->
+    <div class="fstep" id="fstep6">
+      <h2 class="fstep-ttl">Authorization to Release Medical Information</h2>
+      <p class="fstep-sub">Complete this form to authorize release of your medical records.</p>
+      <div class="ibox">This authorization allows West Coast Sleep Clinic to release your medical records. You may leave optional fields blank if not applicable. You have the right to revoke this authorization at any time by notifying us in writing.</div>
+      <div class="fsec">
+        <div class="fsec-ttl">Release To</div>
+        <div class="fg fg2">
+          <div class="fld"><label>Name or Organization <span class="req">*</span></label><input type="text" name="rel_to" placeholder="Name or organization receiving records" required></div>
+          <div class="fld"><label>Phone / Fax</label><input type="tel" name="rel_phone" placeholder="(000) 000-0000"></div>
+        </div>
+        <div class="fld" style="margin-top:16px"><label>Address</label><input type="text" name="rel_addr" placeholder="Address"></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-ttl">Information to Release</div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="rel_entire"> Entire Medical Record</label>
+          <label class="clbl"><input type="checkbox" name="rel_notes"> Office Visit Notes / Progress Notes</label>
+          <label class="clbl"><input type="checkbox" name="rel_labs"> Lab Results</label>
+          <label class="clbl"><input type="checkbox" name="rel_imaging"> Imaging / Radiology Reports</label>
+          <label class="clbl"><input type="checkbox" name="rel_sleep"> Sleep Study Reports</label>
+          <label class="clbl"><input type="checkbox" name="rel_rx"> Prescription / Medication History</label>
+          <label class="clbl"><input type="checkbox" name="rel_billing"> Billing Records</label>
+          <label class="clbl"><input type="checkbox" name="rel_other"> Other:</label>
+        </div>
+        <div class="fld" style="margin-top:10px"><label>Other (specify)</label><input type="text" name="rel_other_desc" placeholder="Specify other records"></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-ttl">Details</div>
+        <div class="fg fg2">
+          <div class="fld"><label>Purpose of Release</label><input type="text" name="rel_purpose" placeholder="Continuing care, personal use, etc."></div>
+          <div class="fld"><label>Date Range of Records</label><input type="text" name="rel_dates" placeholder="e.g. All records, or date range"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Authorization Expiration Date</label><input type="date" name="rel_exp"></div>
+          <div class="fld" style="align-self:center;padding-top:22px"><label class="clbl" style="font-size:14px"><input type="checkbox" name="rel_no_exp"> No Expiration (one-year default)</label></div>
+        </div>
+      </div>
+      <div class="chk-col">
+        <label class="clbl"><input type="checkbox" name="consent_release" required> I authorize the release of the medical information described above. I understand I may revoke this authorization at any time in writing. I understand that a photocopy or electronic copy of this authorization is as valid as the original.</label>
+      </div>
+      <div class="sig-row">
+        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig6" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label>Date</label><input type="date" name="date6" required></div>
+      </div>
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(5)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(7)">Next: Questionnaire &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: Questionnaire -->
+    <div class="fstep" id="fstep7">
+      <h2 class="fstep-ttl">Patient Questionnaire</h2>
+      <p class="fstep-sub">This helps our physicians understand your health history and sleep concerns.</p>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Chief Complaint &amp; Sleep History</div>
+        <div class="fld"><label>What is your main reason for visiting today? <span class="req">*</span></label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required></textarea></div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>How many hours of sleep do you get per night?</label><input type="number" name="sleep_hrs" min="0" max="24" step=".5" placeholder="e.g. 6.5"></div>
+          <div class="fld"><label>How long have you had this concern?</label><input type="text" name="concern_duration" placeholder="e.g. 6 months, 2 years"></div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Usual bedtime</label><input type="time" name="bedtime"></div>
+          <div class="fld"><label>Usual wake time</label><input type="time" name="waketime"></div>
+        </div>
+        <div class="fld" style="margin-top:16px">
+          <label>Sleep Symptoms (check all that apply)</label>
+          <div class="chk-col" style="margin-top:8px">
+            <label class="clbl"><input type="checkbox" name="sym_sleep_onset"> Difficulty falling asleep</label>
+            <label class="clbl"><input type="checkbox" name="sym_wake_night"> Waking up frequently during the night</label>
+            <label class="clbl"><input type="checkbox" name="sym_early_wake"> Waking up too early and unable to return to sleep</label>
+            <label class="clbl"><input type="checkbox" name="sym_snore"> Snoring</label>
+            <label class="clbl"><input type="checkbox" name="sym_witnessed"> Witnessed pauses in breathing or gasping</label>
+            <label class="clbl"><input type="checkbox" name="sym_not_refreshed"> Not feeling refreshed after sleep</label>
+            <label class="clbl"><input type="checkbox" name="sym_daytime"> Excessive daytime sleepiness</label>
+            <label class="clbl"><input type="checkbox" name="sym_rls"> Restless legs or uncomfortable leg sensations at night</label>
+            <label class="clbl"><input type="checkbox" name="sym_grind"> Teeth grinding or jaw clenching during sleep</label>
+            <label class="clbl"><input type="checkbox" name="sym_walk"> Sleepwalking or talking in sleep</label>
+          </div>
+        </div>
+        <div class="fg fg2" style="margin-top:16px">
+          <div class="fld"><label>Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="prev_study" value="No"> No</label></div></div>
+          <div class="fld"><label>Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> No</label></div></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Epworth Sleepiness Scale</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:14px">How likely are you to doze off or fall asleep in the following situations?<br><strong>0</strong> = Would never doze &nbsp; <strong>1</strong> = Slight chance &nbsp; <strong>2</strong> = Moderate chance &nbsp; <strong>3</strong> = High chance</p>
+        <div style="overflow-x:auto">
+          <table class="ess-table">
+            <thead><tr><th>Situation</th><th style="text-align:center">0</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th style="text-align:center">3</th></tr></thead>
+            <tbody>
+              <tr><td>Sitting and reading</td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="3"></label></div></td></tr>
+              <tr><td>Watching TV</td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="3"></label></div></td></tr>
+              <tr><td>Sitting inactive in a public place</td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="3"></label></div></td></tr>
+              <tr><td>As a passenger in a car for an hour</td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="3"></label></div></td></tr>
+              <tr><td>Lying down in the afternoon when possible</td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="3"></label></div></td></tr>
+              <tr><td>Sitting and talking to someone</td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="3"></label></div></td></tr>
+              <tr><td>Sitting quietly after lunch (no alcohol)</td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="3"></label></div></td></tr>
+              <tr><td>In a car stopped for a few minutes in traffic</td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="3"></label></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Medical History</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:12px">Check all conditions that apply to you:</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
+          <label class="clbl"><input type="checkbox" name="hx_htn"> High Blood Pressure (Hypertension)</label>
+          <label class="clbl"><input type="checkbox" name="hx_dm"> Diabetes (Type 1 or Type 2)</label>
+          <label class="clbl"><input type="checkbox" name="hx_heart"> Heart Disease / Cardiac Condition</label>
+          <label class="clbl"><input type="checkbox" name="hx_afib"> Atrial Fibrillation (AFib)</label>
+          <label class="clbl"><input type="checkbox" name="hx_stroke"> Stroke or TIA</label>
+          <label class="clbl"><input type="checkbox" name="hx_asthma"> Asthma</label>
+          <label class="clbl"><input type="checkbox" name="hx_copd"> COPD / Emphysema</label>
+          <label class="clbl"><input type="checkbox" name="hx_anxiety"> Anxiety / Panic Disorder</label>
+          <label class="clbl"><input type="checkbox" name="hx_depression"> Depression</label>
+          <label class="clbl"><input type="checkbox" name="hx_thyroid"> Thyroid Disorder</label>
+          <label class="clbl"><input type="checkbox" name="hx_obesity"> Obesity</label>
+          <label class="clbl"><input type="checkbox" name="hx_reflux"> GERD / Acid Reflux</label>
+          <label class="clbl"><input type="checkbox" name="hx_cancer"> Cancer (current or past)</label>
+          <label class="clbl"><input type="checkbox" name="hx_kidney"> Kidney Disease</label>
+          <label class="clbl"><input type="checkbox" name="hx_liver"> Liver Disease</label>
+        </div>
+        <div class="fld" style="margin-top:16px"><label>Other Medical Conditions</label><input type="text" name="hx_other" placeholder="List any other conditions not listed above"></div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Medications &amp; Allergies</div>
+        <div class="fld"><label>Current Medications (include dosages if known)</label><textarea name="medications" placeholder="List all current medications, vitamins, and supplements..."></textarea></div>
+        <div class="fld" style="margin-top:16px"><label>Known Drug Allergies</label><input type="text" name="allergies" placeholder="List any drug allergies or NKDA (No Known Drug Allergies)"></div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Additional Information</div>
+        <div class="fg fg2">
+          <div class="fld"><label>Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;"></div>
+          <div class="fld"><label>Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
+        </div>
+        <div class="fld" style="margin-top:16px"><label>Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(6)">&larr; Back</button>
+        <button class="btn-sub" onclick="submitForms()">Submit Registration &#10003;</button>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+</div><!-- /regFormArea -->
+
+<div id="submitError" style="display:none;max-width:780px;margin:16px auto;padding:14px 20px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:6px;font-size:15px;font-weight:500;"></div>
+
+<!-- Completion page -->
+<div id="donePg" class="done-wrap">
+  <div class="done-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <h2>Registration Complete!</h2>
+  <p>Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
+  <p>We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
+  <p><em>Sleep Better. Feel Better. Live Better.</em></p>
+  <div style="margin-top:36px">
+    <a href="test2.html" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+  </div>
+</div>
+
+<!-- ══════ FOOTER ══════ -->
+<footer>
+  <div class="foot-in">
+    <div class="foot-brand">
+      <span class="f-logo">West Coast Sleep Clinic</span>
+      <span class="f-sub">Largo &nbsp;&middot;&nbsp; Florida</span>
+      <p>A dedicated sleep wellness center serving the Largo, Florida community with expert, compassionate care since 2026.</p>
+      <div class="foot-socials">
+        <a href="" class="foot-social-btn" aria-label="Instagram">
+          <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+            <defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="10%" stop-color="#fdf497"/><stop offset="25%" stop-color="#fd5949"/><stop offset="50%" stop-color="#d6249f"/><stop offset="100%" stop-color="#285aeb"/></radialGradient></defs>
+            <rect x="1" y="1" width="34" height="34" rx="9" ry="9" fill="url(#ig-grad)"/>
+            <rect x="9" y="9" width="18" height="18" rx="5" ry="5" fill="none" stroke="#fff" stroke-width="2"/>
+            <circle cx="18" cy="18" r="4.5" fill="none" stroke="#fff" stroke-width="2"/>
+            <circle cx="24" cy="12" r="1.3" fill="#fff"/>
+          </svg>
+        </a>
+        <a href="" class="foot-social-btn" aria-label="Facebook">
+          <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="34" height="34" rx="9" ry="9" fill="#1877F2"/>
+            <path d="M20.5 18.5h2.8l.5-3H20.5v-1.8c0-.84.41-1.7 1.7-1.7h1.6V9.4s-1.45-.25-2.84-.25c-2.9 0-4.8 1.76-4.8 4.94V15.5H13v3h3.1V27h3.9v-8.5z" fill="#fff"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>&copy; 2026 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Paste your Power Automate HTTP trigger URL here after creating the flow
+var FLOW_URL = 'PASTE_YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL_HERE';
+
+var curStep = 1;
+var totalSteps = 7;
+var stepNames = ['Patient Registration','Consent to Treat','Financial Policy','HIPAA Notice','Text/Tele Consent','Auth to Release','Questionnaire'];
+
+function goStep(n) {
+  document.getElementById('fstep' + curStep).classList.remove('active');
+  curStep = n;
+  document.getElementById('fstep' + curStep).classList.add('active');
+
+  for (var i = 1; i <= totalSteps; i++) {
+    var circ = document.getElementById('sc' + i);
+    var lbl  = document.getElementById('sl' + i);
+    if (!circ || !lbl) continue;
+    circ.className = 'step-circ' + (i === curStep ? ' active' : i < curStep ? ' done' : '');
+    lbl.className  = 'step-lbl'  + (i === curStep ? ' active' : i < curStep ? ' done' : '');
+    if (i < totalSteps) {
+      var conn = document.getElementById('conn' + i);
+      if (conn) conn.className = 'step-conn' + (i < curStep ? ' done' : '');
+    }
+  }
+  document.getElementById('stepProg').textContent = 'Step ' + curStep + ' of ' + totalSteps + ' — ' + stepNames[curStep - 1];
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function val(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? (el.value || '') : '';
+}
+
+function getRadioValue(name) {
+  var el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : '';
+}
+
+function getCheckbox(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? el.checked : false;
+}
+
+function showSubmitError(msg) {
+  var errEl = document.getElementById('submitError');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+  var btn = document.querySelector('.btn-sub');
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration ✓'; }
+}
+
+function showDonePage() {
+  document.getElementById('regFormArea').style.display = 'none';
+  document.querySelector('.stepper').style.display = 'none';
+  document.getElementById('submitError').style.display = 'none';
+  document.getElementById('donePg').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function submitForms() {
+  var btn = document.querySelector('.btn-sub');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
+  var essTotal = 0;
+  for (var i = 1; i <= 8; i++) {
+    var v = parseInt(getRadioValue('ess' + i), 10);
+    if (!isNaN(v)) essTotal += v;
+  }
+
+  var payload = {
+    // Demographics
+    first_name:              val('first_name'),
+    last_name:               val('last_name'),
+    middle_initial:          val('mi'),
+    date_of_birth:           val('dob'),
+    age:                     val('age'),
+    sex:                     getRadioValue('sex'),
+    ssn:                     val('ssn'),
+    drivers_license:         val('dl'),
+    address:                 val('address'),
+    city:                    val('city'),
+    state:                   val('state'),
+    zip:                     val('zip'),
+    home_phone:              val('home_phone'),
+    cell_phone:              val('cell_phone'),
+    email:                   val('email'),
+    marital_status:          getRadioValue('marital'),
+    employer:                val('employer'),
+    occupation:              val('occupation'),
+    // Emergency contact
+    ec_name:                 val('ec_name'),
+    ec_relationship:         val('ec_rel'),
+    ec_phone:                val('ec_phone'),
+    // Insurance
+    primary_insurance:       val('ins1'),
+    policy_holder:           val('ph_name'),
+    ph_relationship:         val('ph_rel'),
+    member_id:               val('member_id'),
+    group_number:            val('group_num'),
+    secondary_insurance:     val('ins2'),
+    secondary_member_id:     val('member_id2'),
+    pcp:                     val('pcp'),
+    referring_provider:      val('ref_prov'),
+    // Pharmacy
+    pharmacy_name:           val('pharm_name'),
+    pharmacy_address:        val('pharm_addr'),
+    pharmacy_phone:          val('pharm_phone'),
+    // Consent to Treat
+    consent_treat:           getCheckbox('consent_treat'),
+    sig_consent_treat:       val('sig2'),
+    date_consent_treat:      val('date2'),
+    // Financial Policy
+    consent_financial:       getCheckbox('consent_financial'),
+    sig_financial:           val('sig3'),
+    date_financial:          val('date3'),
+    // HIPAA
+    consent_hipaa:           getCheckbox('consent_hipaa'),
+    hipaa_representative:    val('hipaa_rep'),
+    sig_hipaa:               val('sig4'),
+    date_hipaa:              val('date4'),
+    // Text / Telehealth Consent
+    consent_text:            getCheckbox('consent_text'),
+    text_phone:              val('text_phone'),
+    consent_telehealth:      getCheckbox('consent_telehealth'),
+    sig_tele:                val('sig5'),
+    date_tele:               val('date5'),
+    // Authorization to Release
+    release_to:              val('rel_to'),
+    release_phone:           val('rel_phone'),
+    release_address:         val('rel_addr'),
+    release_entire_record:   getCheckbox('rel_entire'),
+    release_notes:           getCheckbox('rel_notes'),
+    release_labs:            getCheckbox('rel_labs'),
+    release_imaging:         getCheckbox('rel_imaging'),
+    release_sleep:           getCheckbox('rel_sleep'),
+    release_rx:              getCheckbox('rel_rx'),
+    release_billing:         getCheckbox('rel_billing'),
+    release_other:           getCheckbox('rel_other'),
+    release_other_desc:      val('rel_other_desc'),
+    release_purpose:         val('rel_purpose'),
+    release_date_range:      val('rel_dates'),
+    release_expiration:      val('rel_exp'),
+    release_no_expiration:   getCheckbox('rel_no_exp'),
+    consent_release:         getCheckbox('consent_release'),
+    sig_release:             val('sig6'),
+    date_release:            val('date6'),
+    // Sleep history & symptoms
+    chief_complaint:         val('chief_complaint'),
+    sleep_hours:             val('sleep_hrs'),
+    concern_duration:        val('concern_duration'),
+    bedtime:                 val('bedtime'),
+    wake_time:               val('waketime'),
+    sym_sleep_onset:         getCheckbox('sym_sleep_onset'),
+    sym_wake_night:          getCheckbox('sym_wake_night'),
+    sym_early_wake:          getCheckbox('sym_early_wake'),
+    sym_snore:               getCheckbox('sym_snore'),
+    sym_witnessed:           getCheckbox('sym_witnessed'),
+    sym_not_refreshed:       getCheckbox('sym_not_refreshed'),
+    sym_daytime:             getCheckbox('sym_daytime'),
+    sym_rls:                 getCheckbox('sym_rls'),
+    sym_grind:               getCheckbox('sym_grind'),
+    sym_walk:                getCheckbox('sym_walk'),
+    prev_sleep_study:        getRadioValue('prev_study'),
+    cpap_use:                getRadioValue('cpap_use'),
+    // Epworth Sleepiness Scale
+    ess1:                    getRadioValue('ess1'),
+    ess2:                    getRadioValue('ess2'),
+    ess3:                    getRadioValue('ess3'),
+    ess4:                    getRadioValue('ess4'),
+    ess5:                    getRadioValue('ess5'),
+    ess6:                    getRadioValue('ess6'),
+    ess7:                    getRadioValue('ess7'),
+    ess8:                    getRadioValue('ess8'),
+    ess_total:               essTotal,
+    // Medical history
+    hx_hypertension:         getCheckbox('hx_htn'),
+    hx_diabetes:             getCheckbox('hx_dm'),
+    hx_heart_disease:        getCheckbox('hx_heart'),
+    hx_afib:                 getCheckbox('hx_afib'),
+    hx_stroke:               getCheckbox('hx_stroke'),
+    hx_asthma:               getCheckbox('hx_asthma'),
+    hx_copd:                 getCheckbox('hx_copd'),
+    hx_anxiety:              getCheckbox('hx_anxiety'),
+    hx_depression:           getCheckbox('hx_depression'),
+    hx_thyroid:              getCheckbox('hx_thyroid'),
+    hx_obesity:              getCheckbox('hx_obesity'),
+    hx_reflux:               getCheckbox('hx_reflux'),
+    hx_cancer:               getCheckbox('hx_cancer'),
+    hx_kidney:               getCheckbox('hx_kidney'),
+    hx_liver:                getCheckbox('hx_liver'),
+    hx_other:                val('hx_other'),
+    // Medications & additional
+    medications:             val('medications'),
+    allergies:               val('allergies'),
+    height:                  val('height'),
+    weight:                  val('weight'),
+    comments:                val('comments'),
+    submitted_at:            new Date().toISOString()
+  };
+
+  fetch(FLOW_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) {
+    if (r.ok || r.status === 202) {
+      showDonePage();
+    } else {
+      showSubmitError('Submission failed (status ' + r.status + '). Please call us at 727-472-9112.');
+    }
+  })
+  .catch(function(err) {
+    showSubmitError('Unable to submit. Please call us at 727-472-9112 or try again. (' + err.message + ')');
+  });
+}
+</script>
+</body>
+</html>
