@@ -39,8 +39,8 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 @keyframes heroWave{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .hero-logo{display:block;margin:0 auto;height:500px;width:auto;max-width:92%;object-fit:contain;position:relative;z-index:1}
 @media(max-width:600px){
-  .hero{min-height:420px;padding-bottom:100px}
-  .hero-top-left{top:auto;left:50%;bottom:24px;transform:translateX(-50%);align-items:center;width:90%}
+  .hero{min-height:420px;padding-bottom:120px}
+  .hero-top-left{top:auto;left:0;right:0;bottom:24px;align-items:center;padding:0 20px}
   .hero-logo{height:auto;width:85%;max-height:280px}
 }
 .hero-top-left{position:absolute;top:36px;left:36px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
