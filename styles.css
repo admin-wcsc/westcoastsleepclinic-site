@@ -34,16 +34,13 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
 .mob-phone{display:block;padding:14px 24px 8px;font-size:17px;font-weight:700;color:#2C7DA0;text-decoration:none}
-@media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}.nav-badge{display:inline-flex}.hero-top-left{display:none!important}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
+@media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}.nav-badge{display:inline-flex}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
 
 /* ── HERO ── */
 .hero{background:linear-gradient(90deg,#f7f6f3,#ffffff,#f2ece0,#f7f6f3);background-size:300% 100%;animation:heroWave 8s ease-in-out infinite;color:var(--td);padding:48px 24px 80px;position:relative;overflow:hidden;min-height:520px}
 @keyframes heroWave{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .hero-logo{display:block;margin:0 auto;height:500px;width:auto;max-width:92%;object-fit:contain;position:relative;z-index:1}
-.hero-top-left{position:absolute;top:36px;left:36px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
 .hero-in{max-width:1100px;margin:0 auto;position:relative;z-index:1}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(176,135,84,.18);border:1px solid rgba(176,135,84,.38);border-radius:99px;padding:6px 16px;font-size:13px;font-weight:500;color:#2C7DA0;letter-spacing:.04em;margin-bottom:22px}
-.hero-badge .dot{width:8px;height:8px;background:var(--mg);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5.5vw,76px);font-weight:500;line-height:1.04;color:#2C7DA0;margin-bottom:18px}
 .hero h1 em{font-style:italic;color:var(--gold3)}
@@ -110,6 +107,8 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .ins-check{width:20px;height:20px;background:linear-gradient(135deg,var(--dg),var(--mg));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .ins-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .ins-check-cell{display:flex;align-items:center;gap:10px}
+.ins-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(176,135,84,.18);border:1px solid rgba(176,135,84,.38);border-radius:99px;padding:6px 16px;font-size:13px;font-weight:500;color:#2C7DA0;letter-spacing:.04em;margin-bottom:16px}
+.ins-badge .dot{width:8px;height:8px;background:var(--mg);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
 .ins-note-box{background:linear-gradient(135deg,rgba(29,86,110,.05),rgba(176,135,84,.05));border:1px solid rgba(176,135,84,.22);border-left:4px solid var(--gold3);border-radius:0 10px 10px 0;padding:24px 26px;margin-top:28px}
 .ins-note-box h4{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;color:var(--gold3);margin-bottom:9px}
 .ins-note-box p{font-size:14px;color:var(--tm);line-height:1.72}
