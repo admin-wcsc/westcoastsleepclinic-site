@@ -41,7 +41,14 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .mob-nav.open{display:block}
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08)}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
+.mob-lang-wrap{padding:14px 24px 4px;border-bottom:1px solid rgba(0,0,0,.08)}
 @media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}}
+
+/* ── LANG TOGGLE ── */
+.lang-toggle{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.lang-btn{background:transparent;border:1.5px solid rgba(176,135,84,.45);color:rgba(29,54,78,.6);padding:5px 11px;font-size:11px;font-weight:700;letter-spacing:.08em;border-radius:3px;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
+.lang-btn:hover{border-color:var(--gold3);color:var(--gold3)}
+.lang-btn.active{background:var(--gold);border-color:var(--gold);color:#fff}
 
 /* ── REG HEADER ── */
 .reg-hdr{background:linear-gradient(180deg,var(--dg) 0%,var(--mg) 100%);padding:56px 24px 42px;text-align:center;color:#fff}
@@ -147,44 +154,54 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="registration.html">Patient Registration</a></li>
+        <li><a href="/" data-i18n="nav.home">Home</a></li>
+        <li><a href="registration.html" data-i18n="nav.reg">Patient Registration</a></li>
       </ul>
     </nav>
     <a href="tel:7274729112" class="nav-phone" style="margin-left:auto">&#128222; 727-472-9112</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
+    </div>
     <button class="hamburger" aria-label="Menu" onclick="document.getElementById('mobNav').classList.toggle('open')">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/">Home</a>
-  <a href="registration.html">Patient Registration</a>
+  <a href="/" data-i18n="nav.home">Home</a>
+  <a href="registration.html" data-i18n="nav.reg">Patient Registration</a>
+  <div class="mob-lang-wrap">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnES2" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══════ REG HEADER ══════ -->
 <div class="reg-hdr">
-  <h1>Patient Registration</h1>
-  <p>Please complete all forms below. Use the Next button to proceed through each step.</p>
+  <h1 data-i18n="reg.h2">Patient Registration</h1>
+  <p data-i18n="reg.sub">Please complete all forms below. Use the Next button to proceed through each step.</p>
 </div>
 
 <!-- ══════ STEPPER ══════ -->
 <div class="stepper">
   <div class="stepper-in">
     <div class="step-row">
-      <div class="step-item"><div class="step-circ active" id="sc1">1</div><div class="step-lbl active" id="sl1">Patient Reg</div></div>
+      <div class="step-item"><div class="step-circ active" id="sc1">1</div><div class="step-lbl active" id="sl1" data-i18n="step.1">Patient Reg</div></div>
       <div class="step-conn" id="conn1"></div>
-      <div class="step-item"><div class="step-circ" id="sc2">2</div><div class="step-lbl" id="sl2">Consent to Treat</div></div>
+      <div class="step-item"><div class="step-circ" id="sc2">2</div><div class="step-lbl" id="sl2" data-i18n="step.2">Consent to Treat</div></div>
       <div class="step-conn" id="conn2"></div>
-      <div class="step-item"><div class="step-circ" id="sc3">3</div><div class="step-lbl" id="sl3">Financial Policy</div></div>
+      <div class="step-item"><div class="step-circ" id="sc3">3</div><div class="step-lbl" id="sl3" data-i18n="step.3">Financial Policy</div></div>
       <div class="step-conn" id="conn3"></div>
-      <div class="step-item"><div class="step-circ" id="sc4">4</div><div class="step-lbl" id="sl4">HIPAA Notice</div></div>
+      <div class="step-item"><div class="step-circ" id="sc4">4</div><div class="step-lbl" id="sl4" data-i18n="step.4">HIPAA Notice</div></div>
       <div class="step-conn" id="conn4"></div>
-      <div class="step-item"><div class="step-circ" id="sc5">5</div><div class="step-lbl" id="sl5">Text/Tele Consent</div></div>
+      <div class="step-item"><div class="step-circ" id="sc5">5</div><div class="step-lbl" id="sl5" data-i18n="step.5">Text/Tele Consent</div></div>
       <div class="step-conn" id="conn5"></div>
-      <div class="step-item"><div class="step-circ" id="sc6">6</div><div class="step-lbl" id="sl6">Auth to Release</div></div>
+      <div class="step-item"><div class="step-circ" id="sc6">6</div><div class="step-lbl" id="sl6" data-i18n="step.6">Auth to Release</div></div>
       <div class="step-conn" id="conn6"></div>
-      <div class="step-item"><div class="step-circ" id="sc7">7</div><div class="step-lbl" id="sl7">Questionnaire</div></div>
+      <div class="step-item"><div class="step-circ" id="sc7">7</div><div class="step-lbl" id="sl7" data-i18n="step.7">Questionnaire</div></div>
     </div>
     <div class="step-prog" id="stepProg">Step 1 of 7 — Patient Registration</div>
   </div>
@@ -196,109 +213,109 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
 
     <!-- STEP 1: Patient Registration -->
     <div class="fstep active" id="fstep1">
-      <h2 class="fstep-ttl">Patient Registration</h2>
-      <p class="fstep-sub">Please fill in your personal and insurance information completely.</p>
-      <p class="req-note"><span>*</span> Indicates a required field</p>
+      <h2 class="fstep-ttl" data-i18n="s1.ttl">Patient Registration</h2>
+      <p class="fstep-sub" data-i18n="s1.sub">Please fill in your personal and insurance information completely.</p>
+      <p class="req-note" data-i18n="s1.req"><span>*</span> Indicates a required field</p>
 
       <div class="fsec">
-        <div class="fsec-ttl">Patient Demographics</div>
+        <div class="fsec-ttl" data-i18n="s1.sec.demo">Patient Demographics</div>
         <div class="fg fg3">
-          <div class="fld"><label>First Name <span class="req">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
-          <div class="fld"><label>Last Name <span class="req">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
-          <div class="fld"><label>Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
+          <div class="fld"><label data-i18n="s1.fn">First Name <span class="req">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
+          <div class="fld"><label data-i18n="s1.ln">Last Name <span class="req">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
+          <div class="fld"><label data-i18n="s1.mi">Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Date of Birth <span class="req">*</span></label><input type="date" name="dob" required></div>
-          <div class="fld"><label>Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
+          <div class="fld"><label data-i18n="s1.dob">Date of Birth <span class="req">*</span></label><input type="date" name="dob" required></div>
+          <div class="fld"><label data-i18n="s1.age">Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
         </div>
         <div class="fld" style="margin-top:16px">
-          <label>Sex</label>
+          <label data-i18n="s1.sex">Sex</label>
           <div class="radio-row">
-            <label class="rlbl"><input type="radio" name="sex" value="Male"> Male</label>
-            <label class="rlbl"><input type="radio" name="sex" value="Female"> Female</label>
-            <label class="rlbl"><input type="radio" name="sex" value="Other"> Other</label>
+            <label class="rlbl"><input type="radio" name="sex" value="Male"> <span data-i18n="s1.male">Male</span></label>
+            <label class="rlbl"><input type="radio" name="sex" value="Female"> <span data-i18n="s1.female">Female</span></label>
+            <label class="rlbl"><input type="radio" name="sex" value="Other"> <span data-i18n="s1.other">Other</span></label>
           </div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Social Security #</label><input type="text" name="ssn" placeholder="XXX-XX-XXXX" maxlength="11"></div>
-          <div class="fld"><label>Driver's License #</label><input type="text" name="dl" placeholder="License number"></div>
+          <div class="fld"><label data-i18n="s1.ssn">Social Security #</label><input type="text" name="ssn" placeholder="XXX-XX-XXXX" maxlength="11"></div>
+          <div class="fld"><label data-i18n="s1.dl">Driver's License #</label><input type="text" name="dl" placeholder="License number"></div>
         </div>
-        <div class="fld" style="margin-top:16px"><label>Street Address</label><input type="text" name="address" placeholder="Street address"></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s1.addr">Street Address</label><input type="text" name="address" placeholder="Street address"></div>
         <div class="fg fg3" style="margin-top:16px">
-          <div class="fld"><label>City</label><input type="text" name="city" placeholder="City"></div>
-          <div class="fld"><label>State</label><input type="text" name="state" placeholder="FL" maxlength="2"></div>
-          <div class="fld"><label>Zip Code</label><input type="text" name="zip" placeholder="00000" maxlength="10"></div>
+          <div class="fld"><label data-i18n="s1.city">City</label><input type="text" name="city" placeholder="City"></div>
+          <div class="fld"><label data-i18n="s1.state">State</label><input type="text" name="state" placeholder="FL" maxlength="2"></div>
+          <div class="fld"><label data-i18n="s1.zip">Zip Code</label><input type="text" name="zip" placeholder="00000" maxlength="10"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Home Phone</label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
-          <div class="fld"><label>Cell Phone</label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label data-i18n="s1.hphone">Home Phone</label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label data-i18n="s1.cphone">Cell Phone</label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
         </div>
-        <div class="fld" style="margin-top:16px"><label>Email Address <span class="req">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s1.email">Email Address <span class="req">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
         <div class="fld" style="margin-top:16px">
-          <label>Marital Status</label>
+          <label data-i18n="s1.marital">Marital Status</label>
           <div class="radio-row">
-            <label class="rlbl"><input type="radio" name="marital" value="Single"> Single</label>
-            <label class="rlbl"><input type="radio" name="marital" value="Married"> Married</label>
-            <label class="rlbl"><input type="radio" name="marital" value="Divorced"> Divorced</label>
-            <label class="rlbl"><input type="radio" name="marital" value="Widowed"> Widowed</label>
+            <label class="rlbl"><input type="radio" name="marital" value="Single"> <span data-i18n="s1.single">Single</span></label>
+            <label class="rlbl"><input type="radio" name="marital" value="Married"> <span data-i18n="s1.married">Married</span></label>
+            <label class="rlbl"><input type="radio" name="marital" value="Divorced"> <span data-i18n="s1.divorced">Divorced</span></label>
+            <label class="rlbl"><input type="radio" name="marital" value="Widowed"> <span data-i18n="s1.widowed">Widowed</span></label>
           </div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Employer</label><input type="text" name="employer" placeholder="Employer name"></div>
-          <div class="fld"><label>Occupation</label><input type="text" name="occupation" placeholder="Your occupation"></div>
+          <div class="fld"><label data-i18n="s1.employer">Employer</label><input type="text" name="employer" placeholder="Employer name"></div>
+          <div class="fld"><label data-i18n="s1.occ">Occupation</label><input type="text" name="occupation" placeholder="Your occupation"></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Emergency Contact</div>
+        <div class="fsec-ttl" data-i18n="s1.sec.ec">Emergency Contact</div>
         <div class="fg fg3">
-          <div class="fld"><label>Contact Name</label><input type="text" name="ec_name" placeholder="Full name"></div>
-          <div class="fld"><label>Relationship</label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc."></div>
-          <div class="fld"><label>Contact Phone</label><input type="tel" name="ec_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label data-i18n="s1.ec.name">Contact Name</label><input type="text" name="ec_name" placeholder="Full name"></div>
+          <div class="fld"><label data-i18n="s1.ec.rel">Relationship</label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc."></div>
+          <div class="fld"><label data-i18n="s1.ec.phone">Contact Phone</label><input type="tel" name="ec_phone" placeholder="(000) 000-0000"></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Insurance Information</div>
+        <div class="fsec-ttl" data-i18n="s1.sec.ins">Insurance Information</div>
         <div class="fg fg2">
-          <div class="fld"><label>Primary Insurance Company</label><input type="text" name="ins1" placeholder="Insurance company name"></div>
-          <div class="fld"><label>Policy Holder Name</label><input type="text" name="ph_name" placeholder="Policy holder full name"></div>
+          <div class="fld"><label data-i18n="s1.ins1">Primary Insurance Company</label><input type="text" name="ins1" placeholder="Insurance company name"></div>
+          <div class="fld"><label data-i18n="s1.ph.name">Policy Holder Name</label><input type="text" name="ph_name" placeholder="Policy holder full name"></div>
         </div>
         <div class="fg fg3" style="margin-top:16px">
-          <div class="fld"><label>Relationship to Patient</label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc."></div>
-          <div class="fld"><label>Member ID #</label><input type="text" name="member_id" placeholder="Member ID"></div>
-          <div class="fld"><label>Group #</label><input type="text" name="group_num" placeholder="Group number"></div>
+          <div class="fld"><label data-i18n="s1.ph.rel">Relationship to Patient</label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc."></div>
+          <div class="fld"><label data-i18n="s1.member_id">Member ID #</label><input type="text" name="member_id" placeholder="Member ID"></div>
+          <div class="fld"><label data-i18n="s1.group">Group #</label><input type="text" name="group_num" placeholder="Group number"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Secondary Insurance (if any)</label><input type="text" name="ins2" placeholder="Secondary insurance"></div>
-          <div class="fld"><label>Secondary Member ID #</label><input type="text" name="member_id2" placeholder="Secondary member ID"></div>
+          <div class="fld"><label data-i18n="s1.ins2">Secondary Insurance (if any)</label><input type="text" name="ins2" placeholder="Secondary insurance"></div>
+          <div class="fld"><label data-i18n="s1.member_id2">Secondary Member ID #</label><input type="text" name="member_id2" placeholder="Secondary member ID"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Primary Care Provider (PCP)</label><input type="text" name="pcp" placeholder="PCP name"></div>
-          <div class="fld"><label>Referring Provider</label><input type="text" name="ref_prov" placeholder="Referring provider name"></div>
+          <div class="fld"><label data-i18n="s1.pcp">Primary Care Provider (PCP)</label><input type="text" name="pcp" placeholder="PCP name"></div>
+          <div class="fld"><label data-i18n="s1.ref">Referring Provider</label><input type="text" name="ref_prov" placeholder="Referring provider name"></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Preferred Pharmacy</div>
+        <div class="fsec-ttl" data-i18n="s1.sec.pharm">Preferred Pharmacy</div>
         <div class="fg fg3">
-          <div class="fld"><label>Pharmacy Name</label><input type="text" name="pharm_name" placeholder="Pharmacy name"></div>
-          <div class="fld"><label>Pharmacy Address</label><input type="text" name="pharm_addr" placeholder="Pharmacy address"></div>
-          <div class="fld"><label>Pharmacy Phone</label><input type="tel" name="pharm_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label data-i18n="s1.pharm.name">Pharmacy Name</label><input type="text" name="pharm_name" placeholder="Pharmacy name"></div>
+          <div class="fld"><label data-i18n="s1.pharm.addr">Pharmacy Address</label><input type="text" name="pharm_addr" placeholder="Pharmacy address"></div>
+          <div class="fld"><label data-i18n="s1.pharm.phone">Pharmacy Phone</label><input type="tel" name="pharm_phone" placeholder="(000) 000-0000"></div>
         </div>
       </div>
 
       <div class="form-nav">
         <span></span>
-        <button class="btn-nxt" onclick="goStep(2)">Next: Consent to Treat &rarr;</button>
+        <button class="btn-nxt" onclick="goStep(2)" data-i18n="s1.next">Next: Consent to Treat &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 2: Consent to Treat -->
     <div class="fstep" id="fstep2">
-      <h2 class="fstep-ttl">Consent to Treat</h2>
-      <p class="fstep-sub">Please read carefully and sign below.</p>
-      <div class="policy-box">
+      <h2 class="fstep-ttl" data-i18n="s2.ttl">Consent to Treat</h2>
+      <p class="fstep-sub" data-i18n="s2.sub">Please read carefully and sign below.</p>
+      <div class="policy-box" data-i18n="s2.policy">
         <h4>Consent to Treatment</h4>
         <p>I hereby consent to and authorize West Coast Sleep Clinic and its physicians, nurses, and medical staff to provide medical evaluation, diagnosis, and treatment that they deem appropriate for my care. I understand that the practice of medicine is not an exact science, and that no guarantees or assurances have been made regarding the outcome of any treatment or procedure.</p>
         <p>I consent to physical examinations, diagnostic tests (including blood draws, sleep studies, imaging, and other procedures), medical treatments, and the administration of medications as deemed necessary by the treating physician.</p>
@@ -307,95 +324,94 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
         <p>I authorize West Coast Sleep Clinic to bill my insurance company or other third-party payer on my behalf for services rendered. I understand that I am ultimately responsible for any charges not covered by my insurance.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_treat" required> I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</label>
+        <label class="clbl"><input type="checkbox" name="consent_treat" required> <span data-i18n="s2.chk">I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span></label>
       </div>
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig2" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label>Date</label><input type="date" name="date2" required></div>
+        <div class="fld"><label data-i18n="s2.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig2" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s2.date">Date</label><input type="date" name="date2" required></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(1)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(3)">Next: Financial Policy &rarr;</button>
+        <button class="btn-back" onclick="goStep(1)" data-i18n="s2.back">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(3)" data-i18n="s2.next">Next: Financial Policy &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 3: Financial Policy -->
     <div class="fstep" id="fstep3">
-      <h2 class="fstep-ttl">Financial Policy</h2>
-      <p class="fstep-sub">Please read our financial policy and acknowledge below.</p>
-      <div class="policy-box">
+      <h2 class="fstep-ttl" data-i18n="s3.ttl">Financial Policy</h2>
+      <p class="fstep-sub" data-i18n="s3.sub">Please read our financial policy and acknowledge below.</p>
+      <div class="policy-box" data-i18n="s3.policy">
         <h4>Patient Financial Policy</h4>
         <p><strong>Co-pays, Deductibles &amp; Co-insurance:</strong> All co-pays, deductibles, and co-insurance amounts are due at the time of service. We accept cash, check, and major credit/debit cards.</p>
         <p><strong>Insurance Billing:</strong> We will bill your insurance company as a courtesy. You are responsible for ensuring that we have current and accurate insurance information. If your insurance does not pay within 60 days, the balance will become your responsibility.</p>
-        <p><strong>Non-Covered Services:</strong> Some services may not be covered by your insurance plan. You will be financially responsible for these services. We will make every effort to inform you of potentially non-covered services prior to providing them.</p>
+        <p><strong>Non-Covered Services:</strong> Some services may not be covered by your insurance plan. You will be financially responsible for these services.</p>
         <p><strong>Referrals &amp; Prior Authorizations:</strong> If your insurance requires a referral or prior authorization, it is your responsibility to obtain this before your visit. Failure to do so may result in non-payment by your insurance, and you will be responsible for the full balance.</p>
         <p><strong>Self-Pay Patients:</strong> Payment is due in full at the time of service. Please contact our billing office to discuss payment arrangements if needed.</p>
         <p><strong>Returned Checks:</strong> A fee of $35.00 will be charged for any returned checks.</p>
-        <p><strong>Delinquent Accounts:</strong> Accounts with an outstanding balance more than 90 days past due may be referred to a collection agency. Collection costs and attorney fees will be added to your balance.</p>
         <p><strong>Cancellations:</strong> We require 24 hours notice for appointment cancellations. Repeated late cancellations or no-shows may result in a fee.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_financial" required> I have read and understand the Financial Policy above, and I agree to abide by its terms.</label>
+        <label class="clbl"><input type="checkbox" name="consent_financial" required> <span data-i18n="s3.chk">I have read and understand the Financial Policy above, and I agree to abide by its terms.</span></label>
       </div>
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig3" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label>Date</label><input type="date" name="date3" required></div>
+        <div class="fld"><label data-i18n="s3.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig3" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s3.date">Date</label><input type="date" name="date3" required></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(2)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(4)">Next: HIPAA Notice &rarr;</button>
+        <button class="btn-back" onclick="goStep(2)" data-i18n="s3.back">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(4)" data-i18n="s3.next">Next: HIPAA Notice &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 4: HIPAA Notice -->
     <div class="fstep" id="fstep4">
-      <h2 class="fstep-ttl">HIPAA Notice of Privacy Practices</h2>
-      <p class="fstep-sub">Your privacy is important to us. Please review our Notice of Privacy Practices.</p>
-      <div class="policy-box">
+      <h2 class="fstep-ttl" data-i18n="s4.ttl">HIPAA Notice of Privacy Practices</h2>
+      <p class="fstep-sub" data-i18n="s4.sub">Your privacy is important to us. Please review our Notice of Privacy Practices.</p>
+      <div class="policy-box" data-i18n="s4.policy">
         <h4>Notice of Privacy Practices — Acknowledgment</h4>
         <p>This notice describes how medical information about you may be used and disclosed and how you can get access to this information. Please review it carefully.</p>
         <p><strong>Our Commitment to Your Privacy:</strong> West Coast Sleep Clinic is dedicated to maintaining the privacy of your protected health information (PHI). We are required by law to maintain the privacy of your PHI and to provide you with this notice regarding our legal duties and privacy practices.</p>
         <p><strong>How We May Use Your Information:</strong> We may use or disclose your PHI for treatment purposes (such as sharing information with other providers involved in your care), payment purposes (such as billing your insurance company), and healthcare operations (such as quality assessment and improvement activities).</p>
         <p><strong>Your Rights:</strong> You have the right to:<ul><li>Request a restriction on uses and disclosures of your PHI</li><li>Request confidential communications</li><li>Inspect and copy your PHI</li><li>Request an amendment to your PHI</li><li>Receive an accounting of disclosures</li><li>Receive a copy of this notice</li></ul></p>
-        <p><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer at the contact information on file, or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
+        <p><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_hipaa" required> I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</label>
+        <label class="clbl"><input type="checkbox" name="consent_hipaa" required> <span data-i18n="s4.chk">I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</span></label>
       </div>
       <div class="fld" style="margin-top:18px">
-        <label>If you are signing on behalf of the patient, please explain your relationship:</label>
+        <label data-i18n="s4.rep">If you are signing on behalf of the patient, please explain your relationship:</label>
         <input type="text" name="hipaa_rep" placeholder="Leave blank if signing for yourself">
       </div>
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Representative) Signature <span class="req">*</span></label><input type="text" name="sig4" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label>Date</label><input type="date" name="date4" required></div>
+        <div class="fld"><label data-i18n="s4.sig">Patient (or Representative) Signature <span class="req">*</span></label><input type="text" name="sig4" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s4.date">Date</label><input type="date" name="date4" required></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(3)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(5)">Next: Text &amp; Tele Consent &rarr;</button>
+        <button class="btn-back" onclick="goStep(3)" data-i18n="s4.back">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(5)" data-i18n="s4.next">Next: Text &amp; Tele Consent &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 5: Text and Telehealth Consent -->
     <div class="fstep" id="fstep5">
-      <h2 class="fstep-ttl">Text &amp; Telehealth Consent</h2>
-      <p class="fstep-sub">Please read and agree to the following communication consents.</p>
+      <h2 class="fstep-ttl" data-i18n="s5.ttl">Text &amp; Telehealth Consent</h2>
+      <p class="fstep-sub" data-i18n="s5.sub">Please read and agree to the following communication consents.</p>
       <div class="fsec">
-        <div class="fsec-ttl">Text Message Consent</div>
-        <div class="policy-box">
+        <div class="fsec-ttl" data-i18n="s5.txt.sec">Text Message Consent</div>
+        <div class="policy-box" data-i18n="s5.txt.policy">
           <h4>Consent to Receive Text Messages</h4>
           <p>By signing below, you consent to receive text messages (SMS) from West Coast Sleep Clinic at the mobile phone number(s) you have provided. These messages may include appointment reminders, health information, billing notifications, and other practice communications.</p>
           <p><strong>Message and data rates may apply.</strong> Message frequency varies. You may opt out at any time by replying STOP to any text message. Reply HELP for help. Carriers are not liable for delayed or undelivered messages.</p>
           <p>Text messaging is not a secure form of communication. By consenting, you understand and accept the risk that text messages may be intercepted. Do not send sensitive medical information via text message.</p>
         </div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="consent_text"> I consent to receive text messages from West Coast Sleep Clinic as described above.</label>
+          <label class="clbl"><input type="checkbox" name="consent_text"> <span data-i18n="s5.txt.chk">I consent to receive text messages from West Coast Sleep Clinic as described above.</span></label>
         </div>
-        <div class="fld" style="margin-top:14px"><label>Best Cell Phone for Texts</label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
+        <div class="fld" style="margin-top:14px"><label data-i18n="s5.txt.phone">Best Cell Phone for Texts</label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
       </div>
       <div class="fsec">
-        <div class="fsec-ttl">Telehealth Consent</div>
-        <div class="policy-box">
+        <div class="fsec-ttl" data-i18n="s5.tele.sec">Telehealth Consent</div>
+        <div class="policy-box" data-i18n="s5.tele.policy">
           <h4>Consent to Telehealth Services</h4>
           <p>Telehealth involves the use of electronic communications to enable healthcare providers to provide clinical services to patients using interactive audio, video, or data communications. I understand that telehealth services involve the communication of my personal medical information, both orally and visually, to healthcare practitioners located in other areas.</p>
           <p><strong>Risks &amp; Benefits:</strong> I understand there are potential risks with telehealth including interruptions, unauthorized access, and technical difficulties. I understand that my healthcare provider may determine that the transmitted information is of insufficient quality to make medical or health decisions, and that I may need an in-person visit.</p>
@@ -403,168 +419,168 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
           <p>I understand I may refuse telehealth services at any time without affecting my right to future care or treatment.</p>
         </div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="consent_telehealth"> I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</label>
+          <label class="clbl"><input type="checkbox" name="consent_telehealth"> <span data-i18n="s5.tele.chk">I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</span></label>
         </div>
       </div>
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label>Date</label><input type="date" name="date5" required></div>
+        <div class="fld"><label data-i18n="s5.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s5.date">Date</label><input type="date" name="date5" required></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(4)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(6)">Next: Authorization to Release &rarr;</button>
+        <button class="btn-back" onclick="goStep(4)" data-i18n="s5.back">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(6)" data-i18n="s5.next">Next: Authorization to Release &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 6: Authorization to Release -->
     <div class="fstep" id="fstep6">
-      <h2 class="fstep-ttl">Authorization to Release Medical Information</h2>
-      <p class="fstep-sub">Complete this form to authorize release of your medical records.</p>
-      <div class="ibox">This authorization allows West Coast Sleep Clinic to release your medical records. You may leave optional fields blank if not applicable. You have the right to revoke this authorization at any time by notifying us in writing.</div>
+      <h2 class="fstep-ttl" data-i18n="s6.ttl">Authorization to Release Medical Information</h2>
+      <p class="fstep-sub" data-i18n="s6.sub">Complete this form to authorize release of your medical records.</p>
+      <div class="ibox" data-i18n="s6.ibox">This authorization allows West Coast Sleep Clinic to release your medical records. You may leave optional fields blank if not applicable. You have the right to revoke this authorization at any time by notifying us in writing.</div>
       <div class="fsec">
-        <div class="fsec-ttl">Release To</div>
+        <div class="fsec-ttl" data-i18n="s6.rel.sec">Release To</div>
         <div class="fg fg2">
-          <div class="fld"><label>Name or Organization <span class="req">*</span></label><input type="text" name="rel_to" placeholder="Name or organization receiving records" required></div>
-          <div class="fld"><label>Phone / Fax</label><input type="tel" name="rel_phone" placeholder="(000) 000-0000"></div>
+          <div class="fld"><label data-i18n="s6.rel.to">Name or Organization <span class="req">*</span></label><input type="text" name="rel_to" placeholder="Name or organization receiving records" required></div>
+          <div class="fld"><label data-i18n="s6.rel.phone">Phone / Fax</label><input type="tel" name="rel_phone" placeholder="(000) 000-0000"></div>
         </div>
-        <div class="fld" style="margin-top:16px"><label>Address</label><input type="text" name="rel_addr" placeholder="Address"></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s6.rel.addr">Address</label><input type="text" name="rel_addr" placeholder="Address"></div>
       </div>
       <div class="fsec">
-        <div class="fsec-ttl">Information to Release</div>
+        <div class="fsec-ttl" data-i18n="s6.info.sec">Information to Release</div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="rel_entire"> Entire Medical Record</label>
-          <label class="clbl"><input type="checkbox" name="rel_notes"> Office Visit Notes / Progress Notes</label>
-          <label class="clbl"><input type="checkbox" name="rel_labs"> Lab Results</label>
-          <label class="clbl"><input type="checkbox" name="rel_imaging"> Imaging / Radiology Reports</label>
-          <label class="clbl"><input type="checkbox" name="rel_sleep"> Sleep Study Reports</label>
-          <label class="clbl"><input type="checkbox" name="rel_rx"> Prescription / Medication History</label>
-          <label class="clbl"><input type="checkbox" name="rel_billing"> Billing Records</label>
-          <label class="clbl"><input type="checkbox" name="rel_other"> Other:</label>
+          <label class="clbl"><input type="checkbox" name="rel_entire"> <span data-i18n="s6.entire">Entire Medical Record</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_notes"> <span data-i18n="s6.notes">Office Visit Notes / Progress Notes</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_labs"> <span data-i18n="s6.labs">Lab Results</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_imaging"> <span data-i18n="s6.imaging">Imaging / Radiology Reports</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_sleep"> <span data-i18n="s6.sleep">Sleep Study Reports</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_rx"> <span data-i18n="s6.rx">Prescription / Medication History</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_billing"> <span data-i18n="s6.billing">Billing Records</span></label>
+          <label class="clbl"><input type="checkbox" name="rel_other"> <span data-i18n="s6.other_chk">Other:</span></label>
         </div>
-        <div class="fld" style="margin-top:10px"><label>Other (specify)</label><input type="text" name="rel_other_desc" placeholder="Specify other records"></div>
+        <div class="fld" style="margin-top:10px"><label data-i18n="s6.other_spec">Other (specify)</label><input type="text" name="rel_other_desc" placeholder="Specify other records"></div>
       </div>
       <div class="fsec">
-        <div class="fsec-ttl">Details</div>
+        <div class="fsec-ttl" data-i18n="s6.det.sec">Details</div>
         <div class="fg fg2">
-          <div class="fld"><label>Purpose of Release</label><input type="text" name="rel_purpose" placeholder="Continuing care, personal use, etc."></div>
-          <div class="fld"><label>Date Range of Records</label><input type="text" name="rel_dates" placeholder="e.g. All records, or date range"></div>
+          <div class="fld"><label data-i18n="s6.purpose">Purpose of Release</label><input type="text" name="rel_purpose" placeholder="Continuing care, personal use, etc."></div>
+          <div class="fld"><label data-i18n="s6.dates">Date Range of Records</label><input type="text" name="rel_dates" placeholder="e.g. All records, or date range"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Authorization Expiration Date</label><input type="date" name="rel_exp"></div>
-          <div class="fld" style="align-self:center;padding-top:22px"><label class="clbl" style="font-size:14px"><input type="checkbox" name="rel_no_exp"> No Expiration (one-year default)</label></div>
+          <div class="fld"><label data-i18n="s6.exp">Authorization Expiration Date</label><input type="date" name="rel_exp"></div>
+          <div class="fld" style="align-self:center;padding-top:22px"><label class="clbl" style="font-size:14px"><input type="checkbox" name="rel_no_exp"> <span data-i18n="s6.no_exp">No Expiration (one-year default)</span></label></div>
         </div>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_release" required> I authorize the release of the medical information described above. I understand I may revoke this authorization at any time in writing. I understand that a photocopy or electronic copy of this authorization is as valid as the original.</label>
+        <label class="clbl"><input type="checkbox" name="consent_release" required> <span data-i18n="s6.chk">I authorize the release of the medical information described above. I understand I may revoke this authorization at any time in writing. I understand that a photocopy or electronic copy of this authorization is as valid as the original.</span></label>
       </div>
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig6" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label>Date</label><input type="date" name="date6" required></div>
+        <div class="fld"><label data-i18n="s6.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig6" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s6.date">Date</label><input type="date" name="date6" required></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(5)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(7)">Next: Questionnaire &rarr;</button>
+        <button class="btn-back" onclick="goStep(5)" data-i18n="s6.back">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(7)" data-i18n="s6.next">Next: Questionnaire &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 7: Questionnaire -->
     <div class="fstep" id="fstep7">
-      <h2 class="fstep-ttl">Patient Questionnaire</h2>
-      <p class="fstep-sub">This helps our physicians understand your health history and sleep concerns.</p>
+      <h2 class="fstep-ttl" data-i18n="s7.ttl">Patient Questionnaire</h2>
+      <p class="fstep-sub" data-i18n="s7.sub">This helps our physicians understand your health history and sleep concerns.</p>
 
       <div class="fsec">
-        <div class="fsec-ttl">Chief Complaint &amp; Sleep History</div>
-        <div class="fld"><label>What is your main reason for visiting today? <span class="req">*</span></label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required></textarea></div>
+        <div class="fsec-ttl" data-i18n="s7.cc.sec">Chief Complaint &amp; Sleep History</div>
+        <div class="fld"><label data-i18n="s7.cc.label">What is your main reason for visiting today?</label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required></textarea></div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>How many hours of sleep do you get per night?</label><input type="number" name="sleep_hrs" min="0" max="24" step=".5" placeholder="e.g. 6.5"></div>
-          <div class="fld"><label>How long have you had this concern?</label><input type="text" name="concern_duration" placeholder="e.g. 6 months, 2 years"></div>
+          <div class="fld"><label data-i18n="s7.hrs.label">How many hours of sleep do you get per night?</label><input type="number" name="sleep_hrs" min="0" max="24" step=".5" placeholder="e.g. 6.5"></div>
+          <div class="fld"><label data-i18n="s7.dur.label">How long have you had this concern?</label><input type="text" name="concern_duration" placeholder="e.g. 6 months, 2 years"></div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Usual bedtime</label><input type="time" name="bedtime"></div>
-          <div class="fld"><label>Usual wake time</label><input type="time" name="waketime"></div>
+          <div class="fld"><label data-i18n="s7.bed.label">Usual bedtime</label><input type="time" name="bedtime"></div>
+          <div class="fld"><label data-i18n="s7.wake.label">Usual wake time</label><input type="time" name="waketime"></div>
         </div>
         <div class="fld" style="margin-top:16px">
-          <label>Sleep Symptoms (check all that apply)</label>
+          <label data-i18n="s7.sym.label">Sleep Symptoms (check all that apply)</label>
           <div class="chk-col" style="margin-top:8px">
-            <label class="clbl"><input type="checkbox" name="sym_sleep_onset"> Difficulty falling asleep</label>
-            <label class="clbl"><input type="checkbox" name="sym_wake_night"> Waking up frequently during the night</label>
-            <label class="clbl"><input type="checkbox" name="sym_early_wake"> Waking up too early and unable to return to sleep</label>
-            <label class="clbl"><input type="checkbox" name="sym_snore"> Snoring</label>
-            <label class="clbl"><input type="checkbox" name="sym_witnessed"> Witnessed pauses in breathing or gasping</label>
-            <label class="clbl"><input type="checkbox" name="sym_not_refreshed"> Not feeling refreshed after sleep</label>
-            <label class="clbl"><input type="checkbox" name="sym_daytime"> Excessive daytime sleepiness</label>
-            <label class="clbl"><input type="checkbox" name="sym_rls"> Restless legs or uncomfortable leg sensations at night</label>
-            <label class="clbl"><input type="checkbox" name="sym_grind"> Teeth grinding or jaw clenching during sleep</label>
-            <label class="clbl"><input type="checkbox" name="sym_walk"> Sleepwalking or talking in sleep</label>
+            <label class="clbl"><input type="checkbox" name="sym_sleep_onset"> <span data-i18n="s7.sym1">Difficulty falling asleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_wake_night"> <span data-i18n="s7.sym2">Waking up frequently during the night</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_early_wake"> <span data-i18n="s7.sym3">Waking up too early and unable to return to sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_snore"> <span data-i18n="s7.sym4">Snoring</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_witnessed"> <span data-i18n="s7.sym5">Witnessed pauses in breathing or gasping</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_not_refreshed"> <span data-i18n="s7.sym6">Not feeling refreshed after sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_daytime"> <span data-i18n="s7.sym7">Excessive daytime sleepiness</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_rls"> <span data-i18n="s7.sym8">Restless legs or uncomfortable leg sensations at night</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_grind"> <span data-i18n="s7.sym9">Teeth grinding or jaw clenching during sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_walk"> <span data-i18n="s7.sym10">Sleepwalking or talking in sleep</span></label>
           </div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label>Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="prev_study" value="No"> No</label></div></div>
-          <div class="fld"><label>Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> No</label></div></div>
+          <div class="fld"><label data-i18n="s7.prev.label">Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="prev_study" value="No"> No</label></div></div>
+          <div class="fld"><label data-i18n="s7.cpap.label">Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> No</label></div></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Epworth Sleepiness Scale</div>
-        <p style="font-size:14px;color:var(--tl);margin-bottom:14px">How likely are you to doze off or fall asleep in the following situations?<br><strong>0</strong> = Would never doze &nbsp; <strong>1</strong> = Slight chance &nbsp; <strong>2</strong> = Moderate chance &nbsp; <strong>3</strong> = High chance</p>
+        <div class="fsec-ttl" data-i18n="s7.ess.sec">Epworth Sleepiness Scale</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:14px" data-i18n="s7.ess.intro">How likely are you to doze off or fall asleep in the following situations?<br><strong>0</strong> = Would never doze &nbsp; <strong>1</strong> = Slight chance &nbsp; <strong>2</strong> = Moderate chance &nbsp; <strong>3</strong> = High chance</p>
         <div style="overflow-x:auto">
           <table class="ess-table">
-            <thead><tr><th>Situation</th><th style="text-align:center">0</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th style="text-align:center">3</th></tr></thead>
+            <thead><tr><th data-i18n="s7.ess.sit">Situation</th><th style="text-align:center">0</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th style="text-align:center">3</th></tr></thead>
             <tbody>
-              <tr><td>Sitting and reading</td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="3"></label></div></td></tr>
-              <tr><td>Watching TV</td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="3"></label></div></td></tr>
-              <tr><td>Sitting inactive in a public place</td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="3"></label></div></td></tr>
-              <tr><td>As a passenger in a car for an hour</td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="3"></label></div></td></tr>
-              <tr><td>Lying down in the afternoon when possible</td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="3"></label></div></td></tr>
-              <tr><td>Sitting and talking to someone</td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="3"></label></div></td></tr>
-              <tr><td>Sitting quietly after lunch (no alcohol)</td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="3"></label></div></td></tr>
-              <tr><td>In a car stopped for a few minutes in traffic</td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess1">Sitting and reading</td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess2">Watching TV</td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess3">Sitting inactive in a public place</td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess4">As a passenger in a car for an hour</td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess5">Lying down in the afternoon when possible</td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess6">Sitting and talking to someone</td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess7">Sitting quietly after lunch (no alcohol)</td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="3"></label></div></td></tr>
+              <tr><td data-i18n="s7.ess8">In a car stopped for a few minutes in traffic</td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="3"></label></div></td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Medical History</div>
-        <p style="font-size:14px;color:var(--tl);margin-bottom:12px">Check all conditions that apply to you:</p>
+        <div class="fsec-ttl" data-i18n="s7.hx.sec">Medical History</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:12px" data-i18n="s7.hx.intro">Check all conditions that apply to you:</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
-          <label class="clbl"><input type="checkbox" name="hx_htn"> High Blood Pressure (Hypertension)</label>
-          <label class="clbl"><input type="checkbox" name="hx_dm"> Diabetes (Type 1 or Type 2)</label>
-          <label class="clbl"><input type="checkbox" name="hx_heart"> Heart Disease / Cardiac Condition</label>
-          <label class="clbl"><input type="checkbox" name="hx_afib"> Atrial Fibrillation (AFib)</label>
-          <label class="clbl"><input type="checkbox" name="hx_stroke"> Stroke or TIA</label>
-          <label class="clbl"><input type="checkbox" name="hx_asthma"> Asthma</label>
-          <label class="clbl"><input type="checkbox" name="hx_copd"> COPD / Emphysema</label>
-          <label class="clbl"><input type="checkbox" name="hx_anxiety"> Anxiety / Panic Disorder</label>
-          <label class="clbl"><input type="checkbox" name="hx_depression"> Depression</label>
-          <label class="clbl"><input type="checkbox" name="hx_thyroid"> Thyroid Disorder</label>
-          <label class="clbl"><input type="checkbox" name="hx_obesity"> Obesity</label>
-          <label class="clbl"><input type="checkbox" name="hx_reflux"> GERD / Acid Reflux</label>
-          <label class="clbl"><input type="checkbox" name="hx_cancer"> Cancer (current or past)</label>
-          <label class="clbl"><input type="checkbox" name="hx_kidney"> Kidney Disease</label>
-          <label class="clbl"><input type="checkbox" name="hx_liver"> Liver Disease</label>
+          <label class="clbl"><input type="checkbox" name="hx_htn"> <span data-i18n="s7.hx1">High Blood Pressure (Hypertension)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_dm"> <span data-i18n="s7.hx2">Diabetes (Type 1 or Type 2)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_heart"> <span data-i18n="s7.hx3">Heart Disease / Cardiac Condition</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_afib"> <span data-i18n="s7.hx4">Atrial Fibrillation (AFib)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_stroke"> <span data-i18n="s7.hx5">Stroke or TIA</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_asthma"> <span data-i18n="s7.hx6">Asthma</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_copd"> <span data-i18n="s7.hx7">COPD / Emphysema</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_anxiety"> <span data-i18n="s7.hx8">Anxiety / Panic Disorder</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_depression"> <span data-i18n="s7.hx9">Depression</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_thyroid"> <span data-i18n="s7.hx10">Thyroid Disorder</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_obesity"> <span data-i18n="s7.hx11">Obesity</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_reflux"> <span data-i18n="s7.hx12">GERD / Acid Reflux</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_cancer"> <span data-i18n="s7.hx13">Cancer (current or past)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_kidney"> <span data-i18n="s7.hx14">Kidney Disease</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_liver"> <span data-i18n="s7.hx15">Liver Disease</span></label>
         </div>
-        <div class="fld" style="margin-top:16px"><label>Other Medical Conditions</label><input type="text" name="hx_other" placeholder="List any other conditions not listed above"></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s7.hx.other">Other Medical Conditions</label><input type="text" name="hx_other" placeholder="List any other conditions not listed above"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Medications &amp; Allergies</div>
-        <div class="fld"><label>Current Medications (include dosages if known)</label><textarea name="medications" placeholder="List all current medications, vitamins, and supplements..."></textarea></div>
-        <div class="fld" style="margin-top:16px"><label>Known Drug Allergies</label><input type="text" name="allergies" placeholder="List any drug allergies or NKDA (No Known Drug Allergies)"></div>
+        <div class="fsec-ttl" data-i18n="s7.med.sec">Medications &amp; Allergies</div>
+        <div class="fld"><label data-i18n="s7.med.label">Current Medications (include dosages if known)</label><textarea name="medications" placeholder="List all current medications, vitamins, and supplements..."></textarea></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s7.allergy.label">Known Drug Allergies</label><input type="text" name="allergies" placeholder="List any drug allergies or NKDA (No Known Drug Allergies)"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Additional Information</div>
+        <div class="fsec-ttl" data-i18n="s7.add.sec">Additional Information</div>
         <div class="fg fg2">
-          <div class="fld"><label>Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;"></div>
-          <div class="fld"><label>Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
+          <div class="fld"><label data-i18n="s7.height">Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;"></div>
+          <div class="fld"><label data-i18n="s7.weight">Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
         </div>
-        <div class="fld" style="margin-top:16px"><label>Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
+        <div class="fld" style="margin-top:16px"><label data-i18n="s7.comments">Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(6)">&larr; Back</button>
-        <button class="btn-sub" onclick="submitForms()">Submit Registration &#10003;</button>
+        <button class="btn-back" onclick="goStep(6)" data-i18n="s7.back">&larr; Back</button>
+        <button class="btn-sub" onclick="submitForms()" data-i18n="s7.submit">Submit Registration &#10003;</button>
       </div>
     </div>
 
@@ -576,12 +592,12 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
 <!-- Completion page -->
 <div id="donePg" class="done-wrap">
   <div class="done-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-  <h2>Registration Complete!</h2>
-  <p>Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
-  <p>We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
-  <p><em>Sleep Better. Feel Better. Live Better.</em></p>
+  <h2 data-i18n="done.h2">Registration Complete!</h2>
+  <p data-i18n="done.p1">Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
+  <p data-i18n="done.p2">We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
+  <p data-i18n="done.p3"><em>Sleep Better. Feel Better. Live Better.</em></p>
   <div style="margin-top:36px">
-    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+    <a href="/" data-i18n="done.home" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
   </div>
 </div>
 
@@ -591,7 +607,6 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
     <div class="foot-brand">
       <span class="f-logo">West Coast Sleep Clinic</span>
       <span class="f-sub">Largo &nbsp;&middot;&nbsp; Florida</span>
-      <p>A dedicated sleep wellness center serving the Largo, Florida community with expert, compassionate care since 2026.</p>
       <div class="foot-socials">
         <a href="" class="foot-social-btn" aria-label="Instagram">
           <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
@@ -611,13 +626,12 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
       </div>
     </div>
     <div class="foot-bot">
-      <span>&copy; 2026 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+      <span data-i18n="foot.copy">&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
     </div>
   </div>
 </footer>
 
 <script>
-// Paste your Power Automate HTTP trigger URL here after creating the flow
 var FLOW_URL = 'PASTE_YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL_HERE';
 
 var curStep = 1;
@@ -686,7 +700,6 @@ function submitForms() {
   }
 
   var payload = {
-    // Demographics
     first_name:              val('first_name'),
     last_name:               val('last_name'),
     middle_initial:          val('mi'),
@@ -705,11 +718,9 @@ function submitForms() {
     marital_status:          getRadioValue('marital'),
     employer:                val('employer'),
     occupation:              val('occupation'),
-    // Emergency contact
     ec_name:                 val('ec_name'),
     ec_relationship:         val('ec_rel'),
     ec_phone:                val('ec_phone'),
-    // Insurance
     primary_insurance:       val('ins1'),
     policy_holder:           val('ph_name'),
     ph_relationship:         val('ph_rel'),
@@ -719,30 +730,24 @@ function submitForms() {
     secondary_member_id:     val('member_id2'),
     pcp:                     val('pcp'),
     referring_provider:      val('ref_prov'),
-    // Pharmacy
     pharmacy_name:           val('pharm_name'),
     pharmacy_address:        val('pharm_addr'),
     pharmacy_phone:          val('pharm_phone'),
-    // Consent to Treat
     consent_treat:           getCheckbox('consent_treat'),
     sig_consent_treat:       val('sig2'),
     date_consent_treat:      val('date2'),
-    // Financial Policy
     consent_financial:       getCheckbox('consent_financial'),
     sig_financial:           val('sig3'),
     date_financial:          val('date3'),
-    // HIPAA
     consent_hipaa:           getCheckbox('consent_hipaa'),
     hipaa_representative:    val('hipaa_rep'),
     sig_hipaa:               val('sig4'),
     date_hipaa:              val('date4'),
-    // Text / Telehealth Consent
     consent_text:            getCheckbox('consent_text'),
     text_phone:              val('text_phone'),
     consent_telehealth:      getCheckbox('consent_telehealth'),
     sig_tele:                val('sig5'),
     date_tele:               val('date5'),
-    // Authorization to Release
     release_to:              val('rel_to'),
     release_phone:           val('rel_phone'),
     release_address:         val('rel_addr'),
@@ -762,7 +767,6 @@ function submitForms() {
     consent_release:         getCheckbox('consent_release'),
     sig_release:             val('sig6'),
     date_release:            val('date6'),
-    // Sleep history & symptoms
     chief_complaint:         val('chief_complaint'),
     sleep_hours:             val('sleep_hrs'),
     concern_duration:        val('concern_duration'),
@@ -780,7 +784,6 @@ function submitForms() {
     sym_walk:                getCheckbox('sym_walk'),
     prev_sleep_study:        getRadioValue('prev_study'),
     cpap_use:                getRadioValue('cpap_use'),
-    // Epworth Sleepiness Scale
     ess1:                    getRadioValue('ess1'),
     ess2:                    getRadioValue('ess2'),
     ess3:                    getRadioValue('ess3'),
@@ -790,7 +793,6 @@ function submitForms() {
     ess7:                    getRadioValue('ess7'),
     ess8:                    getRadioValue('ess8'),
     ess_total:               essTotal,
-    // Medical history
     hx_hypertension:         getCheckbox('hx_htn'),
     hx_diabetes:             getCheckbox('hx_dm'),
     hx_heart_disease:        getCheckbox('hx_heart'),
@@ -807,7 +809,6 @@ function submitForms() {
     hx_kidney:               getCheckbox('hx_kidney'),
     hx_liver:                getCheckbox('hx_liver'),
     hx_other:                val('hx_other'),
-    // Medications & additional
     medications:             val('medications'),
     allergies:               val('allergies'),
     height:                  val('height'),
@@ -833,5 +834,6 @@ function submitForms() {
   });
 }
 </script>
+<script src="lang.js"></script>
 </body>
 </html>
