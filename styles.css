@@ -25,7 +25,8 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
 .nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
 .nav-phone:hover{color:var(--td)}
-.nav-badge{font-size:11px;padding:4px 12px;margin-bottom:0;flex-shrink:0;display:none}
+.nav-badge{display:none;align-items:center;gap:8px;background:rgba(176,135,84,.18);border:1px solid rgba(176,135,84,.38);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:500;color:#2C7DA0;letter-spacing:.04em;flex-shrink:0}
+.nav-badge .dot{width:8px;height:8px;background:var(--mg);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
 .mob-nav{display:none;position:fixed;top:76px;left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
