@@ -25,6 +25,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
 .nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
 .nav-phone:hover{color:var(--td)}
+.nav-badge{font-size:11px;padding:4px 12px;margin-bottom:0;flex-shrink:0}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
 .mob-nav{display:none;position:fixed;top:76px;left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
@@ -39,8 +40,9 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 @keyframes heroWave{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .hero-logo{display:block;margin:0 auto;height:500px;width:auto;max-width:92%;object-fit:contain;position:relative;z-index:1}
 @media(max-width:600px){
-  .hero{min-height:420px;padding-bottom:120px}
-  .hero-top-left{top:auto;left:0;right:0;bottom:24px;align-items:center;padding:0 20px}
+  .nav-badge{display:none}
+  .hero{min-height:380px;padding-bottom:24px}
+  .hero-top-left{display:none}
   .hero-logo{height:auto;width:85%;max-height:280px}
 }
 .hero-top-left{position:absolute;top:36px;left:36px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
