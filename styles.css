@@ -34,7 +34,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
 .mob-phone{display:block;padding:14px 24px 8px;font-size:17px;font-weight:700;color:#2C7DA0;text-decoration:none}
-@media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}.nav-badge{display:inline-flex}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
+@media(max-width:860px){.main-nav,.nav-phone{display:none}.hamburger{display:flex}.nav-badge,.ins-badge{display:none}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
 
 /* ── HERO ── */
 .hero{background:linear-gradient(90deg,#f7f6f3,#ffffff,#f2ece0,#f7f6f3);background-size:300% 100%;animation:heroWave 8s ease-in-out infinite;color:var(--td);padding:48px 24px 80px;position:relative;overflow:hidden;min-height:520px}
