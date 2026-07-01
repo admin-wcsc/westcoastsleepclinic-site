@@ -10,6 +10,9 @@
 <link rel="icon" type="image/png" href="westcoast sleep clinic logo for browser.png">
 <link rel="apple-touch-icon" href="westcoast sleep clinic logo for browser.png">
 <link rel="stylesheet" href="styles.css">
+<style>
+  .site-header{background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;box-shadow:none}
+</style>
 </head>
 <body>
 
@@ -19,8 +22,10 @@
     <div class="nav-badge"><span class="dot"></span><span data-i18n="badge">Now Accepting New Patients</span></div>
     <nav>
       <ul class="main-nav">
-        <li><a href="/" data-i18n="nav.home">Home</a></li>
-        <!-- HIDDEN UNTIL FORM READY: <li><a href="registration.html" data-i18n="nav.reg">Patient Registration</a></li> -->
+        <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="dr-scuteri.html" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
+        <li style="display:none"><a href="registration.html" data-i18n="nav.reg">New Patient Registration</a></li>
+        <li style="display:none"><a href="provider-referral.html" data-i18n="nav.referral">Provider Referral Intake</a></li>
       </ul>
     </nav>
     <a href="tel:7274729112" class="nav-phone" style="margin-left:auto">&#128222; 727-472-9112</a>
@@ -35,8 +40,10 @@
 </header>
 <div class="mob-nav" id="mobNav">
   <a href="tel:7274729112" class="mob-phone">&#128222; 727-472-9112</a>
-  <a href="/" data-i18n="nav.home">Home</a>
-  <!-- HIDDEN UNTIL FORM READY: <a href="registration.html" data-i18n="nav.reg">Patient Registration</a> -->
+  <a href="index.html" data-i18n="nav.home">Home</a>
+  <a href="dr-scuteri.html" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
+  <a href="registration.html" data-i18n="nav.reg" style="display:none">New Patient Registration</a>
+  <a href="provider-referral.html" data-i18n="nav.referral" style="display:none">Provider Referral Intake</a>
   <div class="mob-lang-wrap">
     <div class="lang-toggle">
       <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
@@ -47,10 +54,10 @@
 
 <!-- ══════ HERO ══════ -->
 <section class="hero">
-  <img src="westcoast sleep clinic logo - Editedv2.png" alt="West Coast Sleep Clinic" class="hero-logo">
+  <img src="westcoast sleep clinic logo - Editedv2.png" alt="West Coast Sleep Clinic" class="hero-logo" width="1143" height="872">
 </section>
 
-<div class="sec-transition" style="height:160px;background:linear-gradient(to bottom,#f7f6f3 0%,var(--dg) 100%)"></div>
+<div class="sec-transition" style="height:72px;background:linear-gradient(to bottom,#f7f6f3 0%,var(--dg) 100%)"></div>
 
 <!-- ══════ SERVICES & INSURANCE TABS ══════ -->
 <section class="tab-section">
@@ -73,9 +80,8 @@
         <table class="svc-main-table">
           <thead>
             <tr>
-              <th style="width:22%" data-i18n="th.svc">Service</th>
-              <th style="width:54%" data-i18n="th.desc">Description &amp; Highlights</th>
-              <th style="width:24%" data-i18n="th.price">Pricing / Notes</th>
+              <th style="width:28%" data-i18n="th.svc">Service</th>
+              <th style="width:72%" data-i18n="th.desc">Description &amp; Highlights</th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +107,6 @@
                   <span class="svc-tag">Pediatric Sleep</span>
                 </div>
               </td>
-              <td><span style="font-size:13px;color:var(--tl)" data-i18n="svc1.price">Most major insurance plans accepted. Call to verify.</span></td>
             </tr>
             <tr>
               <td>
@@ -120,10 +125,6 @@
                   <span class="svc-tag">Nutrition Coaching</span>
                   <span class="svc-tag">Physician Supervised</span>
                 </div>
-              </td>
-              <td>
-                <span class="svc-price-badge">$275 / Month</span>
-                <div style="font-size:11.5px;color:var(--tl);margin-top:10px;line-height:1.5" data-i18n="svc2.price.note">Price locked 6&nbsp;months if you book now for June!</div>
               </td>
             </tr>
             <tr>
@@ -145,7 +146,6 @@
                   <span class="svc-tag">Custom Wellness Blends</span>
                 </div>
               </td>
-              <td><span style="font-size:13px;color:var(--tl)" data-i18n="svc3.price">Call for current pricing</span></td>
             </tr>
             <tr>
               <td>
@@ -165,7 +165,6 @@
                   <span class="svc-tag">Telehealth Visits</span>
                 </div>
               </td>
-              <td><span style="font-size:13px;color:var(--tl)" data-i18n="svc4.price">Call for availability and pricing</span></td>
             </tr>
           </tbody>
         </table>
@@ -263,7 +262,7 @@
   </div>
 </section>
 
-<div class="sec-transition" style="height:160px;background:linear-gradient(to bottom,#c8e4f2,#1d566e)"></div>
+<div class="sec-transition" style="height:110px;background:linear-gradient(to bottom,#fff 0%,#c8e4f2 40%,#1d566e 100%)"></div>
 
 <!-- ══════ OUR PROMISE ══════ -->
 <section class="promise-section">
@@ -307,7 +306,7 @@
         <span class="f-logo">West Coast Sleep Clinic</span>
         <span class="f-sub">Largo &nbsp;&middot;&nbsp; Florida</span>
         <div class="foot-socials">
-          <a href="https://www.instagram.com/westcoastsleepclinic/" class="foot-social-btn" aria-label="Instagram" target="_blank" rel="noopener">
+          <a href="https://www.instagram.com/westcoastsleepclinic/" class="foot-social-btn" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <radialGradient id="ig-grad" cx="30%" cy="107%" r="120%">
