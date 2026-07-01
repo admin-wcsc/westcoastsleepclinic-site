@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patient Registration — West Coast Sleep Clinic</title>
+<title>New Patient Registration — West Coast Sleep Clinic</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -33,7 +33,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .main-nav{display:flex;align-items:center;gap:4px;list-style:none}
 .main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
-.nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0;margin-left:auto}
 .nav-phone:hover{color:var(--td)}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
@@ -42,7 +42,8 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08)}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
 .mob-lang-wrap{padding:14px 24px 4px;border-bottom:1px solid rgba(0,0,0,.08)}
-@media(max-width:860px){.main-nav,.nav-phone,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex}}
+.mob-phone{display:block;padding:14px 24px 8px;font-size:17px;font-weight:700;color:#2C7DA0;text-decoration:none}
+@media(max-width:860px){.main-nav,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex;margin-left:auto}.nav-phone{margin-left:0}}
 
 /* ── LANG TOGGLE ── */
 .lang-toggle{display:flex;align-items:center;gap:3px;flex-shrink:0}
@@ -52,7 +53,8 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 
 /* ── REG HEADER ── */
 .reg-hdr{background:linear-gradient(180deg,var(--dg) 0%,var(--mg) 100%);padding:56px 24px 42px;text-align:center;color:#fff}
-.reg-hdr h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:8px;color:#fff}
+.reg-hdr h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:6px;color:#fff}
+.reg-hdr .reg-welcome{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,26px);font-weight:400;font-style:italic;color:rgba(255,255,255,.88);margin-bottom:14px}
 .reg-hdr p{font-size:15px;color:rgba(255,255,255,.78)}
 
 /* ── STEPPER ── */
@@ -64,12 +66,17 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .step-circ{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--tl);background:#fff;transition:all .3s;flex-shrink:0}
 .step-circ.active{border-color:var(--dg);background:var(--dg);color:#fff}
 .step-circ.done{border-color:var(--gold);background:var(--gold);color:#fff}
-.step-lbl{font-size:10px;font-weight:500;color:var(--tl);white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
-.step-lbl.active{color:var(--dg);font-weight:700}
+.step-circ.complete{border-color:#27ae60;background:#27ae60;color:#fff}
+.step-lbl{font-size:10px;font-weight:500;color:var(--tl);white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
+.step-lbl.active{color:var(--dg);font-weight:700;max-width:none;overflow:visible;text-overflow:clip;font-size:11px}
 .step-lbl.done{color:var(--gold)}
+.step-lbl.complete{color:#27ae60}
 .step-conn{flex:1;height:2px;background:var(--border);min-width:12px;max-width:36px;transition:background .3s}
 .step-conn.done{background:var(--gold)}
-.step-prog{font-size:12px;color:var(--tl);margin-top:9px;text-align:center}
+.step-item.step-done{cursor:pointer}
+.step-item.step-done:hover .step-circ{opacity:.82;transform:scale(1.07)}
+.step-item.step-done:hover .step-lbl{color:var(--gold2)}
+.step-item.step-done:has(.step-circ.complete):hover .step-lbl{color:#2ecc71}
 
 /* ── FORM ── */
 .form-wrap{max-width:780px;margin:0 auto;padding:44px 24px 0}
@@ -88,7 +95,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 @media(max-width:580px){.fg2,.fg3{grid-template-columns:1fr}}
 .fld{display:flex;flex-direction:column;gap:5px}
 .fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
-.fld label .req{color:#c0392b;margin-left:2px}
+.fld label .req,.clbl .req{color:#c0392b;margin-left:3px;font-weight:600}
 .fld input,.fld select,.fld textarea{width:100%;padding:13px 14px;font-size:16px;font-family:'Montserrat',sans-serif;color:var(--td);background:#fff;border:1.5px solid var(--border);border-radius:6px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
 .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--mg);box-shadow:0 0 0 3px rgba(44,125,160,.1)}
 .fld textarea{resize:vertical;min-height:90px}
@@ -154,11 +161,13 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/" data-i18n="nav.home">Home</a></li>
-        <!-- HIDDEN UNTIL FORM READY: <li><a href="registration.html" data-i18n="nav.reg">Patient Registration</a></li> -->
+        <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="dr-scuteri.html" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
+        <li><a href="registration.html" data-i18n="nav.reg">Patient Registration</a></li>
+        <li><a href="provider-referral.html" data-i18n="nav.referral">Provider Referral Intake</a></li>
       </ul>
     </nav>
-    <a href="tel:7274729112" class="nav-phone" style="margin-left:auto">&#128222; 727-472-9112</a>
+    <a href="tel:7274729112" class="nav-phone">&#128222; 727-472-9112</a>
     <div class="lang-toggle">
       <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
       <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
@@ -169,8 +178,10 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/" data-i18n="nav.home">Home</a>
-  <!-- HIDDEN UNTIL FORM READY: <a href="registration.html" data-i18n="nav.reg">Patient Registration</a> -->
+  <a href="index.html" data-i18n="nav.home">Home</a>
+  <a href="dr-scuteri.html" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
+  <a href="registration.html" data-i18n="nav.reg">Patient Registration</a>
+  <a href="provider-referral.html" data-i18n="nav.referral">Provider Referral Intake</a>
   <div class="mob-lang-wrap">
     <div class="lang-toggle">
       <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
@@ -182,6 +193,7 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
 <!-- ══════ REG HEADER ══════ -->
 <div class="reg-hdr">
   <h1 data-i18n="reg.h2">Patient Registration</h1>
+  <p class="reg-welcome" data-i18n="reg.welcome">Welcome to West Coast Sleep Clinic!</p>
   <p data-i18n="reg.sub">Please complete all forms below. Use the Next button to proceed through each step.</p>
 </div>
 
@@ -189,21 +201,20 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
 <div class="stepper">
   <div class="stepper-in">
     <div class="step-row">
-      <div class="step-item"><div class="step-circ active" id="sc1">1</div><div class="step-lbl active" id="sl1" data-i18n="step.1">Patient Reg</div></div>
+      <div class="step-item" data-step="1"><div class="step-circ active" id="sc1">1</div><div class="step-lbl active" id="sl1" data-i18n="step.1">Patient Demographics</div></div>
       <div class="step-conn" id="conn1"></div>
-      <div class="step-item"><div class="step-circ" id="sc2">2</div><div class="step-lbl" id="sl2" data-i18n="step.2">Consent to Treat</div></div>
+      <div class="step-item" data-step="2"><div class="step-circ" id="sc2">2</div><div class="step-lbl" id="sl2" data-i18n="step.2">Consent to Treat</div></div>
       <div class="step-conn" id="conn2"></div>
-      <div class="step-item"><div class="step-circ" id="sc3">3</div><div class="step-lbl" id="sl3" data-i18n="step.3">Financial Policy</div></div>
+      <div class="step-item" data-step="3"><div class="step-circ" id="sc3">3</div><div class="step-lbl" id="sl3" data-i18n="step.3">Financial Policy</div></div>
       <div class="step-conn" id="conn3"></div>
-      <div class="step-item"><div class="step-circ" id="sc4">4</div><div class="step-lbl" id="sl4" data-i18n="step.4">HIPAA Notice</div></div>
+      <div class="step-item" data-step="4"><div class="step-circ" id="sc4">4</div><div class="step-lbl" id="sl4" data-i18n="step.4">HIPAA Notice of Privacy Practices</div></div>
       <div class="step-conn" id="conn4"></div>
-      <div class="step-item"><div class="step-circ" id="sc5">5</div><div class="step-lbl" id="sl5" data-i18n="step.5">Text/Tele Consent</div></div>
+      <div class="step-item" data-step="5"><div class="step-circ" id="sc5">5</div><div class="step-lbl" id="sl5" data-i18n="step.5">Text &amp; Telehealth Consent</div></div>
       <div class="step-conn" id="conn5"></div>
-      <div class="step-item"><div class="step-circ" id="sc6">6</div><div class="step-lbl" id="sl6" data-i18n="step.6">Auth to Release</div></div>
+      <div class="step-item" data-step="6"><div class="step-circ" id="sc6">6</div><div class="step-lbl" id="sl6" data-i18n="step.6">Authorization to Release</div></div>
       <div class="step-conn" id="conn6"></div>
-      <div class="step-item"><div class="step-circ" id="sc7">7</div><div class="step-lbl" id="sl7" data-i18n="step.7">Questionnaire</div></div>
+      <div class="step-item" data-step="7"><div class="step-circ" id="sc7">7</div><div class="step-lbl" id="sl7" data-i18n="step.7">Patient Questionnaire</div></div>
     </div>
-    <div class="step-prog" id="stepProg">Step 1 of 7 — Patient Registration</div>
   </div>
 </div>
 
@@ -218,7 +229,6 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
       <p class="req-note" data-i18n="s1.req"><span>*</span> Indicates a required field</p>
 
       <div class="fsec">
-        <div class="fsec-ttl" data-i18n="s1.sec.demo">Patient Demographics</div>
         <div class="fg fg3">
           <div class="fld"><label data-i18n="s1.fn">First Name <span class="req">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
           <div class="fld"><label data-i18n="s1.ln">Last Name <span class="req">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
@@ -324,7 +334,7 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
         <p>I authorize West Coast Sleep Clinic to bill my insurance company or other third-party payer on my behalf for services rendered. I understand that I am ultimately responsible for any charges not covered by my insurance.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_treat" required> <span data-i18n="s2.chk">I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span></label>
+        <label class="clbl"><input type="checkbox" name="consent_treat" required> <span data-i18n="s2.chk">I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span><span class="req">*</span></label>
       </div>
       <div class="sig-row">
         <div class="fld"><label data-i18n="s2.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig2" placeholder="Type full name as signature" required></div>
@@ -351,7 +361,7 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
         <p><strong>Cancellations:</strong> We require 24 hours notice for appointment cancellations. Repeated late cancellations or no-shows may result in a fee.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_financial" required> <span data-i18n="s3.chk">I have read and understand the Financial Policy above, and I agree to abide by its terms.</span></label>
+        <label class="clbl"><input type="checkbox" name="consent_financial" required> <span data-i18n="s3.chk">I have read and understand the Financial Policy above, and I agree to abide by its terms.</span><span class="req">*</span></label>
       </div>
       <div class="sig-row">
         <div class="fld"><label data-i18n="s3.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig3" placeholder="Type full name as signature" required></div>
@@ -376,7 +386,7 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
         <p><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_hipaa" required> <span data-i18n="s4.chk">I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</span></label>
+        <label class="clbl"><input type="checkbox" name="consent_hipaa" required> <span data-i18n="s4.chk">I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</span><span class="req">*</span></label>
       </div>
       <div class="fld" style="margin-top:18px">
         <label data-i18n="s4.rep">If you are signing on behalf of the patient, please explain your relationship:</label>
@@ -405,9 +415,9 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
           <p>Text messaging is not a secure form of communication. By consenting, you understand and accept the risk that text messages may be intercepted. Do not send sensitive medical information via text message.</p>
         </div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="consent_text"> <span data-i18n="s5.txt.chk">I consent to receive text messages from West Coast Sleep Clinic as described above.</span></label>
+          <label class="clbl"><input type="checkbox" name="consent_text" onchange="setStep5Conditional()"> <span data-i18n="s5.txt.chk">I consent to receive text messages from West Coast Sleep Clinic as described above.</span></label>
         </div>
-        <div class="fld" style="margin-top:14px"><label data-i18n="s5.txt.phone">Best Cell Phone for Texts</label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
+        <div class="fld" style="margin-top:14px"><label data-i18n="s5.txt.phone">Best Cell Phone for Texts<span class="req" id="req-text-phone" style="display:none">*</span></label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
       </div>
       <div class="fsec">
         <div class="fsec-ttl" data-i18n="s5.tele.sec">Telehealth Consent</div>
@@ -419,12 +429,12 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
           <p>I understand I may refuse telehealth services at any time without affecting my right to future care or treatment.</p>
         </div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="consent_telehealth"> <span data-i18n="s5.tele.chk">I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</span></label>
+          <label class="clbl"><input type="checkbox" name="consent_telehealth" onchange="setStep5Conditional()"> <span data-i18n="s5.tele.chk">I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</span></label>
         </div>
       </div>
       <div class="sig-row">
-        <div class="fld"><label data-i18n="s5.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature" required></div>
-        <div class="fld"><label data-i18n="s5.date">Date</label><input type="date" name="date5" required></div>
+        <div class="fld"><label data-i18n="s5.sig">Patient (or Guardian) Signature <span class="req" id="req-sig5" style="display:none">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature"></div>
+        <div class="fld"><label data-i18n="s5.date">Date</label><input type="date" name="date5"></div>
       </div>
       <div class="form-nav">
         <button class="btn-back" onclick="goStep(4)" data-i18n="s5.back">&larr; Back</button>
@@ -515,8 +525,8 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
           </div>
         </div>
         <div class="fg fg2" style="margin-top:16px">
-          <div class="fld"><label data-i18n="s7.prev.label">Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="prev_study" value="No"> No</label></div></div>
-          <div class="fld"><label data-i18n="s7.cpap.label">Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> Yes</label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> No</label></div></div>
+          <div class="fld"><label data-i18n="s7.prev.label">Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> <span data-i18n="s7.yes">Yes</span></label><label class="rlbl"><input type="radio" name="prev_study" value="No"> <span data-i18n="s7.no">No</span></label></div></div>
+          <div class="fld"><label data-i18n="s7.cpap.label">Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> <span data-i18n="s7.yes">Yes</span></label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> <span data-i18n="s7.no">No</span></label></div></div>
         </div>
       </div>
 
@@ -597,7 +607,7 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
   <p data-i18n="done.p2">We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
   <p data-i18n="done.p3"><em>Sleep Better. Feel Better. Live Better.</em></p>
   <div style="margin-top:36px">
-    <a href="/" data-i18n="done.home" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+    <a href="index.html" data-i18n="done.home" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
   </div>
 </div>
 
@@ -629,26 +639,73 @@ footer{background:var(--cream);color:rgba(29,54,78,.8);padding:52px 24px 24px;bo
 var FLOW_URL = 'PASTE_YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL_HERE';
 
 var curStep = 1;
+var maxStep = 1;
 var totalSteps = 7;
-var stepNames = ['Patient Registration','Consent to Treat','Financial Policy','HIPAA Notice','Text/Tele Consent','Auth to Release','Questionnaire'];
+
+function setStep5Conditional() {
+  var textChecked = !!(document.querySelector('input[name="consent_text"]') && document.querySelector('input[name="consent_text"]').checked);
+  var teleChecked = !!(document.querySelector('input[name="consent_telehealth"]') && document.querySelector('input[name="consent_telehealth"]').checked);
+  var phoneEl  = document.querySelector('input[name="text_phone"]');
+  var sig5El   = document.querySelector('input[name="sig5"]');
+  var date5El  = document.querySelector('input[name="date5"]');
+  var reqPhone = document.getElementById('req-text-phone');
+  var reqSig5  = document.getElementById('req-sig5');
+  if (phoneEl)  phoneEl.required  = textChecked;
+  if (sig5El)   sig5El.required   = teleChecked;
+  if (date5El)  date5El.required  = teleChecked;
+  if (reqPhone) reqPhone.style.display = textChecked ? '' : 'none';
+  if (reqSig5)  reqSig5.style.display  = teleChecked ? '' : 'none';
+}
+
+function isStepComplete(n) {
+  var step = document.getElementById('fstep' + n);
+  if (!step) return false;
+  var required = step.querySelectorAll('[required]');
+  var radiosSeen = {};
+  for (var i = 0; i < required.length; i++) {
+    var el = required[i];
+    if (el.type === 'radio') {
+      if (radiosSeen[el.name]) continue;
+      radiosSeen[el.name] = true;
+      if (!step.querySelector('input[name="' + el.name + '"]:checked')) return false;
+    } else if (el.type === 'checkbox') {
+      if (!el.checked) return false;
+    } else {
+      if (!(el.value && el.value.trim())) return false;
+    }
+  }
+  return required.length > 0;
+}
+
+function stepLabel(key, fallback) {
+  try {
+    if (typeof T !== 'undefined' && typeof currentLang !== 'undefined' && T[currentLang] && T[currentLang][key] !== undefined) {
+      return T[currentLang][key];
+    }
+  } catch (e) {}
+  return fallback;
+}
 
 function goStep(n) {
   document.getElementById('fstep' + curStep).classList.remove('active');
   curStep = n;
+  if (n > maxStep) maxStep = n;
   document.getElementById('fstep' + curStep).classList.add('active');
 
   for (var i = 1; i <= totalSteps; i++) {
     var circ = document.getElementById('sc' + i);
     var lbl  = document.getElementById('sl' + i);
     if (!circ || !lbl) continue;
-    circ.className = 'step-circ' + (i === curStep ? ' active' : i < curStep ? ' done' : '');
-    lbl.className  = 'step-lbl'  + (i === curStep ? ' active' : i < curStep ? ' done' : '');
+    var isDone = (i !== curStep && i <= maxStep);
+    var isComplete = isDone && isStepComplete(i);
+    circ.className = 'step-circ' + (i === curStep ? ' active' : isComplete ? ' complete' : isDone ? ' done' : '');
+    lbl.className  = 'step-lbl'  + (i === curStep ? ' active' : isComplete ? ' complete' : isDone ? ' done' : '');
+    circ.parentElement.className = 'step-item' + (isDone ? ' step-done' : '');
     if (i < totalSteps) {
       var conn = document.getElementById('conn' + i);
-      if (conn) conn.className = 'step-conn' + (i < curStep ? ' done' : '');
+      if (conn) conn.className = 'step-conn' + (i < maxStep ? ' done' : '');
     }
   }
-  document.getElementById('stepProg').textContent = 'Step ' + curStep + ' of ' + totalSteps + ' — ' + stepNames[curStep - 1];
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
@@ -672,7 +729,7 @@ function showSubmitError(msg) {
   errEl.textContent = msg;
   errEl.style.display = 'block';
   var btn = document.querySelector('.btn-sub');
-  if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration ✓'; }
+  if (btn) { btn.disabled = false; btn.textContent = stepLabel('ui.submit_btn', 'Submit Registration ✓'); }
 }
 
 function showDonePage() {
@@ -685,7 +742,7 @@ function showDonePage() {
 
 function submitForms() {
   var btn = document.querySelector('.btn-sub');
-  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+  if (btn) { btn.disabled = true; btn.textContent = stepLabel('ui.submitting', 'Submitting…'); }
 
   var essTotal = 0;
   for (var i = 1; i <= 8; i++) {
@@ -820,13 +877,20 @@ function submitForms() {
     if (r.ok || r.status === 202) {
       showDonePage();
     } else {
-      showSubmitError('Submission failed (status ' + r.status + '). Please call us at 727-472-9112.');
+      showSubmitError(stepLabel('ui.err.status', 'Submission failed (status {status}). Please call us at 727-472-9112.').replace('{status}', r.status));
     }
   })
   .catch(function(err) {
-    showSubmitError('Unable to submit. Please call us at 727-472-9112 or try again. (' + err.message + ')');
+    showSubmitError(stepLabel('ui.err.network', 'Unable to submit. Please call us at 727-472-9112 or try again. ({msg})').replace('{msg}', err.message));
   });
 }
+
+document.querySelector('.step-row').addEventListener('click', function(e) {
+  var item = e.target.closest('.step-item');
+  if (!item || !item.classList.contains('step-done')) return;
+  var n = parseInt(item.getAttribute('data-step'), 10);
+  if (n && n !== curStep && n <= maxStep) goStep(n);
+});
 </script>
 <script src="lang.js"></script>
 </body>
