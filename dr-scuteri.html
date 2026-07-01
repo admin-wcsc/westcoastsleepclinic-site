@@ -9,33 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="westcoast sleep clinic logo for browser.png">
 <link rel="apple-touch-icon" href="westcoast sleep clinic logo for browser.png">
+<link rel="stylesheet" href="styles.css">
 <style>
-:root{--dg:#1d566e;--mg:#2C7DA0;--gold:#b08754;--gold3:#d4b069;--cream:#FAFAF8;--border:#E2E0DE;--td:#1a2a3a;--tm:#2c5878;--tl:#5b8fa0}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-height:1.6;color:var(--td);background:#fff;overflow-x:hidden}
-
-/* ── NAV ── */
-.site-header{position:sticky;top:0;z-index:100;background:#fff;box-shadow:0 2px 12px rgba(29,86,110,.08)}
-.nav-wrap{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:76px;gap:12px}
-.main-nav{display:flex;align-items:center;gap:4px;list-style:none}
-.main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
-.main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
-.nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
-.nav-phone:hover{color:var(--td)}
+body{background:#fff}
 .lang-toggle{display:flex;gap:4px;flex-shrink:0}
 .lang-btn{background:none;border:1px solid rgba(44,125,160,.3);border-radius:4px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--mg);cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
-#btnEN.active,#btnEN2.active{background:var(--mg);border-color:var(--mg);color:#fff}
-#btnES.active,#btnES2.active{background:var(--gold);border-color:var(--gold);color:#fff}
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
-.hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
-.mob-nav{display:none;position:fixed;top:76px;left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
-.mob-nav.open{display:block}
-.mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08)}
-.mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
-.mob-phone{display:block;padding:14px 24px 8px;font-size:17px;font-weight:700;color:#2C7DA0;text-decoration:none}
 .mob-lang-wrap{padding:14px 24px 4px;display:flex;align-items:center;gap:10px}
-@media(max-width:860px){.main-nav,.nav-phone,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex}}
 
 /* ── SCROLL REVEAL ── */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
@@ -66,11 +45,11 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .dr-cred-sub{font-size:11.5px;color:rgba(255,255,255,.5);margin-top:5px;font-weight:300}
 
 /* ── OPENING QUOTE ── */
-.dr-opening{background:linear-gradient(180deg,#fff 0%,#f5f9fb 100%);padding:72px 24px}
+.dr-opening{background:linear-gradient(180deg,#fff 0%,#f5f9fb 100%);padding:40px 24px 24px}
 .dr-opening-in{max-width:780px;margin:0 auto;text-align:center}
-.dr-open-mark{font-family:'Cormorant Garamond',serif;font-size:96px;line-height:.5;color:var(--gold3);opacity:.5;margin-bottom:8px;display:block}
-.dr-opening-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.5vw,32px);font-weight:400;font-style:italic;color:var(--tm);line-height:1.5;margin-bottom:28px}
-.dr-opening-attr{font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tl)}
+.dr-open-mark{font-family:'Cormorant Garamond',serif;font-size:96px;line-height:.5;color:var(--gold3);opacity:.5;margin-bottom:-28px;display:block}
+.dr-close-mark{font-family:'Cormorant Garamond',serif;font-size:96px;line-height:.5;color:var(--gold3);opacity:.5;margin-top:18px;display:block;text-align:center}
+.dr-opening-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.5vw,32px);font-weight:400;font-style:italic;color:var(--tm);line-height:1.5;margin-bottom:0}
 
 /* ── BIO ── */
 .dr-bio{background:#fff;padding:72px 24px 64px}
@@ -81,8 +60,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .dr-bio p:last-of-type{margin-bottom:0}
 .dr-pullquote{border-left:3px solid var(--gold3);background:rgba(29,86,110,.03);border-radius:0 8px 8px 0;padding:24px 28px;margin:36px 0;position:relative}
 .dr-pullquote p{font-family:'Cormorant Garamond',serif;font-size:clamp(19px,2.5vw,23px);font-weight:400;font-style:italic;color:var(--tm);line-height:1.6;margin-bottom:0!important}
-.dr-pullquote-attr{display:block;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--tl);margin-top:12px}
-
 /* ── MISSION SECTION ── */
 .dr-mission{background:linear-gradient(160deg,#0a2535 0%,var(--dg) 50%,var(--tm) 100%);padding:80px 24px;text-align:center;position:relative;overflow:hidden}
 .dr-mission::before{content:'';position:absolute;top:-30%;right:-5%;width:480px;height:480px;background:radial-gradient(circle,rgba(176,135,84,.1) 0%,transparent 70%);pointer-events:none}
@@ -92,18 +69,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .dr-mission-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,4vw,40px);font-weight:400;font-style:italic;color:#fff;line-height:1.4;margin-bottom:28px}
 .dr-mission-close{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,4vw,40px);font-weight:400;color:var(--gold3);font-style:italic;line-height:1.4}
 
-
-/* ── FOOTER ── */
-footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top:1px solid var(--border)}
-.foot-in{max-width:1100px;margin:0 auto}
-.foot-grid{display:grid;grid-template-columns:1fr;gap:40px;margin-bottom:40px}
-.foot-brand .f-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--gold3);display:block;margin-bottom:3px}
-.foot-brand .f-sub{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:rgba(44,125,160,.6);display:block;margin-bottom:12px}
-.foot-socials{display:flex;gap:10px;margin-top:14px}
-.foot-social-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;transition:opacity .2s,transform .2s}
-.foot-social-btn:hover{opacity:.82;transform:translateY(-2px)}
-.foot-social-btn svg{width:36px;height:36px}
-.foot-bot{border-top:1px solid rgba(176,135,84,.22);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:rgba(29,54,78,.4);letter-spacing:.04em}
 
 /* ── RESPONSIVE ── */
 @media(max-width:700px){
@@ -196,7 +161,7 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
   <div class="dr-opening-in reveal">
     <span class="dr-open-mark">&ldquo;</span>
     <p class="dr-opening-quote" data-i18n="dr.open.q">Sleep is one of the greatest mysteries left in medicine. We know it influences nearly every system in the body — the brain, heart, hormones, metabolism, immune system, and even longevity. Yet we&rsquo;re still discovering why sleep is so essential. That mystery drew me into this field, and every day I continue learning something new.</p>
-    <p class="dr-opening-attr">&mdash;&nbsp; Dr. Bryan Scuteri</p>
+    <span class="dr-close-mark">&rdquo;</span>
   </div>
 </section>
 
@@ -218,7 +183,6 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 
     <div class="dr-pullquote reveal">
       <p data-i18n="dr.q1">&ldquo;I&rsquo;ve watched parents regain the energy to play with their children. I&rsquo;ve seen patients rediscover the focus they thought they&rsquo;d lost forever. Others tell me they finally enjoy retirement, succeed at work again, or simply wake up feeling like themselves for the first time in years. Those moments remind me why I chose this profession.&rdquo;</p>
-      <span class="dr-pullquote-attr">&mdash;&nbsp; Dr. Bryan Scuteri</span>
     </div>
 
     <p class="reveal" data-i18n="dr.p6">Over time, Dr. Scuteri recognized that restoring healthy sleep often requires addressing the conditions that contribute to poor sleep in the first place. Obesity, metabolic dysfunction, hormonal changes, inflammation, and lifestyle all influence how well the body sleeps&mdash;and how well it heals.</p>
@@ -227,7 +191,6 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 
     <div class="dr-pullquote reveal">
       <p data-i18n="dr.q2">&ldquo;I don&rsquo;t believe in treating isolated diagnoses. I believe in helping people restore their health. Better sleep improves overall health, and better overall health almost always improves sleep. When we address both together, we can often change someone&rsquo;s quality of life in ways they never thought possible.&rdquo;</p>
-      <span class="dr-pullquote-attr">&mdash;&nbsp; Dr. Bryan Scuteri</span>
     </div>
 
     <p class="reveal" data-i18n="dr.p8">Whether caring for someone struggling with severe sleep apnea, chronic fatigue, unexplained daytime sleepiness, or helping patients optimize their long-term health, Dr. Scuteri&rsquo;s mission remains the same:</p>
@@ -252,7 +215,7 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
         <span class="f-logo">West Coast Sleep Clinic</span>
         <span class="f-sub">Largo &nbsp;&middot;&nbsp; Florida</span>
         <div class="foot-socials">
-          <a href="https://www.instagram.com/westcoastsleepclinic/" class="foot-social-btn" aria-label="Instagram" target="_blank" rel="noopener">
+          <a href="https://www.instagram.com/westcoastsleepclinic/" class="foot-social-btn" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <radialGradient id="ig-grad" cx="30%" cy="107%" r="120%">
