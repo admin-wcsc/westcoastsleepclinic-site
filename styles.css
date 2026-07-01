@@ -18,8 +18,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 /* ── NAV ── */
 .site-header{position:sticky;top:0;z-index:100;background:#fff;box-shadow:0 2px 12px rgba(29,86,110,.08)}
 .nav-wrap{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:76px;gap:12px}
-.logo-area{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;flex-shrink:0}
-.logo-svg{height:68px;width:auto;object-fit:contain}
 .main-nav{display:flex;align-items:center;gap:4px;list-style:none}
 .main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap;cursor:pointer}
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
@@ -40,22 +38,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .hero{background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;color:var(--td);padding:48px 24px 32px;position:relative;overflow:hidden;min-height:520px}
 @keyframes heroWave{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .hero-logo{display:block;margin:0 auto;height:500px;width:auto;max-width:92%;object-fit:contain;position:relative;z-index:1}
-.hero-in{max-width:1100px;margin:0 auto;position:relative;z-index:1}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5.5vw,76px);font-weight:500;line-height:1.04;color:#2C7DA0;margin-bottom:18px}
-.hero h1 em{font-style:italic;color:var(--gold3)}
-.hero-sub{font-size:17px;color:rgba(44,125,160,.85);margin-bottom:38px;font-weight:300}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
-.btn-pri{background:var(--dg);color:#fff;border:none;padding:16px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;cursor:pointer;text-transform:uppercase;transition:background .2s,transform .2s,box-shadow .2s;text-decoration:none;display:inline-block;box-shadow:0 4px 16px rgba(29,86,110,.35)}
-.btn-pri:hover{background:var(--mg);transform:translateY(-2px);box-shadow:0 8px 24px rgba(44,125,160,.45)}
-.btn-sec{background:transparent;color:#2C7DA0;border:2px solid rgba(44,125,160,.45);padding:14px 28px;font-size:14px;font-weight:500;border-radius:5px;cursor:pointer;text-decoration:none;display:inline-block;transition:border-color .2s,background .2s}
-.btn-sec:hover{border-color:rgba(44,125,160,.8);background:rgba(44,125,160,.07)}
-.hero-right{display:flex;flex-direction:column;gap:14px}
-.hstat-card{background:#fff;border-radius:10px;border:1px solid rgba(176,135,84,.2);padding:22px 24px;box-shadow:0 4px 20px rgba(44,125,160,.08);display:flex;align-items:center;gap:16px}
-.hstat-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--dg),var(--mg));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.hstat-icon svg{width:22px;height:22px;stroke:var(--gold3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.hstat-text .v{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg);line-height:1}
-.hstat-text .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tl);margin-top:4px}
 
 /* ── SHARED ── */
 .sec-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
@@ -92,7 +75,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .svc-desc-cell{color:var(--tm);font-size:14px;line-height:1.65}
 .svc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .svc-tag{background:rgba(44,125,160,.07);color:var(--mg);border:1px solid rgba(44,125,160,.18);border-radius:99px;padding:3px 11px;font-size:11.5px;font-weight:500}
-.svc-price-badge{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;border-radius:6px;padding:7px 16px;font-size:14px;font-weight:700;white-space:nowrap;display:inline-block;box-shadow:0 3px 10px rgba(176,135,84,.3)}
 
 /* ── INSURANCE TABLE ── */
 .ins-split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
@@ -112,8 +94,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .ins-note-box{background:linear-gradient(135deg,rgba(29,86,110,.05),rgba(176,135,84,.05));border:1px solid rgba(176,135,84,.22);border-left:4px solid var(--gold3);border-radius:0 10px 10px 0;padding:24px 26px;margin-top:28px}
 .ins-note-box h4{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;color:var(--gold3);margin-bottom:9px}
 .ins-note-box p{font-size:14px;color:var(--tm);line-height:1.72}
-.ins-disclaimer{margin-top:20px;background:rgba(44,125,160,.06);border:1px solid rgba(44,125,160,.14);border-radius:8px;padding:18px 20px}
-.ins-disclaimer p{font-size:13px;color:var(--tm);line-height:1.7}
 
 /* ── ABOUT ── */
 .about-section{padding:72px 24px;background:#fff}
@@ -147,15 +127,6 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .promise-card h4{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#fff;margin-bottom:10px}
 .promise-card p{font-size:14px;color:rgba(255,255,255,.74);line-height:1.7}
 
-/* ── CTA BAR ── */
-.cta-bar{background:var(--cream);padding:36px 24px;border-top:3px solid rgba(176,135,84,.22)}
-.cta-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.cta-inner h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--td)}
-.cta-inner p{font-size:14px;color:var(--tl);margin-top:3px}
-.cta-phone{font-size:24px;font-weight:700;color:var(--gold3);text-decoration:none;letter-spacing:.02em}
-.cta-phone:hover{color:var(--td)}
-.cta-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(29,54,78,.5);margin-bottom:3px}
-
 /* ── FOOTER ── */
 footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top:1px solid var(--border)}
 .foot-in{max-width:1100px;margin:0 auto}
@@ -164,11 +135,6 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 .foot-brand .f-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--gold3);display:block;margin-bottom:3px}
 .foot-brand .f-sub{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:rgba(44,125,160,.6);display:block;margin-bottom:12px}
 .foot-brand p{font-size:13px;color:rgba(29,54,78,.6);line-height:1.7;margin-bottom:14px}
-.foot-ph{font-size:16px;font-weight:700;color:var(--gold3);text-decoration:none;display:block}
-.foot-ph:hover{color:var(--td)}
-.foot-col h5{font-size:10px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold3);margin-bottom:14px}
-.foot-col a,.foot-col p{display:block;font-size:13.5px;color:rgba(29,54,78,.65);text-decoration:none;line-height:2.1}
-.foot-col a:hover{color:var(--gold3)}
 .foot-socials{display:flex;gap:10px;margin-top:14px}
 .foot-social-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;transition:opacity .2s,transform .2s}
 .foot-social-btn:hover{opacity:.82;transform:translateY(-2px)}
