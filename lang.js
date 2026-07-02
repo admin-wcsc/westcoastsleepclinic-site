@@ -216,7 +216,7 @@ en: {
   'dr.p7':'That realization naturally expanded West Coast Sleep Clinic into a center focused on both sleep medicine and health optimization. Medical weight management, including GLP-1 therapy, hormone optimization for appropriately selected patients, and other evidence-based wellness treatments are offered as part of a comprehensive approach to improving health&mdash;not as standalone trends or quick fixes.',
   'dr.q2':'&ldquo;I don&rsquo;t believe in treating isolated diagnoses. I believe in helping people restore their health. Better sleep improves overall health, and better overall health almost always improves sleep. When we address both together, we can often change someone&rsquo;s quality of life in ways they never thought possible.&rdquo;',
   'dr.p8':'Whether caring for someone struggling with severe sleep apnea, chronic fatigue, unexplained daytime sleepiness, or helping patients optimize their long-term health, Dr. Scuteri&rsquo;s mission remains the same:',
-  'dr.mission.lbl':'His Mission',
+  'dr.mission.lbl':'Mission',
   'dr.mission.quote':'To help people reclaim their energy, restore their health, and live life to its fullest.',
   'dr.mission.close':'Because when people sleep better, they don&rsquo;t just rest better&mdash;they live better.'
 },
