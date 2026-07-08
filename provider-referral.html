@@ -16,11 +16,6 @@ body{background:#f4f8fb}
 .nav-phone{margin-left:auto}
 @media(max-width:860px){.main-nav,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex;margin-left:auto}.nav-phone{display:block;margin-left:0}}
 
-/* ── PAGE HEADER ── */
-.reg-hdr{background:linear-gradient(180deg,var(--dg) 0%,var(--mg) 100%);padding:56px 24px 42px;text-align:center;color:#fff}
-.reg-hdr h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:8px;color:#fff}
-.reg-hdr p{font-size:15px;color:rgba(255,255,255,.78)}
-
 /* ── MAIN CONTENT ── */
 .page-wrap{max-width:780px;margin:0 auto;padding:48px 24px 64px}
 
@@ -48,6 +43,36 @@ body{background:#f4f8fb}
 .modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .modal-body{padding:28px}
 
+/* ── PATIENT INFO FIELDS (ported from registration.html's .fld/.fg system) ── */
+.modal-sec-lbl{font-size:10.5px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.modal-sec-divider{height:1px;background:var(--border);margin:26px 0 22px}
+.fg{display:grid;gap:16px}
+.fg2{grid-template-columns:1fr 1fr}
+@media(max-width:480px){.fg2{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
+.fld label .req{color:#c0392b;margin-left:3px;font-weight:600}
+.fld input:not([type="checkbox"]):not([type="radio"]){width:100%;padding:13px 14px;font-size:16px;font-family:'Montserrat',sans-serif;color:var(--td);background:#fff;border:1.5px solid var(--border);border-radius:6px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.fld input:not([type="checkbox"]):not([type="radio"]):focus{border-color:var(--mg);box-shadow:0 0 0 3px rgba(44,125,160,.1)}
+.fld input::placeholder{color:rgba(107,127,116,.5)}
+.mt-16{margin-top:16px}
+
+/* ── DATE PICKER (ported from registration.html) ── */
+.dpk{position:relative}
+.dpk-pop{position:fixed;display:none;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px;width:260px;z-index:300}
+.dpk-pop.open{display:block}
+.dpk-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dpk-nav{background:none;border:none;cursor:pointer;font-size:18px;color:var(--tm);padding:2px 8px;line-height:1}
+.dpk-nav:hover{color:var(--dg)}
+.dpk-mtitle{font-size:13px;font-weight:600;color:var(--dg)}
+.dpk-wk{display:grid;grid-template-columns:repeat(7,1fr);font-size:11px;color:var(--tl);text-align:center;margin-bottom:4px}
+.dpk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dpk-grid button{border:none;background:none;padding:6px 0;font-size:13px;border-radius:4px;cursor:pointer;color:var(--td);font-family:'Montserrat',sans-serif}
+.dpk-grid button:hover{background:rgba(44,125,160,.1)}
+.dpk-grid button.dpk-today{font-weight:700;color:var(--dg)}
+.dpk-grid button.dpk-sel{background:var(--dg);color:#fff}
+.dpk-grid button.dpk-other{color:var(--tl);opacity:.4}
+
 /* ── DROP ZONE ── */
 .drop-zone{border:2px dashed var(--lg);border-radius:8px;padding:44px 24px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s;position:relative;background:#fbfcfe}
 .drop-zone.drag-over{background:rgba(44,125,160,.08);border-color:var(--dg)}
@@ -55,7 +80,6 @@ body{background:#f4f8fb}
 .dz-icon{margin-bottom:14px;color:var(--lg)}
 .dz-icon svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .dz-primary{font-size:15px;font-weight:600;color:var(--tm);margin-bottom:6px}
-.dz-secondary{font-size:13px;color:var(--tl)}
 .dz-types{font-size:11.5px;color:var(--tl);margin-top:8px;opacity:.8}
 .dz-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--tl);font-size:13px}
 .dz-or::before,.dz-or::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -87,14 +111,6 @@ body{background:#f4f8fb}
 .btn-submit-files:disabled{opacity:.5;cursor:not-allowed}
 .btn-submit-files svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .upload-err{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:4px;padding:10px 14px;margin-top:14px}
-
-/* ── DONE STATE ── */
-.done-wrap{display:none;padding:70px 24px 80px;text-align:center;max-width:620px;margin:0 auto}
-.done-wrap.active{display:block;animation:fadeUp .5s ease}
-.done-icon{width:96px;height:96px;background:linear-gradient(135deg,var(--dg),var(--mg));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 26px}
-.done-icon svg{width:46px;height:46px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.done-wrap h2{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,5vw,48px);font-weight:500;color:var(--dg);margin-bottom:12px}
-.done-wrap p{font-size:16px;color:var(--tm);max-width:480px;margin:0 auto 10px;line-height:1.65}
 
 footer{background:var(--cream)}
 .foot-bot{margin-top:32px}
@@ -193,6 +209,30 @@ footer{background:var(--cream)}
     </div>
 
     <div class="modal-body">
+      <!-- Patient information -->
+      <div class="modal-sec-lbl">Patient Information</div>
+      <div class="fg fg2">
+        <div class="fld"><label>First Name <span class="req">*</span></label><input type="text" id="patFirstName" placeholder="Patient's first name"></div>
+        <div class="fld"><label>Last Name <span class="req">*</span></label><input type="text" id="patLastName" placeholder="Patient's last name"></div>
+      </div>
+      <div class="fg fg2 mt-16">
+        <div class="fld">
+          <label>Date of Birth <span class="req">*</span></label>
+          <div class="dpk" data-dpk="patient_dob">
+            <input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off">
+            <input type="hidden" name="patient_dob">
+            <div class="dpk-pop" data-dpk-pop="patient_dob">
+              <div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div>
+              <div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+              <div class="dpk-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-sec-divider"></div>
+      <div class="modal-sec-lbl">Upload Documents</div>
+
       <!-- Drag and drop zone -->
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInputDrop" multiple
@@ -257,10 +297,8 @@ footer{background:var(--cream)}
   </div>
 </footer>
 
+<script src="storage-client.js"></script>
 <script>
-// Power Automate HTTP trigger URL — replace with actual URL when ready
-var REFERRAL_FLOW_URL = 'PASTE_YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL_HERE';
-
 var selectedFiles = [];
 
 function trLabel(key, fallback) {
@@ -285,6 +323,20 @@ function closeModal() {
 function handleBackdropClick(e) {
   if (e.target === document.getElementById('uploadModal')) closeModal();
 }
+
+function patientFieldsOk() {
+  var fn = document.getElementById('patFirstName').value.trim();
+  var ln = document.getElementById('patLastName').value.trim();
+  var dob = document.querySelector('input[name="patient_dob"]').value;
+  return !!(fn && ln && dob);
+}
+
+function updateSubmitButtonState() {
+  document.getElementById('btnSubmitFiles').disabled = !(selectedFiles.length > 0 && patientFieldsOk());
+}
+
+document.getElementById('uploadModal').addEventListener('input', updateSubmitButtonState);
+document.getElementById('uploadModal').addEventListener('change', updateSubmitButtonState);
 
 // Drag and drop events
 var dz = document.getElementById('dropZone');
@@ -351,7 +403,6 @@ function escHtml(str) {
 function renderFileList() {
   var list  = document.getElementById('fileList');
   var note  = document.getElementById('fileCountNote');
-  var btn   = document.getElementById('btnSubmitFiles');
 
   list.innerHTML = '';
   selectedFiles.forEach(function(f, idx) {
@@ -375,46 +426,34 @@ function renderFileList() {
       : trLabel('pr.file_plural', 'files selected');
     note.textContent = selectedFiles.length + ' ' + fileWord;
     note.style.display = 'block';
-    btn.disabled = false;
   } else {
     note.style.display = 'none';
-    btn.disabled = true;
   }
   document.getElementById('uploadErr').style.display = 'none';
+  updateSubmitButtonState();
 }
 
 function submitFiles() {
-  if (selectedFiles.length === 0) return;
+  if (selectedFiles.length === 0 || !patientFieldsOk()) return;
 
   var btn = document.getElementById('btnSubmitFiles');
   btn.disabled = true;
   btn.textContent = trLabel('pr.uploading', 'Uploading…');
   document.getElementById('uploadErr').style.display = 'none';
 
-  // Build multipart/form-data payload for Power Automate HTTP trigger
-  var form = new FormData();
-  form.append('source', 'provider-referral-intake');
-  form.append('submitted_at', new Date().toISOString());
-  form.append('file_count', String(selectedFiles.length));
-  selectedFiles.forEach(function(f) {
-    form.append('files', f, f.name);
-  });
-
-  // Do NOT manually set Content-Type — browser sets it with correct multipart boundary
-  fetch(REFERRAL_FLOW_URL, {
-    method: 'POST',
-    body: form
+  StorageClient.submitIntake('referral', {
+    source: 'provider-referral-intake',
+    patient_first_name: document.getElementById('patFirstName').value.trim(),
+    patient_last_name: document.getElementById('patLastName').value.trim(),
+    patient_dob: document.querySelector('input[name="patient_dob"]').value,
+    submitted_at: new Date().toISOString(),
+    file_count: selectedFiles.length
+  }, selectedFiles)
+  .then(function () {
+    closeModal();
+    showDonePage();
   })
-  .then(function(r) {
-    if (r.ok || r.status === 202) {
-      closeModal();
-      showDonePage();
-    } else {
-      showUploadError(trLabel('pr.err.upload_status', 'Upload failed (status {status}). Please call us at 727-472-9112.').replace('{status}', r.status));
-      resetSubmitBtn();
-    }
-  })
-  .catch(function(err) {
+  .catch(function (err) {
     showUploadError(trLabel('pr.err.upload_network', 'Unable to upload. Please call us at 727-472-9112 or try again. ({msg})').replace('{msg}', err.message));
     resetSubmitBtn();
   });
@@ -422,7 +461,7 @@ function submitFiles() {
 
 function resetSubmitBtn() {
   var btn = document.getElementById('btnSubmitFiles');
-  btn.disabled = false;
+  updateSubmitButtonState();
   btn.innerHTML =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>' +
@@ -441,9 +480,188 @@ function showDonePage() {
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var openPop = document.querySelector('.dpk-pop.open');
+  if (openPop) { openPop.classList.remove('open'); return; }
+  closeModal();
 });
+
+// ---------------- DATE PICKER (ported from registration.html) ----------------
+function pad2(n) {
+  n = String(n);
+  return n.length < 2 ? '0' + n : n;
+}
+
+// Re-parses the full raw digit buffer on every keystroke (robust against
+// backspace/paste) rather than a stateful per-key machine. A single digit
+// resolves immediately whenever no valid two-digit continuation exists
+// (month 2-9, day 4-9) — this is what makes "7" jump straight to July and
+// "6" straight to the 6th.
+function parseDateDigits(digits) {
+  digits = digits.slice(0, 8);
+  var i = 0, month = '', day = '', year = '';
+
+  if (i < digits.length) {
+    var d1 = digits[i];
+    if (d1 >= '2' && d1 <= '9') { month = '0' + d1; i++; }
+    else if (d1 === '1') {
+      if (i + 1 < digits.length && '012'.indexOf(digits[i + 1]) !== -1) { month = digits[i] + digits[i + 1]; i += 2; }
+      else if (i + 1 < digits.length) { month = '01'; i += 1; }
+      else { month = '1'; i += 1; }
+    } else if (d1 === '0') {
+      if (i + 1 < digits.length && digits[i + 1] !== '0') { month = '0' + digits[i + 1]; i += 2; }
+      else { month = '0'; i += 1; }
+    }
+  }
+
+  if (i < digits.length) {
+    var e1 = digits[i];
+    if (e1 >= '4' && e1 <= '9') { day = '0' + e1; i++; }
+    else if (e1 === '3') {
+      if (i + 1 < digits.length && '01'.indexOf(digits[i + 1]) !== -1) { day = digits[i] + digits[i + 1]; i += 2; }
+      else if (i + 1 < digits.length) { day = '03'; i += 1; }
+      else { day = '3'; i += 1; }
+    } else if (e1 === '1' || e1 === '2') {
+      if (i + 1 < digits.length) { day = digits[i] + digits[i + 1]; i += 2; }
+      else { day = e1; i += 1; }
+    } else if (e1 === '0') {
+      if (i + 1 < digits.length && digits[i + 1] !== '0') { day = '0' + digits[i + 1]; i += 2; }
+      else { day = '0'; i += 1; }
+    }
+  }
+
+  year = digits.slice(i).slice(0, 4);
+
+  return {
+    month: month, day: day, year: year,
+    monthDone: month.length === 2,
+    dayDone: day.length === 2,
+    yearDone: year.length === 4
+  };
+}
+
+function dpkFormatDisplay(parsed) {
+  var out = parsed.month;
+  if (parsed.monthDone) out += '/';
+  out += parsed.day;
+  if (parsed.dayDone) out += '/';
+  out += parsed.year;
+  return out;
+}
+
+var DPK_MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function DatePicker(wrapperEl) {
+  var visible = wrapperEl.querySelector('.dpk-input');
+  var hidden  = wrapperEl.querySelector('input[type="hidden"]');
+  var pop     = wrapperEl.querySelector('.dpk-pop');
+  var mtitle  = wrapperEl.querySelector('.dpk-mtitle');
+  var grid    = wrapperEl.querySelector('.dpk-grid');
+  var prevBtn = wrapperEl.querySelector('[data-dpk-prev]');
+  var nextBtn = wrapperEl.querySelector('[data-dpk-next]');
+  var viewYear, viewMonth, selDay = null;
+
+  function commit(parsed) {
+    hidden.value = (parsed.monthDone && parsed.dayDone && parsed.yearDone)
+      ? parsed.year + '-' + parsed.month + '-' + parsed.day
+      : '';
+  }
+
+  function buildGrid() {
+    mtitle.textContent = DPK_MONTH_NAMES[viewMonth] + ' ' + viewYear;
+    grid.innerHTML = '';
+    var firstDow = new Date(viewYear, viewMonth, 1).getDay();
+    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    var daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+    var today = new Date();
+    var cells = [];
+    for (var k = 0; k < firstDow; k++) {
+      cells.push({ day: daysInPrevMonth - firstDow + 1 + k, other: true });
+    }
+    for (var d = 1; d <= daysInMonth; d++) {
+      cells.push({ day: d, other: false });
+    }
+    var trailing = 42 - cells.length;
+    for (var t = 1; t <= trailing; t++) {
+      cells.push({ day: t, other: true });
+    }
+    cells.forEach(function (c) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = c.day;
+      var classes = [];
+      if (c.other) classes.push('dpk-other');
+      if (!c.other && selDay === c.day) classes.push('dpk-sel');
+      if (!c.other && today.getFullYear() === viewYear && today.getMonth() === viewMonth && today.getDate() === c.day) classes.push('dpk-today');
+      btn.className = classes.join(' ');
+      if (!c.other) {
+        btn.addEventListener('click', function () {
+          selDay = c.day;
+          var mm = pad2(viewMonth + 1);
+          var dd = pad2(c.day);
+          visible.value = mm + '/' + dd + '/' + viewYear;
+          hidden.value = viewYear + '-' + mm + '-' + dd;
+          hidden.dispatchEvent(new Event('input', { bubbles: true }));
+          closePopup();
+        });
+      }
+      grid.appendChild(btn);
+    });
+  }
+
+  function render(parsed) {
+    viewYear  = parsed.yearDone ? parseInt(parsed.year, 10) : new Date().getFullYear();
+    viewMonth = parsed.monthDone ? parseInt(parsed.month, 10) - 1 : new Date().getMonth();
+    selDay    = parsed.dayDone ? parseInt(parsed.day, 10) : null;
+    buildGrid();
+    openPopup();
+  }
+
+  function openPopup() {
+    document.querySelectorAll('.dpk-pop.open').forEach(function (p) { if (p !== pop) p.classList.remove('open'); });
+    var r = visible.getBoundingClientRect();
+    pop.style.top  = (r.bottom + 4) + 'px';
+    pop.style.left = r.left + 'px';
+    pop.classList.add('open');
+  }
+  function closePopup() { pop.classList.remove('open'); }
+
+  prevBtn.addEventListener('click', function () {
+    viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    buildGrid();
+  });
+  nextBtn.addEventListener('click', function () {
+    viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    buildGrid();
+  });
+
+  visible.addEventListener('focus', function () {
+    render(parseDateDigits(visible.value.replace(/\D/g, '')));
+  });
+
+  visible.addEventListener('input', function () {
+    var digits = visible.value.replace(/\D/g, '').slice(0, 8);
+    var parsed = parseDateDigits(digits);
+    var formatted = dpkFormatDisplay(parsed);
+    visible.value = formatted;
+    visible.setSelectionRange(formatted.length, formatted.length);
+    commit(parsed);
+    render(parsed);
+  });
+}
+
+document.querySelectorAll('.dpk').forEach(function (el) { new DatePicker(el); });
+
+document.addEventListener('mousedown', function (e) {
+  document.querySelectorAll('.dpk-pop.open').forEach(function (pop) {
+    var wrapper = pop.closest('.dpk');
+    if (wrapper && !wrapper.contains(e.target)) pop.classList.remove('open');
+  });
+});
+window.addEventListener('scroll', function () {
+  document.querySelectorAll('.dpk-pop.open').forEach(function (p) { p.classList.remove('open'); });
+}, true);
 </script>
 <script src="lang.js"></script>
 </body>
