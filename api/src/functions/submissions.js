@@ -1,0 +1,296 @@
+const { app } = require('@azure/functions');
+const { BlobServiceClient, BlobSASPermissions } = require('@azure/storage-blob');
+
+const CONTAINER_NAME = 'submissions';
+const SUBMISSION_TYPES = ['registration', 'referral'];
+
+let cachedContainerClient = null;
+function getContainerClient() {
+  if (!cachedContainerClient) {
+    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureStorageConnectionString);
+    cachedContainerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
+  }
+  return cachedContainerClient;
+}
+
+function normalizeName(v) {
+  return String(v || '').trim().toLowerCase();
+}
+function normalizeDob(v) {
+  return String(v || '').trim();
+}
+
+// Stop weird filenames from escaping the intended blob path.
+function safeFileName(name) {
+  return String(name || '').replace(/[\\/]/g, '_').replace(/[^A-Za-z0-9._-]/g, '_') || 'file';
+}
+
+async function blobExists(containerClient, blobName) {
+  return containerClient.getBlockBlobClient(blobName).exists();
+}
+
+// If a blob with this name already exists (e.g. two referral batches both
+// included "referral.pdf"), append -2, -3, etc. instead of overwriting.
+async function uniqueBlobName(containerClient, filesPrefix, name) {
+  if (!(await blobExists(containerClient, filesPrefix + name))) return name;
+  const dot = name.lastIndexOf('.');
+  const ext = dot === -1 ? '' : name.slice(dot);
+  const base = dot === -1 ? name : name.slice(0, dot);
+  let i = 2, candidate;
+  do {
+    candidate = base + '-' + i + ext;
+    i++;
+  } while (await blobExists(containerClient, filesPrefix + candidate));
+  return candidate;
+}
+
+async function readRecordBlob(containerClient, blobName) {
+  try {
+    const buffer = await containerClient.getBlockBlobClient(blobName).downloadToBuffer();
+    return JSON.parse(buffer.toString('utf8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+async function writeRecordBlob(containerClient, blobName, value) {
+  const content = JSON.stringify(value, null, 2);
+  await containerClient.getBlockBlobClient(blobName).upload(content, Buffer.byteLength(content), {
+    blobHTTPHeaders: { blobContentType: 'application/json' }
+  });
+}
+
+// Blob names are flat keys with no real "folders" — listBlobsByHierarchy
+// with a '/' delimiter gives us the virtual subfolder names (submission
+// IDs) the same way fs.readdirSync did for the local disk version.
+async function listSubmissionIds(containerClient, type) {
+  const ids = [];
+  for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: type + '/' })) {
+    if (item.kind === 'prefix') {
+      const id = item.name.slice((type + '/').length).replace(/\/$/, '');
+      if (id) ids.push(id);
+    }
+  }
+  return ids;
+}
+
+async function countBlobsUnderPrefix(containerClient, prefix) {
+  let count = 0;
+  for await (const _blob of containerClient.listBlobsFlat({ prefix })) count++;
+  return count;
+}
+
+// registration.html and provider-referral.html use different field names
+// for the same three identity fields, so both are checked when matching a
+// submission against a patient who may already exist in storage (either
+// from their own registration, or a prior referral from another office).
+async function findMatchingPatientRecord(containerClient, firstName, lastName, dob) {
+  const fn = normalizeName(firstName);
+  const ln = normalizeName(lastName);
+  const db = normalizeDob(dob);
+  if (!fn || !ln || !db) return null;
+
+  for (const type of SUBMISSION_TYPES) {
+    const ids = await listSubmissionIds(containerClient, type);
+    for (const id of ids) {
+      const record = await readRecordBlob(containerClient, `${type}/${id}/record.json`);
+      if (!record || !record.data) continue;
+      const d = record.data;
+      const rf = type === 'registration' ? d.first_name : d.patient_first_name;
+      const rl = type === 'registration' ? d.last_name : d.patient_last_name;
+      const rdob = type === 'registration' ? d.date_of_birth : d.patient_dob;
+      if (normalizeName(rf) === fn && normalizeName(rl) === ln && normalizeDob(rdob) === db) {
+        return { type, id, prefix: `${type}/${id}/` };
+      }
+    }
+  }
+  return null;
+}
+
+// Blob Storage has no atomic "rename a folder" operation (blob names are
+// flat keys, not real paths) — copying every blob under the old prefix to
+// the new prefix, then deleting the originals, is the actual native way to
+// do this. This happens to be the same copy-then-delete pattern server.js
+// already used locally (there, as a workaround for OneDrive locking
+// fs.renameSync; here, because Blob Storage simply has no rename at all).
+async function movePrefix(containerClient, oldPrefix, newPrefix) {
+  const toDelete = [];
+  // syncCopyFromURL needs the *source* URL to independently prove access —
+  // being authenticated on the destination client isn't enough, even within
+  // the same account — so each source blob gets a short-lived, read-only
+  // SAS token appended just for the moment of the copy.
+  const sasExpiresOn = new Date(Date.now() + 5 * 60 * 1000);
+  for await (const blob of containerClient.listBlobsFlat({ prefix: oldPrefix })) {
+    const suffix = blob.name.slice(oldPrefix.length);
+    const sourceClient = containerClient.getBlockBlobClient(blob.name);
+    const destClient = containerClient.getBlockBlobClient(newPrefix + suffix);
+    const sourceSasUrl = await sourceClient.generateSasUrl({
+      permissions: BlobSASPermissions.parse('r'),
+      expiresOn: sasExpiresOn
+    });
+    await destClient.syncCopyFromURL(sourceSasUrl);
+    toDelete.push(blob.name);
+  }
+  for (const name of toDelete) {
+    await containerClient.getBlockBlobClient(name).deleteIfExists();
+  }
+}
+
+// Append Blob — purpose-built for exactly this append-only log pattern,
+// avoids the read-modify-write race a normal block blob would have if two
+// requests logged at the same instant. Audit logging is best-effort and
+// never fails a real submission.
+async function appendAudit(containerClient, record) {
+  try {
+    const appendBlobClient = containerClient.getAppendBlobClient('audit.log');
+    await appendBlobClient.createIfNotExists();
+    const line = JSON.stringify(record) + '\n';
+    await appendBlobClient.appendBlock(line, Buffer.byteLength(line));
+  } catch (e) {
+    // best-effort only
+  }
+}
+
+app.http('submissions', {
+  methods: ['GET', 'POST'],
+  authLevel: 'anonymous',
+  route: 'submissions/{type}',
+  handler: async (request, context) => {
+    const containerClient = getContainerClient();
+    const type = request.params.type;
+    const startedAt = Date.now();
+    let status, jsonBody;
+
+    try {
+      if (SUBMISSION_TYPES.indexOf(type) === -1) {
+        status = 404;
+        jsonBody = { error: 'Unknown submission type: ' + type };
+      } else if (request.method === 'GET') {
+        const ids = await listSubmissionIds(containerClient, type);
+        const summaries = [];
+        for (const id of ids) {
+          const record = (await readRecordBlob(containerClient, `${type}/${id}/record.json`)) || {};
+          const fileCount = await countBlobsUnderPrefix(containerClient, `${type}/${id}/files/`);
+          summaries.push({ id, submittedAt: record.submittedAt, fileCount });
+        }
+        status = 200;
+        jsonBody = summaries;
+      } else if (request.method === 'POST') {
+        const body = await request.json();
+        const data = body && body.data;
+        const files = (body && body.files) || [];
+
+        // A submission for a patient who already exists in storage (from
+        // their own registration, or a referral from another office) gets
+        // folded into that existing record instead of creating a
+        // disconnected one — checked for both registration and referral
+        // submissions, just keyed off each form's own field names.
+        const match = type === 'registration'
+          ? await findMatchingPatientRecord(containerClient, data && data.first_name, data && data.last_name, data && data.date_of_birth)
+          : await findMatchingPatientRecord(containerClient, data && data.patient_first_name, data && data.patient_last_name, data && data.patient_dob);
+
+        if (match && type === 'referral') {
+          const filesPrefix = match.prefix + 'files/';
+          for (const f of files) {
+            const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
+            const buffer = Buffer.from(f.base64, 'base64');
+            await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+          }
+
+          const matchedRecord = (await readRecordBlob(containerClient, match.prefix + 'record.json')) || {};
+          matchedRecord.referralHistory = matchedRecord.referralHistory || [];
+          matchedRecord.referralHistory.push({
+            submittedAt: Date.now(),
+            source: (data && data.source) || 'referral',
+            fileCount: files.length,
+            data: data || {}
+          });
+          await writeRecordBlob(containerClient, match.prefix + 'record.json', matchedRecord);
+
+          await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'referral_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
+          status = 200;
+          jsonBody = { ok: true, id: match.id, merged: true, mergedIntoType: match.type };
+        } else if (match && type === 'registration') {
+          // If the match was a referral-only record, this registration is
+          // the patient's first full intake — the record graduates from
+          // "referral" to "registration" and is physically relocated so
+          // its blob prefix matches its new type.
+          let targetPrefix = match.prefix;
+          if (match.type === 'referral') {
+            targetPrefix = `registration/${match.id}/`;
+            await movePrefix(containerClient, match.prefix, targetPrefix);
+          }
+
+          const filesPrefix = targetPrefix + 'files/';
+          for (const f of files) {
+            const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
+            const buffer = Buffer.from(f.base64, 'base64');
+            await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+          }
+
+          const matchedRecord = (await readRecordBlob(containerClient, targetPrefix + 'record.json')) || {};
+          if (match.type === 'registration') {
+            // A second full registration for the same patient — keep the
+            // previous version instead of silently discarding it.
+            matchedRecord.registrationHistory = matchedRecord.registrationHistory || [];
+            matchedRecord.registrationHistory.push({ replacedAt: Date.now(), data: matchedRecord.data || {} });
+          } else if (match.type === 'referral') {
+            // A referral-only record's `data` holds the referral's own
+            // fields directly (it was the first submission for this
+            // patient, so no referralHistory array exists yet) — preserve
+            // it as history before this registration's data takes over.
+            matchedRecord.referralHistory = matchedRecord.referralHistory || [];
+            matchedRecord.referralHistory.unshift({
+              submittedAt: matchedRecord.submittedAt,
+              source: (matchedRecord.data && matchedRecord.data.source) || 'referral',
+              fileCount: (matchedRecord.data && matchedRecord.data.file_count) || 0,
+              data: matchedRecord.data || {}
+            });
+          }
+          matchedRecord.type = 'registration';
+          matchedRecord.data = data || {};
+          await writeRecordBlob(containerClient, targetPrefix + 'record.json', matchedRecord);
+
+          await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
+          status = 200;
+          jsonBody = { ok: true, id: match.id, merged: true, mergedIntoType: match.type };
+        } else {
+          const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+          const prefix = `${type}/${id}/`;
+
+          const record = { id, type, submittedAt: Date.now(), data: data || {} };
+          await writeRecordBlob(containerClient, prefix + 'record.json', record);
+
+          const filesPrefix = prefix + 'files/';
+          for (const f of files) {
+            const name = safeFileName(f.name);
+            const buffer = Buffer.from(f.base64, 'base64');
+            await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+          }
+
+          await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'submission_created', details: { type, id, fileCount: files.length } });
+          status = 200;
+          jsonBody = { ok: true, id, merged: false };
+        }
+      } else {
+        status = 404;
+        jsonBody = { error: 'Unknown route: ' + request.method + ' /submissions/' + type };
+      }
+    } catch (err) {
+      context.error(err);
+      status = 500;
+      jsonBody = { error: err.message };
+    }
+
+    await appendAudit(containerClient, {
+      kind: 'request',
+      ts: Date.now(),
+      method: request.method,
+      route: '/submissions/' + type,
+      status,
+      durationMs: Date.now() - startedAt
+    });
+
+    return { status, jsonBody };
+  }
+});

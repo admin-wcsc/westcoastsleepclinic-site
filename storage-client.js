@@ -14,7 +14,7 @@
 var StorageClient = (function () {
   // Change this ONE line when the backend location changes (e.g. to an
   // Azure Function that writes to Blob Storage).
-  var BASE_URL = 'http://localhost:4000';
+  var BASE_URL = '/api';
 
   function request(path, options) {
     return fetch(BASE_URL + path, options).then(function (res) {
