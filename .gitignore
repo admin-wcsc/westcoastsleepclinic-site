@@ -3,8 +3,6 @@ WCSC-PortalsReady/
 test.html
 test2.html
 testDONOTDEL.htm
-data/
 node_modules/
 api/local.settings.json
 api/node_modules/
-azurite-data/

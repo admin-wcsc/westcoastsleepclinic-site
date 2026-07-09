@@ -2,12 +2,11 @@
   "name": "wcsc-site-dev",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "swa start . --api-location api"
   },
   "devDependencies": {
     "@azure/static-web-apps-cli": "^2.0.9",
     "azure-functions-core-tools": "^4.12.1",
-    "azurite": "^3.35.0",
     "playwright": "^1.61.1"
   },
   "allowScripts": {
