@@ -152,6 +152,10 @@ async function appendAudit(containerClient, record) {
 }
 
 const DRCHRONO_TIMEOUT_MS = 5000; // don't let a hung DrChrono call leave the patient staring at a spinner indefinitely
+// Overridable only so the DrChrono-outage fallback path can be exercised in
+// a live environment without touching real tokens/credentials — point this
+// at an unreachable host temporarily, then unset it.
+const DRCHRONO_BASE_URL = process.env.DrChronoApiBaseUrl || 'https://app.drchrono.com';
 
 function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
@@ -190,7 +194,7 @@ async function getDrChronoAccessToken(containerClient) {
     return tokens.access_token;
   }
 
-  const refreshRes = await fetchWithTimeout('https://app.drchrono.com/o/token/', {
+  const refreshRes = await fetchWithTimeout(`${DRCHRONO_BASE_URL}/o/token/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -241,7 +245,7 @@ async function checkDrChronoForExistingPatient(containerClient, firstName, lastN
   const accessToken = await getDrChronoAccessToken(containerClient);
 
   const params = new URLSearchParams({ first_name: firstName, last_name: lastName, date_of_birth: dob });
-  const res = await fetchWithTimeout(`https://app.drchrono.com/api/patients?${params.toString()}`, {
+  const res = await fetchWithTimeout(`${DRCHRONO_BASE_URL}/api/patients?${params.toString()}`, {
     headers: { Authorization: `Bearer ${accessToken}` }
   }, DRCHRONO_TIMEOUT_MS);
 
