@@ -6,6 +6,12 @@ en: {
   'nav.home':'Home','nav.doctor':'Meet Dr. Scuteri','nav.reg':'New Patient Registration','nav.referral':'Provider Referral Intake',
   /* BADGE */
   'badge':'Now Accepting New Patients',
+  /* RELOCATION / TELEMEDICINE BANNER */
+  'banner.p1':'As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.',
+  'banner.p2':'During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.',
+  'banner.p3':'Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.',
+  'banner.p4':'<strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.',
+  'banner.p5':'We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.',
   /* SERVICES SECTION */
   'svc.lbl':'What We Offer','svc.ttl':'Services &amp; Insurance Coverage',
   'svc.desc':'Explore our full range of physician-supervised services and verify your insurance coverage below.',
@@ -225,6 +231,12 @@ es: {
   'nav.home':'Inicio','nav.doctor':'Conocer al Dr. Scuteri','nav.reg':'Nuevo Registro de Paciente','nav.referral':'Admisión de Referidos de Proveedores',
   /* BADGE */
   'badge':'Aceptando Nuevos Pacientes',
+  /* RELOCATION / TELEMEDICINE BANNER */
+  'banner.p1':'A partir del 24 de julio, todas las citas de pacientes se realizarán por telemedicina mientras reubicamos nuestra oficina para servirle mejor.',
+  'banner.p2':'Durante esta transición, seguimos comprometidos a brindar atención ininterrumpida. Puede continuar programando citas, hablar sobre sus inquietudes de sueño, revisar los resultados de sus pruebas y recibir recomendaciones de tratamiento a través de consultas seguras de telemedicina.',
+  'banner.p3':'Una vez que se complete nuestra reubicación, anunciaremos la reapertura de nuestra oficina y comenzaremos a programar citas en persona.',
+  'banner.p4':'<strong>Importante para los Pacientes de Medicare:</strong>Debido a las pautas actuales de Medicare sobre telemedicina, las citas de pacientes de Medicare comenzarán el 15 de agosto. Le recomendamos llamar a nuestra oficina ahora para reservar su cita, y nuestro equipo le programará para la cita disponible más próxima a partir del 15 de agosto.',
+  'banner.p5':'Agradecemos su paciencia y comprensión durante esta transición y esperamos continuar cuidando su salud del sueño. Si tiene alguna pregunta o desea programar una cita, comuníquese con nuestra oficina.',
   /* SERVICES SECTION */
   'svc.lbl':'Lo Que Ofrecemos','svc.ttl':'Servicios &amp; Cobertura de Seguro',
   'svc.desc':'Explore nuestra gama completa de servicios supervisados por médicos y verifique su cobertura de seguro a continuación.',
