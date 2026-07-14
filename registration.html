@@ -915,34 +915,10 @@ function setStep5Conditional() {
 
 var visitedSteps = { 1: true };
 
-function isStepComplete(n) {
-  var step = document.getElementById('fstep' + n);
-  if (!step) return false;
-  var required = step.querySelectorAll('[required]');
-  var radiosSeen = {};
-  for (var i = 0; i < required.length; i++) {
-    var el = required[i];
-    if (el.type === 'radio') {
-      if (radiosSeen[el.name]) continue;
-      radiosSeen[el.name] = true;
-      if (!step.querySelector('input[name="' + el.name + '"]:checked')) return false;
-    } else if (el.type === 'checkbox') {
-      if (!el.checked) return false;
-    } else {
-      if (!(el.value && el.value.trim())) return false;
-    }
-  }
-  // A step with no required fields (e.g. Step 5 when both optional consents
-  // are declined) still counts as complete once the patient has been there.
-  return required.length > 0 || !!visitedSteps[n];
-}
-
-// ---------------- STEP 1 SECTION MODALS ----------------
-var S1_SECTIONS = ['s1secDetails', 's1secEc', 's1secIns', 's1secPharm'];
-
-function sectionOk(containerId) {
-  var container = document.getElementById(containerId);
-  if (!container) return true;
+// Shared by isStepComplete() and sectionOk() below: true if every
+// [required] field inside the given container is filled in (checked, for
+// checkboxes/radios; non-blank, for everything else).
+function areRequiredFieldsFilled(container) {
   var required = container.querySelectorAll('[required]');
   var radiosSeen = {};
   for (var i = 0; i < required.length; i++) {
@@ -958,6 +934,24 @@ function sectionOk(containerId) {
     }
   }
   return true;
+}
+
+function isStepComplete(n) {
+  var step = document.getElementById('fstep' + n);
+  if (!step) return false;
+  var required = step.querySelectorAll('[required]');
+  // A step with no required fields (e.g. Step 5 when both optional consents
+  // are declined) still counts as complete once the patient has been there.
+  return areRequiredFieldsFilled(step) && (required.length > 0 || !!visitedSteps[n]);
+}
+
+// ---------------- STEP 1 SECTION MODALS ----------------
+var S1_SECTIONS = ['s1secDetails', 's1secEc', 's1secIns', 's1secPharm'];
+
+function sectionOk(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return true;
+  return areRequiredFieldsFilled(container);
 }
 
 function renderS1Menu() {
@@ -977,16 +971,22 @@ function renderS1Menu() {
   });
 }
 
-function openS1Modal(id) {
+// Shared by the Step 1 (any order) and Step 2 (fixed sequence) modals below —
+// both just open/close a .modal-bg and re-render their own menu afterward.
+function openFormModal(id, afterOpen) {
   document.querySelectorAll('.dpk-pop.open').forEach(function (p) { p.classList.remove('open'); });
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (afterOpen) afterOpen();
 }
-function closeS1Modal(id) {
+function closeFormModal(id, afterClose) {
   document.getElementById(id).classList.remove('open');
   document.body.style.overflow = '';
-  renderS1Menu();
+  if (afterClose) afterClose();
 }
+
+function openS1Modal(id) { openFormModal(id); }
+function closeS1Modal(id) { closeFormModal(id, renderS1Menu); }
 function s1Backdrop(e, id) {
   if (e.target === document.getElementById(id)) closeS1Modal(id);
 }
@@ -1025,17 +1025,8 @@ function renderS2() {
   });
 }
 
-function openS2Modal(id) {
-  document.querySelectorAll('.dpk-pop.open').forEach(function (p) { p.classList.remove('open'); });
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-  renderS2();
-}
-function closeS2Modal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-  renderS2();
-}
+function openS2Modal(id) { openFormModal(id, renderS2); }
+function closeS2Modal(id) { closeFormModal(id, renderS2); }
 function s2Backdrop(e, id) {
   if (e.target === document.getElementById(id)) closeS2Modal(id);
 }
