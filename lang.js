@@ -148,7 +148,6 @@ en: {
   'done.home':'Return to Home',
   /* DYNAMIC UI STRINGS (registration.html inline script) */
   'ui.submitting':'Submitting…','ui.submit_btn':'Submit Registration ✓',
-  'ui.err.status':'Submission failed (status {status}). Please call us at 727-472-9112.',
   'ui.err.network':'Unable to submit. Please call us at 727-472-9112 or try again. ({msg})',
   /* PROVIDER REFERRAL INTAKE (provider-referral.html) */
   'pr.hdr.h1':'Provider Referral Intake',
@@ -177,7 +176,6 @@ en: {
   'pr.file_singular':'file selected',
   'pr.file_plural':'files selected',
   'pr.err.unsupported':'Unsupported file type — {files}. Accepted types: Word, PDF, Excel, PNG, JPEG.',
-  'pr.err.upload_status':'Upload failed (status {status}). Please call us at 727-472-9112.',
   'pr.err.upload_network':'Unable to upload. Please call us at 727-472-9112 or try again. ({msg})',
   /* FIELD PLACEHOLDERS (registration.html) */
   'ph.first_name':'First name','ph.last_name':'Last name','ph.mi':'M','ph.age':'Age',
@@ -373,7 +371,6 @@ es: {
   'done.home':'Volver al Inicio',
   /* DYNAMIC UI STRINGS (registration.html inline script) */
   'ui.submitting':'Enviando…','ui.submit_btn':'Enviar Registro ✓',
-  'ui.err.status':'Error al enviar (estado {status}). Por favor llámenos al 727-472-9112.',
   'ui.err.network':'No se pudo enviar. Por favor llámenos al 727-472-9112 o intente de nuevo. ({msg})',
   /* PROVIDER REFERRAL INTAKE (provider-referral.html) */
   'pr.hdr.h1':'Admisión de Referidos de Proveedores',
@@ -402,7 +399,6 @@ es: {
   'pr.file_singular':'archivo seleccionado',
   'pr.file_plural':'archivos seleccionados',
   'pr.err.unsupported':'Tipo de archivo no admitido — {files}. Tipos aceptados: Word, PDF, Excel, PNG, JPEG.',
-  'pr.err.upload_status':'Error al subir (estado {status}). Por favor llámenos al 727-472-9112.',
   'pr.err.upload_network':'No se pudo subir. Por favor llámenos al 727-472-9112 o intente de nuevo. ({msg})',
   /* FIELD PLACEHOLDERS (registration.html) */
   'ph.first_name':'Nombre','ph.last_name':'Apellido','ph.mi':'M','ph.age':'Edad',
