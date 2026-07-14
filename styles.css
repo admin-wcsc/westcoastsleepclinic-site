@@ -166,3 +166,19 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 .done-icon svg{width:46px;height:46px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .done-wrap h2{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,5vw,54px);font-weight:500;color:var(--dg);margin-bottom:12px}
 .done-wrap p{font-size:16px;color:var(--tm);max-width:520px;margin:0 auto 10px;line-height:1.65}
+
+/* ── DATE PICKER (registration.html + provider-referral.html; see date-picker.js) ── */
+.dpk{position:relative}
+.dpk-pop{position:fixed;display:none;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px;width:260px;z-index:300}
+.dpk-pop.open{display:block}
+.dpk-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dpk-nav{background:none;border:none;cursor:pointer;font-size:18px;color:var(--tm);padding:2px 8px;line-height:1}
+.dpk-nav:hover{color:var(--dg)}
+.dpk-mtitle{font-size:13px;font-weight:600;color:var(--dg)}
+.dpk-wk{display:grid;grid-template-columns:repeat(7,1fr);font-size:11px;color:var(--tl);text-align:center;margin-bottom:4px}
+.dpk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dpk-grid button{border:none;background:none;padding:6px 0;font-size:13px;border-radius:4px;cursor:pointer;color:var(--td);font-family:'Montserrat',sans-serif}
+.dpk-grid button:hover{background:rgba(44,125,160,.1)}
+.dpk-grid button.dpk-today{font-weight:700;color:var(--dg)}
+.dpk-grid button.dpk-sel{background:var(--dg);color:#fff}
+.dpk-grid button.dpk-other{color:var(--tl);opacity:.4}
