@@ -4,3 +4,10 @@ function switchTab(btn, tabId) {
   btn.classList.add('active');
   document.getElementById('tab-' + tabId).classList.add('active');
 }
+
+function toggleMobNav() {
+  var nav = document.getElementById('mobNav');
+  var header = document.querySelector('.site-header');
+  nav.style.top = header.getBoundingClientRect().bottom + 'px';
+  nav.classList.toggle('open');
+}
