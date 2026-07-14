@@ -250,6 +250,165 @@ async function checkDrChronoForExistingPatient(containerClient, firstName, lastN
   return Array.isArray(body.results) && body.results.length > 0;
 }
 
+// Registrations get checked against DrChrono first, ahead of everything
+// else below — the authoritative "is this a real existing patient" answer,
+// as opposed to just checking our own transit storage. Returns 'found'
+// (DrChrono confirms an existing patient), 'error' (the check could not
+// complete — DrChrono down, slow, or erroring), 'clear' (DrChrono confirmed
+// no match), or null (not a registration — referrals skip this entirely).
+async function checkDrChronoOutcome(containerClient, context, type, data) {
+  if (type !== 'registration') return null;
+  try {
+    const exists = await checkDrChronoForExistingPatient(containerClient, data && data.first_name, data && data.last_name, data && data.date_of_birth);
+    return exists ? 'found' : 'clear';
+  } catch (err) {
+    context.error('DrChrono check failed:', err.message);
+    return 'error';
+  }
+}
+
+// Reuses the exact same merged/mergedIntoType signal the registration-vs-
+// registration match already returns, so registration.html's existing
+// "Registration Already on File" page handles this with zero frontend
+// changes. No blob gets written — DrChrono is already the record that
+// matters.
+async function handleDrChronoDuplicate(containerClient, data) {
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'drchrono_duplicate_detected', details: { firstName: data && data.first_name, lastName: data && data.last_name } });
+  return { status: 200, jsonBody: { ok: true, merged: true, mergedIntoType: 'registration', source: 'drchrono' } };
+}
+
+// Cannot verify against DrChrono right now — accept the submission (a
+// third-party outage should not be able to block a patient from
+// registering) but route it to a review folder instead of silently
+// trusting or rejecting it.
+async function handleDrChronoUnavailable(containerClient, data, files) {
+  const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  const prefix = `reviewregistration/${id}/`;
+  const record = { id, type: 'reviewregistration', submittedAt: Date.now(), data: data || {} };
+  await writeRecordBlob(containerClient, prefix + 'record.json', record);
+
+  const filesPrefix = prefix + 'files/';
+  for (const f of files) {
+    const name = safeFileName(f.name);
+    const buffer = Buffer.from(f.base64, 'base64');
+    await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+  }
+
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_needs_review', details: { id, fileCount: files.length, reason: 'drchrono_check_failed' } });
+  return { status: 200, jsonBody: { ok: true, id, merged: false } };
+}
+
+// A submission for a patient who already exists in storage (from their own
+// registration, or a referral from another office) gets folded into that
+// existing record instead of creating a disconnected one — checked for both
+// registration and referral submissions, just keyed off each form's own
+// field names.
+async function findExistingRecord(containerClient, type, data) {
+  return type === 'registration'
+    ? findMatchingPatientRecord(containerClient, data && data.first_name, data && data.last_name, data && data.date_of_birth)
+    : findMatchingPatientRecord(containerClient, data && data.patient_first_name, data && data.patient_last_name, data && data.patient_dob);
+}
+
+async function mergeReferralIntoRecord(containerClient, match, data, files) {
+  const filesPrefix = match.prefix + 'files/';
+  for (const f of files) {
+    const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
+    const buffer = Buffer.from(f.base64, 'base64');
+    await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+  }
+
+  const matchedRecord = (await readRecordBlob(containerClient, match.prefix + 'record.json')) || {};
+  matchedRecord.referralHistory = matchedRecord.referralHistory || [];
+  matchedRecord.referralHistory.push({
+    submittedAt: Date.now(),
+    source: (data && data.source) || 'referral',
+    fileCount: files.length,
+    data: data || {}
+  });
+  await writeRecordBlob(containerClient, match.prefix + 'record.json', matchedRecord);
+
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'referral_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
+  return { status: 200, jsonBody: { ok: true, id: match.id, merged: true, mergedIntoType: match.type } };
+}
+
+async function mergeRegistrationIntoRecord(containerClient, match, data, files) {
+  // If the match was a referral-only record, this registration is the
+  // patient's first full intake — the record graduates from "referral" to
+  // "registration" and is physically relocated so its blob prefix matches
+  // its new type.
+  let targetPrefix = match.prefix;
+  if (match.type === 'referral') {
+    targetPrefix = `registration/${match.id}/`;
+    await movePrefix(containerClient, match.prefix, targetPrefix);
+  }
+
+  const filesPrefix = targetPrefix + 'files/';
+  for (const f of files) {
+    const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
+    const buffer = Buffer.from(f.base64, 'base64');
+    await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+  }
+
+  const matchedRecord = (await readRecordBlob(containerClient, targetPrefix + 'record.json')) || {};
+  if (match.type === 'registration') {
+    // A second full registration for the same patient — keep the previous
+    // version instead of silently discarding it.
+    matchedRecord.registrationHistory = matchedRecord.registrationHistory || [];
+    matchedRecord.registrationHistory.push({ replacedAt: Date.now(), data: matchedRecord.data || {} });
+  } else if (match.type === 'referral') {
+    // A referral-only record's `data` holds the referral's own fields
+    // directly (it was the first submission for this patient, so no
+    // referralHistory array exists yet) — preserve it as history before
+    // this registration's data takes over.
+    matchedRecord.referralHistory = matchedRecord.referralHistory || [];
+    matchedRecord.referralHistory.unshift({
+      submittedAt: matchedRecord.submittedAt,
+      source: (matchedRecord.data && matchedRecord.data.source) || 'referral',
+      fileCount: (matchedRecord.data && matchedRecord.data.file_count) || 0,
+      data: matchedRecord.data || {}
+    });
+  }
+  matchedRecord.type = 'registration';
+  matchedRecord.data = data || {};
+  await writeRecordBlob(containerClient, targetPrefix + 'record.json', matchedRecord);
+
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
+  return { status: 200, jsonBody: { ok: true, id: match.id, merged: true, mergedIntoType: match.type } };
+}
+
+async function createNewSubmission(containerClient, type, data, files) {
+  const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  const prefix = `${type}/${id}/`;
+
+  const record = { id, type, submittedAt: Date.now(), data: data || {} };
+  await writeRecordBlob(containerClient, prefix + 'record.json', record);
+
+  const filesPrefix = prefix + 'files/';
+  for (const f of files) {
+    const name = safeFileName(f.name);
+    const buffer = Buffer.from(f.base64, 'base64');
+    await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
+  }
+
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'submission_created', details: { type, id, fileCount: files.length } });
+  return { status: 200, jsonBody: { ok: true, id, merged: false } };
+}
+
+// The single dispatcher: figures out which of the outcomes above applies to
+// this submission, and hands off to the function that handles it. Each
+// handler below is responsible for its own blob writes and its own audit
+// event — this function only decides which one runs.
+async function handleSubmission(containerClient, context, type, data, files) {
+  const drchronoOutcome = await checkDrChronoOutcome(containerClient, context, type, data);
+  if (drchronoOutcome === 'found') return handleDrChronoDuplicate(containerClient, data);
+  if (drchronoOutcome === 'error') return handleDrChronoUnavailable(containerClient, data, files);
+
+  const match = await findExistingRecord(containerClient, type, data);
+  if (match && type === 'referral') return mergeReferralIntoRecord(containerClient, match, data, files);
+  if (match && type === 'registration') return mergeRegistrationIntoRecord(containerClient, match, data, files);
+  return createNewSubmission(containerClient, type, data, files);
+}
+
 app.http('submissions', {
   methods: ['POST'],
   authLevel: 'anonymous',
@@ -261,159 +420,17 @@ app.http('submissions', {
     let status, jsonBody;
 
     try {
+      let result;
       if (SUBMISSION_TYPES.indexOf(type) === -1) {
-        status = 404;
-        jsonBody = { error: 'Unknown submission type: ' + type };
-      } else if (request.method === 'POST') {
+        result = { status: 404, jsonBody: { error: 'Unknown submission type: ' + type } };
+      } else {
         const body = await request.json();
         const data = body && body.data;
         const files = (body && body.files) || [];
-
-        // Registrations get checked against DrChrono first — the
-        // authoritative "is this a real existing patient" answer, as
-        // opposed to just checking our own transit storage. 'found' means
-        // DrChrono confirms an existing patient; 'error' means the check
-        // couldn't complete (DrChrono down/slow/erroring); 'clear' means
-        // DrChrono confirmed no match; null means this isn't a
-        // registration (referrals skip this entirely).
-        let drchronoOutcome = null;
-        if (type === 'registration') {
-          try {
-            const exists = await checkDrChronoForExistingPatient(containerClient, data && data.first_name, data && data.last_name, data && data.date_of_birth);
-            drchronoOutcome = exists ? 'found' : 'clear';
-          } catch (err) {
-            context.error('DrChrono check failed:', err.message);
-            drchronoOutcome = 'error';
-          }
-        }
-
-        if (drchronoOutcome === 'found') {
-          // Reuses the exact same merged/mergedIntoType signal the
-          // registration-vs-registration match already returns, so
-          // registration.html's existing "Registration Already on File"
-          // page handles this with zero frontend changes. No blob gets
-          // written — DrChrono is already the record that matters.
-          await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'drchrono_duplicate_detected', details: { firstName: data && data.first_name, lastName: data && data.last_name } });
-          status = 200;
-          jsonBody = { ok: true, merged: true, mergedIntoType: 'registration', source: 'drchrono' };
-        } else if (drchronoOutcome === 'error') {
-          // Can't verify against DrChrono right now — accept the
-          // submission (a third-party outage shouldn't be able to block a
-          // patient from registering) but route it to a review folder
-          // instead of silently trusting or rejecting it.
-          const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-          const prefix = `reviewregistration/${id}/`;
-          const record = { id, type: 'reviewregistration', submittedAt: Date.now(), data: data || {} };
-          await writeRecordBlob(containerClient, prefix + 'record.json', record);
-
-          const filesPrefix = prefix + 'files/';
-          for (const f of files) {
-            const name = safeFileName(f.name);
-            const buffer = Buffer.from(f.base64, 'base64');
-            await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
-          }
-
-          await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_needs_review', details: { id, fileCount: files.length, reason: 'drchrono_check_failed' } });
-          status = 200;
-          jsonBody = { ok: true, id, merged: false };
-        } else {
-          // A submission for a patient who already exists in storage (from
-          // their own registration, or a referral from another office) gets
-          // folded into that existing record instead of creating a
-          // disconnected one — checked for both registration and referral
-          // submissions, just keyed off each form's own field names.
-          const match = type === 'registration'
-            ? await findMatchingPatientRecord(containerClient, data && data.first_name, data && data.last_name, data && data.date_of_birth)
-            : await findMatchingPatientRecord(containerClient, data && data.patient_first_name, data && data.patient_last_name, data && data.patient_dob);
-
-          if (match && type === 'referral') {
-            const filesPrefix = match.prefix + 'files/';
-            for (const f of files) {
-              const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
-              const buffer = Buffer.from(f.base64, 'base64');
-              await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
-            }
-
-            const matchedRecord = (await readRecordBlob(containerClient, match.prefix + 'record.json')) || {};
-            matchedRecord.referralHistory = matchedRecord.referralHistory || [];
-            matchedRecord.referralHistory.push({
-              submittedAt: Date.now(),
-              source: (data && data.source) || 'referral',
-              fileCount: files.length,
-              data: data || {}
-            });
-            await writeRecordBlob(containerClient, match.prefix + 'record.json', matchedRecord);
-
-            await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'referral_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
-            status = 200;
-            jsonBody = { ok: true, id: match.id, merged: true, mergedIntoType: match.type };
-          } else if (match && type === 'registration') {
-            // If the match was a referral-only record, this registration is
-            // the patient's first full intake — the record graduates from
-            // "referral" to "registration" and is physically relocated so
-            // its blob prefix matches its new type.
-            let targetPrefix = match.prefix;
-            if (match.type === 'referral') {
-              targetPrefix = `registration/${match.id}/`;
-              await movePrefix(containerClient, match.prefix, targetPrefix);
-            }
-
-            const filesPrefix = targetPrefix + 'files/';
-            for (const f of files) {
-              const name = await uniqueBlobName(containerClient, filesPrefix, safeFileName(f.name));
-              const buffer = Buffer.from(f.base64, 'base64');
-              await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
-            }
-
-            const matchedRecord = (await readRecordBlob(containerClient, targetPrefix + 'record.json')) || {};
-            if (match.type === 'registration') {
-              // A second full registration for the same patient — keep the
-              // previous version instead of silently discarding it.
-              matchedRecord.registrationHistory = matchedRecord.registrationHistory || [];
-              matchedRecord.registrationHistory.push({ replacedAt: Date.now(), data: matchedRecord.data || {} });
-            } else if (match.type === 'referral') {
-              // A referral-only record's `data` holds the referral's own
-              // fields directly (it was the first submission for this
-              // patient, so no referralHistory array exists yet) — preserve
-              // it as history before this registration's data takes over.
-              matchedRecord.referralHistory = matchedRecord.referralHistory || [];
-              matchedRecord.referralHistory.unshift({
-                submittedAt: matchedRecord.submittedAt,
-                source: (matchedRecord.data && matchedRecord.data.source) || 'referral',
-                fileCount: (matchedRecord.data && matchedRecord.data.file_count) || 0,
-                data: matchedRecord.data || {}
-              });
-            }
-            matchedRecord.type = 'registration';
-            matchedRecord.data = data || {};
-            await writeRecordBlob(containerClient, targetPrefix + 'record.json', matchedRecord);
-
-            await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
-            status = 200;
-            jsonBody = { ok: true, id: match.id, merged: true, mergedIntoType: match.type };
-          } else {
-            const id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-            const prefix = `${type}/${id}/`;
-
-            const record = { id, type, submittedAt: Date.now(), data: data || {} };
-            await writeRecordBlob(containerClient, prefix + 'record.json', record);
-
-            const filesPrefix = prefix + 'files/';
-            for (const f of files) {
-              const name = safeFileName(f.name);
-              const buffer = Buffer.from(f.base64, 'base64');
-              await containerClient.getBlockBlobClient(filesPrefix + name).upload(buffer, buffer.length);
-            }
-
-            await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'submission_created', details: { type, id, fileCount: files.length } });
-            status = 200;
-            jsonBody = { ok: true, id, merged: false };
-          }
-        }
-      } else {
-        status = 404;
-        jsonBody = { error: 'Unknown route: ' + request.method + ' /submissions/' + type };
+        result = await handleSubmission(containerClient, context, type, data, files);
       }
+      status = result.status;
+      jsonBody = result.jsonBody;
     } catch (err) {
       context.error(err);
       status = 500;
