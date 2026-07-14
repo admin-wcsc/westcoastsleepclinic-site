@@ -810,8 +810,7 @@ footer{background:var(--cream)}
         <p style="font-size:13px;color:var(--tl);margin-bottom:16px">If you have insurance cards, referral paperwork, or prior sleep study results, you may upload them here.</p>
         <div class="drop-zone" id="regDropZone">
           <input type="file" id="regFileInputDrop" multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-            onchange="handleRegFiles(this.files)">
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
           <div class="dz-icon">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           </div>
@@ -826,8 +825,7 @@ footer{background:var(--cream)}
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>Browse from Device</span>
             <input type="file" id="regFileInputBrowse" multiple
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-              onchange="handleRegFiles(this.files)">
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
           </label>
         </div>
 
@@ -1313,7 +1311,7 @@ function submitForms() {
     submitted_at:            new Date().toISOString()
   };
 
-  StorageClient.submitIntake('registration', payload, regSelectedFiles)
+  StorageClient.submitIntake('registration', payload, regUpload.getFiles())
     .then(function (result) {
       // mergedIntoType === 'registration' means this name + DOB already had
       // a registration on file before this submission — as opposed to
@@ -1336,6 +1334,7 @@ document.querySelector('.step-row').addEventListener('click', function(e) {
 
 </script>
 <script src="date-picker.js"></script>
+<script src="upload-widget.js"></script>
 <script>
 
 // A single shared Escape handler: an open calendar popup takes priority
@@ -1522,94 +1521,14 @@ function renderReviewCards() {
     '<div class="rv-list">' + (releaseChecked.length ? releaseChecked.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + (val('rel_other_desc') ? '<br>Other: ' + escHtml(val('rel_other_desc')) : '') + '</div>';
 }
 
-// ---------------- STEP 5: DOCUMENT UPLOAD (ported from provider-referral.html's
-// upload modal — same file-validation/render pattern, duplicated here rather
-// than shared since this page owns its own selection state) ----------------
-var regSelectedFiles = [];
-var REG_ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg'];
-
-function regGetExtension(filename) {
-  var dot = filename.lastIndexOf('.');
-  return dot === -1 ? '' : filename.slice(dot + 1).toLowerCase();
-}
-
-function escHtml(str) {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-function handleRegFiles(files) {
-  var rejected = [];
-  for (var i = 0; i < files.length; i++) {
-    if (REG_ALLOWED_EXTENSIONS.indexOf(regGetExtension(files[i].name)) === -1) {
-      rejected.push(files[i].name);
-      continue;
-    }
-    var duplicate = false;
-    for (var j = 0; j < regSelectedFiles.length; j++) {
-      if (regSelectedFiles[j].name === files[i].name && regSelectedFiles[j].size === files[i].size) {
-        duplicate = true;
-        break;
-      }
-    }
-    if (!duplicate) regSelectedFiles.push(files[i]);
-  }
-  document.getElementById('regFileInputDrop').value = '';
-  document.getElementById('regFileInputBrowse').value = '';
-  renderRegFileList();
-  if (rejected.length > 0) {
-    showRegUploadError('Unsupported file type \u2014 ' + rejected.join(', ') + '. Accepted types: Word, PDF, Excel, PNG, JPEG.');
-  }
-}
-
-function removeRegFile(idx) {
-  regSelectedFiles.splice(idx, 1);
-  renderRegFileList();
-}
-
-function renderRegFileList() {
-  var list = document.getElementById('regFileList');
-  var note = document.getElementById('regFileCountNote');
-  list.innerHTML = '';
-  regSelectedFiles.forEach(function (f, idx) {
-    var item = document.createElement('div');
-    item.className = 'file-item';
-    item.innerHTML =
-      '<div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
-      '<div class="file-info">' +
-        '<div class="file-name">' + escHtml(f.name) + '</div>' +
-        '<div class="file-size">' + formatBytes(f.size) + '</div>' +
-      '</div>' +
-      '<button class="file-remove" type="button" onclick="removeRegFile(' + idx + ')" aria-label="Remove file">' +
-        '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-      '</button>';
-    list.appendChild(item);
-  });
-  if (regSelectedFiles.length > 0) {
-    var fileWord = regSelectedFiles.length === 1 ? 'file selected' : 'files selected';
-    note.textContent = regSelectedFiles.length + ' ' + fileWord;
-    note.style.display = 'block';
-  } else {
-    note.style.display = 'none';
-  }
-  document.getElementById('regUploadErr').style.display = 'none';
-}
-
-function showRegUploadError(msg) {
-  var err = document.getElementById('regUploadErr');
-  err.textContent = msg;
-  err.style.display = 'block';
-}
-
-var regDz = document.getElementById('regDropZone');
-regDz.addEventListener('dragover', function (e) { e.preventDefault(); regDz.classList.add('drag-over'); });
-regDz.addEventListener('dragleave', function (e) { if (!regDz.contains(e.relatedTarget)) regDz.classList.remove('drag-over'); });
-regDz.addEventListener('drop', function (e) { e.preventDefault(); regDz.classList.remove('drag-over'); handleRegFiles(e.dataTransfer.files); });
+// ---------------- STEP 5: DOCUMENT UPLOAD ----------------
+var regUpload = createUploadWidget({
+  dropZoneId: 'regDropZone',
+  fileInputIds: ['regFileInputDrop', 'regFileInputBrowse'],
+  fileListId: 'regFileList',
+  fileCountNoteId: 'regFileCountNote',
+  uploadErrId: 'regUploadErr'
+});
 
 </script>
 <script src="lang.js"></script>

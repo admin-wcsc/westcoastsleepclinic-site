@@ -228,8 +228,7 @@ footer{background:var(--cream)}
       <!-- Drag and drop zone -->
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInputDrop" multiple
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-          onchange="handleFiles(this.files)">
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
         <div class="dz-icon">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
@@ -244,8 +243,7 @@ footer{background:var(--cream)}
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <span data-i18n="pr.browse">Browse from Device</span>
           <input type="file" id="fileInputBrowse" multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-            onchange="handleFiles(this.files)">
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
         </label>
       </div>
 
@@ -290,9 +288,8 @@ footer{background:var(--cream)}
 </footer>
 
 <script src="storage-client.js"></script>
+<script src="upload-widget.js"></script>
 <script>
-var selectedFiles = [];
-
 function trLabel(key, fallback) {
   try {
     if (typeof T !== 'undefined' && typeof currentLang !== 'undefined' && T[currentLang] && T[currentLang][key] !== undefined) {
@@ -324,109 +321,24 @@ function patientFieldsOk() {
 }
 
 function updateSubmitButtonState() {
-  document.getElementById('btnSubmitFiles').disabled = !(selectedFiles.length > 0 && patientFieldsOk());
+  document.getElementById('btnSubmitFiles').disabled = !(prUpload.getFiles().length > 0 && patientFieldsOk());
 }
 
 document.getElementById('uploadModal').addEventListener('input', updateSubmitButtonState);
 document.getElementById('uploadModal').addEventListener('change', updateSubmitButtonState);
 
-// Drag and drop events
-var dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  dz.classList.add('drag-over');
+var prUpload = createUploadWidget({
+  dropZoneId: 'dropZone',
+  fileInputIds: ['fileInputDrop', 'fileInputBrowse'],
+  fileListId: 'fileList',
+  fileCountNoteId: 'fileCountNote',
+  uploadErrId: 'uploadErr',
+  tr: trLabel,
+  onChange: updateSubmitButtonState
 });
-dz.addEventListener('dragleave', function(e) {
-  if (!dz.contains(e.relatedTarget)) dz.classList.remove('drag-over');
-});
-dz.addEventListener('drop', function(e) {
-  e.preventDefault();
-  dz.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
-});
-
-var ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg'];
-
-function getExtension(filename) {
-  var dot = filename.lastIndexOf('.');
-  return dot === -1 ? '' : filename.slice(dot + 1).toLowerCase();
-}
-
-function handleFiles(files) {
-  var rejected = [];
-  for (var i = 0; i < files.length; i++) {
-    if (ALLOWED_EXTENSIONS.indexOf(getExtension(files[i].name)) === -1) {
-      rejected.push(files[i].name);
-      continue;
-    }
-    var duplicate = false;
-    for (var j = 0; j < selectedFiles.length; j++) {
-      if (selectedFiles[j].name === files[i].name && selectedFiles[j].size === files[i].size) {
-        duplicate = true;
-        break;
-      }
-    }
-    if (!duplicate) selectedFiles.push(files[i]);
-  }
-  // Reset inputs so the same file can be re-selected after removal
-  document.getElementById('fileInputDrop').value = '';
-  document.getElementById('fileInputBrowse').value = '';
-  renderFileList();
-  if (rejected.length > 0) {
-    showUploadError(trLabel('pr.err.unsupported', 'Unsupported file type — {files}. Accepted types: Word, PDF, Excel, PNG, JPEG.').replace('{files}', rejected.join(', ')));
-  }
-}
-
-function removeFile(idx) {
-  selectedFiles.splice(idx, 1);
-  renderFileList();
-}
-
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function renderFileList() {
-  var list  = document.getElementById('fileList');
-  var note  = document.getElementById('fileCountNote');
-
-  list.innerHTML = '';
-  selectedFiles.forEach(function(f, idx) {
-    var item = document.createElement('div');
-    item.className = 'file-item';
-    item.innerHTML =
-      '<div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
-      '<div class="file-info">' +
-        '<div class="file-name">' + escHtml(f.name) + '</div>' +
-        '<div class="file-size">' + formatBytes(f.size) + '</div>' +
-      '</div>' +
-      '<button class="file-remove" onclick="removeFile(' + idx + ')" aria-label="Remove file">' +
-        '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-      '</button>';
-    list.appendChild(item);
-  });
-
-  if (selectedFiles.length > 0) {
-    var fileWord = selectedFiles.length === 1
-      ? trLabel('pr.file_singular', 'file selected')
-      : trLabel('pr.file_plural', 'files selected');
-    note.textContent = selectedFiles.length + ' ' + fileWord;
-    note.style.display = 'block';
-  } else {
-    note.style.display = 'none';
-  }
-  document.getElementById('uploadErr').style.display = 'none';
-  updateSubmitButtonState();
-}
 
 function submitFiles() {
-  if (selectedFiles.length === 0 || !patientFieldsOk()) return;
+  if (prUpload.getFiles().length === 0 || !patientFieldsOk()) return;
 
   var btn = document.getElementById('btnSubmitFiles');
   btn.disabled = true;
@@ -439,14 +351,14 @@ function submitFiles() {
     patient_last_name: document.getElementById('patLastName').value.trim(),
     patient_dob: document.querySelector('input[name="patient_dob"]').value,
     submitted_at: new Date().toISOString(),
-    file_count: selectedFiles.length
-  }, selectedFiles)
+    file_count: prUpload.getFiles().length
+  }, prUpload.getFiles())
   .then(function () {
     closeModal();
     showDonePage();
   })
   .catch(function (err) {
-    showUploadError(trLabel('pr.err.upload_network', 'Unable to upload. Please call us at 727-472-9112 or try again. ({msg})').replace('{msg}', err.message));
+    prUpload.showError(trLabel('pr.err.upload_network', 'Unable to upload. Please call us at 727-472-9112 or try again. ({msg})').replace('{msg}', err.message));
     resetSubmitBtn();
   });
 }
@@ -458,12 +370,6 @@ function resetSubmitBtn() {
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>' +
     '</svg> <span data-i18n="pr.submit_files">' + trLabel('pr.submit_files', 'Submit Documents') + '</span>';
-}
-
-function showUploadError(msg) {
-  var err = document.getElementById('uploadErr');
-  err.textContent = msg;
-  err.style.display = 'block';
 }
 
 function showDonePage() {
