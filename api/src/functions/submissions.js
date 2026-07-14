@@ -74,12 +74,6 @@ async function listSubmissionIds(containerClient, type) {
   return ids;
 }
 
-async function countBlobsUnderPrefix(containerClient, prefix) {
-  let count = 0;
-  for await (const _blob of containerClient.listBlobsFlat({ prefix })) count++;
-  return count;
-}
-
 // registration.html and provider-referral.html use different field names
 // for the same three identity fields, so both are checked when matching a
 // submission against a patient who may already exist in storage (either
@@ -257,7 +251,7 @@ async function checkDrChronoForExistingPatient(containerClient, firstName, lastN
 }
 
 app.http('submissions', {
-  methods: ['GET', 'POST'],
+  methods: ['POST'],
   authLevel: 'anonymous',
   route: 'submissions/{type}',
   handler: async (request, context) => {
@@ -270,16 +264,6 @@ app.http('submissions', {
       if (SUBMISSION_TYPES.indexOf(type) === -1) {
         status = 404;
         jsonBody = { error: 'Unknown submission type: ' + type };
-      } else if (request.method === 'GET') {
-        const ids = await listSubmissionIds(containerClient, type);
-        const summaries = [];
-        for (const id of ids) {
-          const record = (await readRecordBlob(containerClient, `${type}/${id}/record.json`)) || {};
-          const fileCount = await countBlobsUnderPrefix(containerClient, `${type}/${id}/files/`);
-          summaries.push({ id, submittedAt: record.submittedAt, fileCount });
-        }
-        status = 200;
-        jsonBody = summaries;
       } else if (request.method === 'POST') {
         const body = await request.json();
         const data = body && body.data;

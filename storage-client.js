@@ -59,12 +59,7 @@ var StorageClient = (function () {
     });
   }
 
-  function listSubmissions(type) {
-    return request('/submissions/' + type, { method: 'GET' });
-  }
-
   return {
-    submitIntake: submitIntake,
-    listSubmissions: listSubmissions
+    submitIntake: submitIntake
   };
 })();

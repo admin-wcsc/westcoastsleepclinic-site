@@ -3,8 +3,13 @@
     { "route": "/home", "rewrite": "/index.html" },
     { "route": "/about", "rewrite": "/dr-scuteri.html" },
     { "route": "/referral", "rewrite": "/provider-referral.html" },
+    { "route": "/registration", "rewrite": "/registration.html" },
     { "route": "/dr-scuteri.html", "redirect": "/about", "statusCode": 301 },
-    { "route": "/provider-referral.html", "redirect": "/referral", "statusCode": 301 }
+    { "route": "/provider-referral.html", "redirect": "/referral", "statusCode": 301 },
+    { "route": "/index.html", "redirect": "/", "statusCode": 301 }
   ],
-  "trailingSlash": "never"
+  "trailingSlash": "never",
+  "globalHeaders": {
+    "Cache-Control": "public, max-age=3600"
+  }
 }
