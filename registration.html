@@ -445,7 +445,7 @@ footer{background:var(--cream)}
       <div class="fsec">
         <div class="fsec-ttl">Additional Information</div>
         <div class="fg fg2">
-          <div class="fld"><label>Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;"></div>
+          <div class="fld"><label>Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;" inputmode="numeric"></div>
           <div class="fld"><label>Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
         </div>
         <div class="fld mt-16"><label>Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
@@ -1848,6 +1848,33 @@ document.querySelectorAll('input[type="tel"]').forEach(function (input) {
     input.setSelectionRange(pos, pos);
   });
 });
+
+// ---------------- HEIGHT AUTO-FORMAT (feet'inches") ----------------
+// Single digit feet, up to 2-digit inches capped at 12.
+function formatHeight(raw) {
+  var digits = raw.replace(/\D/g, '').slice(0, 3);
+  if (!digits.length) return '';
+  if (digits.length === 1) return digits + "'";
+  var feet = digits.slice(0, 1);
+  var inches = digits.slice(1);
+  if (inches.length === 2 && parseInt(inches, 10) > 12) inches = '12';
+  return feet + "'" + inches + '"';
+}
+
+var heightInput = document.querySelector('[name="height"]');
+if (heightInput) {
+  heightInput.addEventListener('input', function () {
+    var caretDigitsBefore = heightInput.value.slice(0, heightInput.selectionStart).replace(/\D/g, '').length;
+    var formatted = formatHeight(heightInput.value);
+    heightInput.value = formatted;
+    var pos = 0, seen = 0;
+    while (pos < formatted.length && seen < caretDigitsBefore) {
+      if (/\d/.test(formatted[pos])) seen++;
+      pos++;
+    }
+    heightInput.setSelectionRange(pos, pos);
+  });
+}
 
 // ---------------- STEP 1 MENU: live status + initial paint ----------------
 document.getElementById('fstep2').addEventListener('input', renderS1Menu);
