@@ -115,10 +115,12 @@ body{background:#f4f8fb}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(10,30,50,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
 .modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
-/* Insurance modal has more fields than the others (2 insurance dropdowns,
-   policy holder details, PCP/referring provider) — widened so its fg2/fg3
-   rows can lay out side by side instead of cramming into the shared 580px. */
-#modalS1Ins .modal-card{max-width:760px}
+/* Insurance and Patient Details are the two longest Step 2 modals — widened
+   so their fg2/fg3 rows can lay out side by side instead of cramming into
+   the shared 580px. Emergency Contact and Pharmacy stay at the default
+   width; they're short enough that the single-column layout reads fine. */
+#modalS1Ins .modal-card,
+#modalS1Details .modal-card{max-width:760px}
 .modal-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .modal-head h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg)}
 .modal-close{background:none;border:none;cursor:pointer;color:var(--tl);line-height:1;padding:4px;border-radius:4px;transition:color .2s,background .2s}
