@@ -47,6 +47,8 @@ en: {
   'p3.h4':'Your Health, Our Priority','p3.p':'Your long-term health, comfort, and wellbeing are at the center of every decision we make. We are committed to real, lasting results.',
   /* FOOTER */
   'foot.copy':'&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida',
+  /* FLOATING CALL BUTTON (EN only for now, see feedback-wcsc-dev-pause-i18n memory) */
+  'fab.call':'Call Us',
   /* REGISTRATION PAGE */
   'reg.h2':'New Patient Registration','reg.welcome':'Welcome to West Coast Sleep Clinic!','reg.sub':'Please complete all forms below. Use the Next button to proceed through each step.',
   'step.1':'Patient Demographics','step.2':'Consent to Treat','step.3':'Financial Policy','step.4':'HIPAA Notice of Privacy Practices','step.5':'Text &amp; Telehealth Consent','step.6':'Authorization to Release','step.7':'Reason for Appointment',

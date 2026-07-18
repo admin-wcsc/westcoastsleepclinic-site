@@ -41,6 +41,13 @@ jobs:
           cd registration-app
           npm install
           npm run build
+      # Guarantees the deployed pages can never drift from partials/header.html
+      # and partials/footer.html — the same script that runs locally before
+      # `npm start` (see package.json's "prestart") runs here too.
+      - name: Sync shared header/footer
+        if: github.ref == 'refs/heads/dev'
+        run: node scripts/sync-partials.js
+
       - name: Assemble combined deploy folder
         if: github.ref == 'refs/heads/dev'
         run: |

@@ -1,0 +1,32 @@
+<!-- ══════ HEADER ══════ -->
+<header class="site-header">
+  <div class="nav-wrap">
+    <nav>
+      <ul class="main-nav">
+        <li><a href="/" data-i18n="nav.home">Home</a></li>
+        <li><a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration" data-i18n="nav.reg">New Patient Registration</a></li>
+        <li><a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a></li>
+      </ul>
+    </nav>
+    <div class="lang-toggle" style="margin-left:auto">
+      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
+    </div>
+    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+<div class="mob-nav" id="mobNav">
+  <a href="/" data-i18n="nav.home">Home</a>
+  <a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
+  <a href="/registration" data-i18n="nav.reg">New Patient Registration</a>
+  <a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a>
+  <div class="mob-lang-wrap">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnES2" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
+</div>

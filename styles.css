@@ -22,16 +22,25 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .main-nav{display:flex;align-items:center;gap:4px;list-style:none}
 .main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap;cursor:pointer}
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
-.nav-phone{font-size:14px;font-weight:600;color:#2C7DA0;text-decoration:none;white-space:nowrap;flex-shrink:0}
-.nav-phone:hover{color:var(--td)}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
 .mob-nav{display:none;position:fixed;top:var(--nav-height);left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
 .mob-nav.open{display:block}
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
-.mob-phone{display:block;padding:14px 24px 8px;font-size:17px;font-weight:700;color:#2C7DA0;text-decoration:none}
-@media(max-width:860px){.main-nav,.nav-phone,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex}.ins-badge{display:none}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
+@media(max-width:860px){.main-nav,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex}.ins-badge{display:none}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
+
+/* ── FLOATING CALL BUTTON (persistent across all pages, replaces the old
+   nav-bar/hamburger phone links) ── */
+.call-fab{position:fixed;right:20px;bottom:20px;z-index:150}
+.call-fab-btn{width:56px;height:56px;border-radius:50%;background:var(--dg);opacity:.82;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;transition:opacity .2s,transform .2s}
+.call-fab-btn:hover{opacity:1;transform:scale(1.06)}
+.call-fab-btn svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.call-fab-pop{display:none;position:absolute;right:0;bottom:66px;background:#fff;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:16px 20px;white-space:nowrap;text-align:center}
+.call-fab-pop.open{display:block}
+.call-fab-pop-lbl{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--tl);font-weight:600;margin-bottom:4px}
+.call-fab-pop a{font-size:18px;font-weight:700;color:var(--dg);text-decoration:none}
+.call-fab-pop a:hover{color:var(--gold)}
 
 /* ── HERO ── */
 .hero{background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;color:var(--td);padding:48px 24px 32px;position:relative;overflow:hidden;min-height:520px}

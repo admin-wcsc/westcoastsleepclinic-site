@@ -2,6 +2,8 @@
   "name": "wcsc-site-dev",
   "private": true,
   "scripts": {
+    "sync-partials": "node scripts/sync-partials.js",
+    "prestart": "node scripts/sync-partials.js",
     "start": "swa start . --api-location api"
   },
   "devDependencies": {
