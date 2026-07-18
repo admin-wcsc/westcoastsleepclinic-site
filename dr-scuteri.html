@@ -20,9 +20,6 @@
 <link rel="stylesheet" href="styles.css">
 <style>
 body{background:#fff}
-.lang-toggle{display:flex;gap:4px;flex-shrink:0}
-.lang-btn{background:none;border:1px solid rgba(44,125,160,.3);border-radius:4px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--mg);cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
-.mob-lang-wrap{padding:14px 24px 4px;display:flex;align-items:center;gap:10px}
 
 /* ── SCROLL REVEAL ── */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
@@ -115,38 +112,72 @@ body{background:#fff}
 </head>
 <body>
 
+<!-- SHARED:BANNER:START (kept in sync from partials/banner.html by scripts/sync-partials.js — edit the partial, not this block) -->
+<!-- ══════ RELOCATION / TELEMEDICINE BANNER ══════
+     Temporary, site-wide banner. Fully self-contained (styling + toggle
+     logic live right here) so it can be removed later by deleting this
+     file, removing the SHARED:BANNER markers from the 4 pages, and
+     dropping its entry from scripts/sync-partials.js's SECTIONS list --
+     nothing elsewhere depends on it.
+     To hide it instantly without any of that, set BANNER_ENABLED to
+     false below and re-run the sync. -->
+<style>
+  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px}
+  .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-in p{margin:0 0 12px}
+  .relocation-banner-in p:last-child{margin-bottom:0}
+  .relocation-banner-in strong{display:block;margin-bottom:4px}
+  .relocation-banner-more{display:none}
+  .relocation-banner-more.open{display:block}
+  .relocation-banner-toggle{background:none;border:none;padding:0;color:#7a1f1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:14px;font-family:'Montserrat',sans-serif}
+  .hide-relocation-banner .relocation-banner{display:none}
+</style>
+<div class="relocation-banner" id="relocation-banner">
+  <div class="relocation-banner-in">
+    <p><span>As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span> <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()">Read More</button></p>
+    <div class="relocation-banner-more" id="relocationBannerMore">
+      <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
+      <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
+      <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
+      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+    </div>
+  </div>
+</div>
+<script>
+  var BANNER_ENABLED = true; // set to false to hide the banner on every page
+  if (!BANNER_ENABLED) document.documentElement.classList.add('hide-relocation-banner');
+
+  function toggleRelocationBannerMore() {
+    var more = document.getElementById('relocationBannerMore');
+    var btn = document.getElementById('relocationBannerToggle');
+    var open = more.classList.toggle('open');
+    btn.textContent = open ? 'Read Less' : 'Read More';
+  }
+</script>
+<!-- SHARED:BANNER:END -->
+
 <!-- SHARED:HEADER:START (kept in sync from partials/header.html by scripts/sync-partials.js — edit the partial, not this block) -->
 <!-- ══════ HEADER ══════ -->
 <header class="site-header">
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/" data-i18n="nav.home">Home</a></li>
-        <li><a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration" data-i18n="nav.reg">New Patient Registration</a></li>
-        <li><a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/referral">Provider Referral Intake</a></li>
       </ul>
     </nav>
-    <div class="lang-toggle" style="margin-left:auto">
-      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
-    </div>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()">
+    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/" data-i18n="nav.home">Home</a>
-  <a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
-  <a href="/registration" data-i18n="nav.reg">New Patient Registration</a>
-  <a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a>
-  <div class="mob-lang-wrap">
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES2" onclick="setLang('es')">ES</button>
-    </div>
-  </div>
+  <a href="/">Home</a>
+  <a href="/about">Meet Dr. Scuteri</a>
+  <a href="/registration">New Patient Registration</a>
+  <a href="/referral">Provider Referral Intake</a>
 </div>
 <!-- SHARED:HEADER:END -->
 
@@ -156,32 +187,32 @@ body{background:#fff}
     <p class="dr-eyebrow">West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</p>
     <div class="dr-gold-rule"></div>
     <h1 class="dr-name">Dr. Bryan Scuteri</h1>
-    <p class="dr-title-line" data-i18n="dr.title">Founder &nbsp;&middot;&nbsp; Physician &nbsp;&middot;&nbsp; Sleep Medicine Specialist</p>
-    <p class="dr-credential-line" data-i18n="dr.credential">Double Board-Certified in Sleep Medicine &amp; Family Medicine</p>
+    <p class="dr-title-line">Founder &nbsp;&middot;&nbsp; Physician &nbsp;&middot;&nbsp; Sleep Medicine Specialist</p>
+    <p class="dr-credential-line">Double Board-Certified in Sleep Medicine &amp; Family Medicine</p>
     <div class="dr-hero-creds">
       <div class="dr-cred-card reveal reveal-delay-1">
         <div class="dr-cred-icon">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
         </div>
-        <p class="dr-cred-label" data-i18n="dr.cred.cert">Board-Certified</p>
-        <p class="dr-cred-title" data-i18n="dr.cred.sleep">Sleep Medicine</p>
-        <p class="dr-cred-sub" data-i18n="dr.cred.sub1">American Board of Sleep Medicine</p>
+        <p class="dr-cred-label">Board-Certified</p>
+        <p class="dr-cred-title">Sleep Medicine</p>
+        <p class="dr-cred-sub">American Board of Sleep Medicine</p>
       </div>
       <div class="dr-cred-card reveal reveal-delay-2">
         <div class="dr-cred-icon">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <p class="dr-cred-label" data-i18n="dr.cred.cert">Board-Certified</p>
-        <p class="dr-cred-title" data-i18n="dr.cred.family">Family Medicine</p>
-        <p class="dr-cred-sub" data-i18n="dr.cred.sub2">American Board of Family Medicine</p>
+        <p class="dr-cred-label">Board-Certified</p>
+        <p class="dr-cred-title">Family Medicine</p>
+        <p class="dr-cred-sub">American Board of Family Medicine</p>
       </div>
       <div class="dr-cred-card reveal reveal-delay-3">
         <div class="dr-cred-icon">
           <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
         </div>
-        <p class="dr-cred-label" data-i18n="dr.cred.fellow">Fellowship Training</p>
-        <p class="dr-cred-title" data-i18n="dr.cred.sleep">Sleep Medicine</p>
-        <p class="dr-cred-sub" data-i18n="dr.cred.sub3">Louisiana State University &middot; 2019</p>
+        <p class="dr-cred-label">Fellowship Training</p>
+        <p class="dr-cred-title">Sleep Medicine</p>
+        <p class="dr-cred-sub">Louisiana State University &middot; 2019</p>
       </div>
     </div>
   </div>
@@ -191,7 +222,7 @@ body{background:#fff}
 <section class="dr-opening">
   <div class="dr-opening-in reveal">
     <span class="dr-open-mark">&ldquo;</span>
-    <p class="dr-opening-quote" data-i18n="dr.open.q">Sleep is one of the greatest mysteries left in medicine. We know it influences nearly every system in the body — the brain, heart, hormones, metabolism, immune system, and even longevity. Yet we&rsquo;re still discovering why sleep is so essential. That mystery drew me into this field, and every day I continue learning something new.</p>
+    <p class="dr-opening-quote">Sleep is one of the greatest mysteries left in medicine. We know it influences nearly every system in the body — the brain, heart, hormones, metabolism, immune system, and even longevity. Yet we&rsquo;re still discovering why sleep is so essential. That mystery drew me into this field, and every day I continue learning something new.</p>
     <span class="dr-close-mark">&rdquo;</span>
   </div>
 </section>
@@ -199,42 +230,42 @@ body{background:#fff}
 <!-- ══════ BIOGRAPHY ══════ -->
 <section class="dr-bio">
   <div class="dr-bio-in">
-    <h2 class="dr-bio-h2 reveal" data-i18n="dr.bio.h2">About Dr. Bryan Scuteri</h2>
+    <h2 class="dr-bio-h2 reveal">About Dr. Bryan Scuteri</h2>
     <div class="dr-bio-divider reveal"></div>
 
-    <p class="reveal" data-i18n="dr.p1">Dr. Bryan Scuteri is a double board-certified physician in Sleep Medicine and Family Medicine and the founder of West Coast Sleep Clinic in Largo, Florida. His approach to medicine is built on a simple belief: people deserve to understand why they don&rsquo;t feel well&mdash;not just receive another prescription.</p>
+    <p class="reveal">Dr. Bryan Scuteri is a double board-certified physician in Sleep Medicine and Family Medicine and the founder of West Coast Sleep Clinic in Largo, Florida. His approach to medicine is built on a simple belief: people deserve to understand why they don&rsquo;t feel well&mdash;not just receive another prescription.</p>
 
-    <p class="reveal" data-i18n="dr.p2">After completing his residency in Family Medicine, Dr. Scuteri pursued fellowship training in Sleep Medicine at Louisiana State University, graduating in 2019. It was there that a lifelong fascination became a career.</p>
+    <p class="reveal">After completing his residency in Family Medicine, Dr. Scuteri pursued fellowship training in Sleep Medicine at Louisiana State University, graduating in 2019. It was there that a lifelong fascination became a career.</p>
 
-    <p class="reveal" data-i18n="dr.p3">To Dr. Scuteri, sleep medicine is far more than diagnosing sleep apnea or interpreting sleep studies. It is understanding the person behind the symptoms. Fatigue, poor concentration, weight gain, low motivation, depression, memory problems, and chronic health conditions are often deeply connected, and finding those connections is what he enjoys most.</p>
+    <p class="reveal">To Dr. Scuteri, sleep medicine is far more than diagnosing sleep apnea or interpreting sleep studies. It is understanding the person behind the symptoms. Fatigue, poor concentration, weight gain, low motivation, depression, memory problems, and chronic health conditions are often deeply connected, and finding those connections is what he enjoys most.</p>
 
-    <p class="reveal" data-i18n="dr.p4">Since opening West Coast Sleep Clinic, Dr. Scuteri has cared for patients with the full spectrum of sleep disorders, including obstructive and central sleep apnea, insomnia, narcolepsy, restless legs syndrome, parasomnias, and circadian rhythm disorders. His philosophy has always been rooted in evidence-based medicine, compassionate listening, and individualized care.</p>
+    <p class="reveal">Since opening West Coast Sleep Clinic, Dr. Scuteri has cared for patients with the full spectrum of sleep disorders, including obstructive and central sleep apnea, insomnia, narcolepsy, restless legs syndrome, parasomnias, and circadian rhythm disorders. His philosophy has always been rooted in evidence-based medicine, compassionate listening, and individualized care.</p>
 
-    <p class="reveal" data-i18n="dr.p5">Some of the most rewarding moments in his career happen long after the sleep study is over.</p>
-
-    <div class="dr-pullquote reveal">
-      <p data-i18n="dr.q1">&ldquo;I&rsquo;ve watched parents regain the energy to play with their children. I&rsquo;ve seen patients rediscover the focus they thought they&rsquo;d lost forever. Others tell me they finally enjoy retirement, succeed at work again, or simply wake up feeling like themselves for the first time in years. Those moments remind me why I chose this profession.&rdquo;</p>
-    </div>
-
-    <p class="reveal" data-i18n="dr.p6">Over time, Dr. Scuteri recognized that restoring healthy sleep often requires addressing the conditions that contribute to poor sleep in the first place. Obesity, metabolic dysfunction, hormonal changes, inflammation, and lifestyle all influence how well the body sleeps&mdash;and how well it heals.</p>
-
-    <p class="reveal" data-i18n="dr.p7">That realization naturally expanded West Coast Sleep Clinic into a center focused on both sleep medicine and health optimization. Medical weight management, including GLP-1 therapy, hormone optimization for appropriately selected patients, and other evidence-based wellness treatments are offered as part of a comprehensive approach to improving health&mdash;not as standalone trends or quick fixes.</p>
+    <p class="reveal">Some of the most rewarding moments in his career happen long after the sleep study is over.</p>
 
     <div class="dr-pullquote reveal">
-      <p data-i18n="dr.q2">&ldquo;I don&rsquo;t believe in treating isolated diagnoses. I believe in helping people restore their health. Better sleep improves overall health, and better overall health almost always improves sleep. When we address both together, we can often change someone&rsquo;s quality of life in ways they never thought possible.&rdquo;</p>
+      <p>&ldquo;I&rsquo;ve watched parents regain the energy to play with their children. I&rsquo;ve seen patients rediscover the focus they thought they&rsquo;d lost forever. Others tell me they finally enjoy retirement, succeed at work again, or simply wake up feeling like themselves for the first time in years. Those moments remind me why I chose this profession.&rdquo;</p>
     </div>
 
-    <p class="reveal" data-i18n="dr.p8">Whether caring for someone struggling with severe sleep apnea, chronic fatigue, unexplained daytime sleepiness, or helping patients optimize their long-term health, Dr. Scuteri&rsquo;s mission remains the same:</p>
+    <p class="reveal">Over time, Dr. Scuteri recognized that restoring healthy sleep often requires addressing the conditions that contribute to poor sleep in the first place. Obesity, metabolic dysfunction, hormonal changes, inflammation, and lifestyle all influence how well the body sleeps&mdash;and how well it heals.</p>
+
+    <p class="reveal">That realization naturally expanded West Coast Sleep Clinic into a center focused on both sleep medicine and health optimization. Medical weight management, including GLP-1 therapy, hormone optimization for appropriately selected patients, and other evidence-based wellness treatments are offered as part of a comprehensive approach to improving health&mdash;not as standalone trends or quick fixes.</p>
+
+    <div class="dr-pullquote reveal">
+      <p>&ldquo;I don&rsquo;t believe in treating isolated diagnoses. I believe in helping people restore their health. Better sleep improves overall health, and better overall health almost always improves sleep. When we address both together, we can often change someone&rsquo;s quality of life in ways they never thought possible.&rdquo;</p>
+    </div>
+
+    <p class="reveal">Whether caring for someone struggling with severe sleep apnea, chronic fatigue, unexplained daytime sleepiness, or helping patients optimize their long-term health, Dr. Scuteri&rsquo;s mission remains the same:</p>
   </div>
 </section>
 
 <!-- ══════ MISSION ══════ -->
 <section class="dr-mission">
   <div class="dr-mission-in">
-    <p class="dr-mission-eyebrow reveal" data-i18n="dr.mission.lbl">Mission</p>
+    <p class="dr-mission-eyebrow reveal">Mission</p>
     <div class="dr-mission-rule reveal"></div>
-    <p class="dr-mission-quote reveal" data-i18n="dr.mission.quote">To help people reclaim their energy, restore their health, and live life to its fullest.</p>
-    <p class="dr-mission-close reveal" data-i18n="dr.mission.close">Because when people sleep better, they don&rsquo;t just rest better&mdash;they live better.</p>
+    <p class="dr-mission-quote reveal">To help people reclaim their energy, restore their health, and live life to its fullest.</p>
+    <p class="dr-mission-close reveal">Because when people sleep better, they don&rsquo;t just rest better&mdash;they live better.</p>
   </div>
 </section>
 
@@ -268,14 +299,14 @@ body{background:#fff}
       </div>
     </div>
     <div class="foot-bot">
-      <span data-i18n="foot.copy">&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+      <span>&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
     </div>
   </div>
 </footer>
 
 <div class="call-fab">
   <div class="call-fab-pop" id="callFabPop">
-    <div class="call-fab-pop-lbl" data-i18n="fab.call">Call Us</div>
+    <div class="call-fab-pop-lbl">Call Us</div>
     <a href="tel:7274729112">727-472-9112</a>
   </div>
   <button class="call-fab-btn" aria-label="Call Us" onclick="toggleCallFab()">
@@ -297,6 +328,5 @@ const io = new IntersectionObserver(function(entries) {
 document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
 </script>
 <script src="script.js"></script>
-<script src="lang.js"></script>
 </body>
 </html>

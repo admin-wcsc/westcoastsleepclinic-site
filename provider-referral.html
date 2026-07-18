@@ -108,45 +108,79 @@ footer{background:var(--cream)}
 </head>
 <body>
 
+<!-- SHARED:BANNER:START (kept in sync from partials/banner.html by scripts/sync-partials.js — edit the partial, not this block) -->
+<!-- ══════ RELOCATION / TELEMEDICINE BANNER ══════
+     Temporary, site-wide banner. Fully self-contained (styling + toggle
+     logic live right here) so it can be removed later by deleting this
+     file, removing the SHARED:BANNER markers from the 4 pages, and
+     dropping its entry from scripts/sync-partials.js's SECTIONS list --
+     nothing elsewhere depends on it.
+     To hide it instantly without any of that, set BANNER_ENABLED to
+     false below and re-run the sync. -->
+<style>
+  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px}
+  .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-in p{margin:0 0 12px}
+  .relocation-banner-in p:last-child{margin-bottom:0}
+  .relocation-banner-in strong{display:block;margin-bottom:4px}
+  .relocation-banner-more{display:none}
+  .relocation-banner-more.open{display:block}
+  .relocation-banner-toggle{background:none;border:none;padding:0;color:#7a1f1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:14px;font-family:'Montserrat',sans-serif}
+  .hide-relocation-banner .relocation-banner{display:none}
+</style>
+<div class="relocation-banner" id="relocation-banner">
+  <div class="relocation-banner-in">
+    <p><span>As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span> <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()">Read More</button></p>
+    <div class="relocation-banner-more" id="relocationBannerMore">
+      <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
+      <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
+      <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
+      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+    </div>
+  </div>
+</div>
+<script>
+  var BANNER_ENABLED = true; // set to false to hide the banner on every page
+  if (!BANNER_ENABLED) document.documentElement.classList.add('hide-relocation-banner');
+
+  function toggleRelocationBannerMore() {
+    var more = document.getElementById('relocationBannerMore');
+    var btn = document.getElementById('relocationBannerToggle');
+    var open = more.classList.toggle('open');
+    btn.textContent = open ? 'Read Less' : 'Read More';
+  }
+</script>
+<!-- SHARED:BANNER:END -->
+
 <!-- SHARED:HEADER:START (kept in sync from partials/header.html by scripts/sync-partials.js — edit the partial, not this block) -->
 <!-- ══════ HEADER ══════ -->
 <header class="site-header">
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/" data-i18n="nav.home">Home</a></li>
-        <li><a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration" data-i18n="nav.reg">New Patient Registration</a></li>
-        <li><a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/referral">Provider Referral Intake</a></li>
       </ul>
     </nav>
-    <div class="lang-toggle" style="margin-left:auto">
-      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
-    </div>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()">
+    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/" data-i18n="nav.home">Home</a>
-  <a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
-  <a href="/registration" data-i18n="nav.reg">New Patient Registration</a>
-  <a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a>
-  <div class="mob-lang-wrap">
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES2" onclick="setLang('es')">ES</button>
-    </div>
-  </div>
+  <a href="/">Home</a>
+  <a href="/about">Meet Dr. Scuteri</a>
+  <a href="/registration">New Patient Registration</a>
+  <a href="/referral">Provider Referral Intake</a>
 </div>
 <!-- SHARED:HEADER:END -->
 
 <!-- ══════ PAGE HEADER ══════ -->
 <div class="reg-hdr">
-  <h1 data-i18n="pr.hdr.h1">Provider Referral Intake</h1>
-  <p data-i18n="pr.hdr.sub">Securely submit patient referral documents to West Coast Sleep Clinic</p>
+  <h1>Provider Referral Intake</h1>
+  <p>Securely submit patient referral documents to West Coast Sleep Clinic</p>
 </div>
 
 <!-- ══════ MAIN CONTENT ══════ -->
@@ -154,22 +188,22 @@ footer{background:var(--cream)}
   <div class="page-wrap">
 
     <div class="disclaimer-box">
-      <p data-i18n="pr.disc.p1">Thank you for referring your patient to West Coast Sleep Clinic. We appreciate your referral and look forward to providing excellent care.</p>
-      <p data-i18n="pr.disc.p2">To help us schedule your patient's appointment as quickly as possible, please upload the following:</p>
+      <p>Thank you for referring your patient to West Coast Sleep Clinic. We appreciate your referral and look forward to providing excellent care.</p>
+      <p>To help us schedule your patient's appointment as quickly as possible, please upload the following:</p>
       <ul>
-        <li data-i18n="pr.disc.li1">Patient demographics (including contact information and insurance)</li>
-        <li data-i18n="pr.disc.li2">Provider referral/order</li>
-        <li data-i18n="pr.disc.li3">Relevant medical records (if available)</li>
+        <li>Patient demographics (including contact information and insurance)</li>
+        <li>Provider referral/order</li>
+        <li>Relevant medical records (if available)</li>
       </ul>
-      <p data-i18n="pr.disc.p3">Please note: A provider referral is required for patients with HMO insurance plans and may also be required by other insurance plans before an appointment can be scheduled.</p>
-      <p data-i18n="pr.disc.p4">Once all required documents have been received, our scheduling team will contact the patient promptly to arrange their appointment.</p>
-      <p data-i18n="pr.disc.p5">Thank you for trusting West Coast Sleep Clinic with your patient's care.</p>
+      <p>Please note: A provider referral is required for patients with HMO insurance plans and may also be required by other insurance plans before an appointment can be scheduled.</p>
+      <p>Once all required documents have been received, our scheduling team will contact the patient promptly to arrange their appointment.</p>
+      <p>Thank you for trusting West Coast Sleep Clinic with your patient's care.</p>
     </div>
 
     <div class="upload-trigger-wrap">
       <button class="btn-upload-open" onclick="openModal()">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span data-i18n="pr.upload.btn">Click Here to Upload Files</span>
+        <span>Click Here to Upload Files</span>
       </button>
     </div>
 
@@ -179,12 +213,12 @@ footer{background:var(--cream)}
 <!-- ══════ DONE STATE ══════ -->
 <div id="donePg" class="done-wrap">
   <div class="done-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-  <h2 data-i18n="pr.done.h2">Documents Received</h2>
-  <p data-i18n="pr.done.p1">Thank you. Your referral documents have been successfully submitted to West Coast Sleep Clinic.</p>
-  <p data-i18n="pr.done.p2">Our scheduling team will contact the patient promptly to arrange their appointment.</p>
-  <p style="margin-top:20px"><em data-i18n="pr.done.p3">Thank you for trusting West Coast Sleep Clinic with your patient's care.</em></p>
+  <h2>Documents Received</h2>
+  <p>Thank you. Your referral documents have been successfully submitted to West Coast Sleep Clinic.</p>
+  <p>Our scheduling team will contact the patient promptly to arrange their appointment.</p>
+  <p style="margin-top:20px"><em>Thank you for trusting West Coast Sleep Clinic with your patient's care.</em></p>
   <div style="margin-top:36px">
-    <a href="/" data-i18n="done.home" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
   </div>
 </div>
 
@@ -192,7 +226,7 @@ footer{background:var(--cream)}
 <div class="modal-bg" id="uploadModal" onclick="handleBackdropClick(event)">
   <div class="modal-card">
     <div class="modal-head">
-      <h3 data-i18n="pr.modal.title">Upload Referral Documents</h3>
+      <h3>Upload Referral Documents</h3>
       <button class="modal-close" onclick="closeModal()" aria-label="Close">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -230,16 +264,16 @@ footer{background:var(--cream)}
         <div class="dz-icon">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
-        <div class="dz-primary" data-i18n="pr.dz.primary">Drag &amp; drop files here</div>
-        <div class="dz-types" data-i18n="pr.dz.types">Word &middot; PDF &middot; Excel &middot; PNG &middot; JPEG</div>
+        <div class="dz-primary">Drag &amp; drop files here</div>
+        <div class="dz-types">Word &middot; PDF &middot; Excel &middot; PNG &middot; JPEG</div>
       </div>
 
-      <div class="dz-or" data-i18n="pr.dz.or">or</div>
+      <div class="dz-or">or</div>
 
       <div style="text-align:center">
         <label class="btn-browse">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span data-i18n="pr.browse">Browse from Device</span>
+          <span>Browse from Device</span>
           <input type="file" id="fileInputBrowse" multiple
             accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
         </label>
@@ -252,10 +286,10 @@ footer{background:var(--cream)}
     </div>
 
     <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeModal()" data-i18n="pr.cancel">Cancel</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-submit-files" id="btnSubmitFiles" onclick="submitFiles()" disabled>
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span data-i18n="pr.submit_files">Submit Documents</span>
+        <span>Submit Documents</span>
       </button>
     </div>
   </div>
@@ -291,14 +325,14 @@ footer{background:var(--cream)}
       </div>
     </div>
     <div class="foot-bot">
-      <span data-i18n="foot.copy">&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+      <span>&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
     </div>
   </div>
 </footer>
 
 <div class="call-fab">
   <div class="call-fab-pop" id="callFabPop">
-    <div class="call-fab-pop-lbl" data-i18n="fab.call">Call Us</div>
+    <div class="call-fab-pop-lbl">Call Us</div>
     <a href="tel:7274729112">727-472-9112</a>
   </div>
   <button class="call-fab-btn" aria-label="Call Us" onclick="toggleCallFab()">
@@ -310,15 +344,6 @@ footer{background:var(--cream)}
 <script src="storage-client.js"></script>
 <script src="upload-widget.js"></script>
 <script>
-function trLabel(key, fallback) {
-  try {
-    if (typeof T !== 'undefined' && typeof currentLang !== 'undefined' && T[currentLang] && T[currentLang][key] !== undefined) {
-      return T[currentLang][key];
-    }
-  } catch (e) {}
-  return fallback;
-}
-
 function openModal() {
   document.getElementById('uploadModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -353,7 +378,6 @@ var prUpload = createUploadWidget({
   fileListId: 'fileList',
   fileCountNoteId: 'fileCountNote',
   uploadErrId: 'uploadErr',
-  tr: trLabel,
   onChange: updateSubmitButtonState
 });
 
@@ -362,7 +386,7 @@ function submitFiles() {
 
   var btn = document.getElementById('btnSubmitFiles');
   btn.disabled = true;
-  btn.textContent = trLabel('pr.uploading', 'Uploading…');
+  btn.textContent = 'Uploading…';
   document.getElementById('uploadErr').style.display = 'none';
 
   StorageClient.submitIntake('referral', {
@@ -378,7 +402,7 @@ function submitFiles() {
     showDonePage();
   })
   .catch(function (err) {
-    prUpload.showError(trLabel('pr.err.upload_network', 'Unable to upload. Please call us at 727-472-9112 or try again. ({msg})').replace('{msg}', err.message));
+    prUpload.showError('Unable to upload. Please call us at 727-472-9112 or try again. (' + err.message + ')');
     resetSubmitBtn();
   });
 }
@@ -389,7 +413,7 @@ function resetSubmitBtn() {
   btn.innerHTML =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>' +
-    '</svg> <span data-i18n="pr.submit_files">' + trLabel('pr.submit_files', 'Submit Documents') + '</span>';
+    '</svg> <span>Submit Documents</span>';
 }
 
 function showDonePage() {
@@ -408,6 +432,5 @@ document.addEventListener('keydown', function (e) {
 </script>
 <script src="date-picker.js"></script>
 <script src="script.js"></script>
-<script src="lang.js"></script>
 </body>
 </html>

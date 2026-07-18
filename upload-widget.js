@@ -24,7 +24,6 @@ function formatBytes(bytes) {
 
 // opts:
 //   dropZoneId, fileInputIds (array), fileListId, fileCountNoteId, uploadErrId — required
-//   tr(key, fallback) — optional; omit to always use the English fallback text
 //   onChange() — optional; called after every add/remove so the page can react
 //   (e.g. provider-referral.html re-checks whether Submit should be enabled)
 function createUploadWidget(opts) {
@@ -33,7 +32,6 @@ function createUploadWidget(opts) {
   var fileList = document.getElementById(opts.fileListId);
   var fileCountNote = document.getElementById(opts.fileCountNoteId);
   var uploadErr = document.getElementById(opts.uploadErrId);
-  var tr = opts.tr || function (key, fallback) { return fallback; };
 
   function showError(msg) {
     uploadErr.textContent = msg;
@@ -60,7 +58,7 @@ function createUploadWidget(opts) {
     opts.fileInputIds.forEach(function (id) { document.getElementById(id).value = ''; });
     renderFileList();
     if (rejected.length > 0) {
-      showError(tr('pr.err.unsupported', 'Unsupported file type — {files}. Accepted types: Word, PDF, Excel, PNG, JPEG.').replace('{files}', rejected.join(', ')));
+      showError('Unsupported file type — ' + rejected.join(', ') + '. Accepted types: Word, PDF, Excel, PNG, JPEG.');
     }
   }
 
@@ -87,7 +85,7 @@ function createUploadWidget(opts) {
     });
 
     if (files.length > 0) {
-      var fileWord = files.length === 1 ? tr('pr.file_singular', 'file selected') : tr('pr.file_plural', 'files selected');
+      var fileWord = files.length === 1 ? 'file selected' : 'files selected';
       fileCountNote.textContent = files.length + ' ' + fileWord;
       fileCountNote.style.display = 'block';
     } else {

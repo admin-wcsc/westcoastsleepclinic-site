@@ -28,7 +28,7 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:300;line-hei
 .mob-nav.open{display:block}
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
 .mob-nav a:hover{color:var(--gold);background:rgba(0,0,0,.04)}
-@media(max-width:860px){.main-nav,.nav-wrap .lang-toggle{display:none}.hamburger{display:flex}.ins-badge{display:none}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
+@media(max-width:860px){.main-nav{display:none}.hamburger{display:flex}.ins-badge{display:none}.hero-logo{height:auto;width:85%;max-height:280px}.sec-transition{height:48px!important}.about-section{padding:40px 24px}.promise-section{padding:40px 24px 48px}.tab-content{padding:28px 16px 40px}}
 
 /* ── FLOATING CALL BUTTON (persistent across all pages, replaces the old
    nav-bar/hamburger phone links) ── */
@@ -154,14 +154,6 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 .foot-social-btn:hover{opacity:.82;transform:translateY(-2px)}
 .foot-social-btn svg{width:36px;height:36px}
 .foot-bot{border-top:1px solid rgba(176,135,84,.22);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:rgba(29,54,78,.4);letter-spacing:.04em}
-
-/* ── LANG TOGGLE ── */
-.lang-toggle{display:flex;align-items:center;gap:3px;flex-shrink:0}
-.lang-btn{background:transparent;border:1.5px solid rgba(176,135,84,.45);color:rgba(29,54,78,.6);padding:5px 11px;font-size:11px;font-weight:700;letter-spacing:.08em;border-radius:3px;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
-.lang-btn:hover{border-color:var(--gold3);color:var(--gold3)}
-#btnEN.active,#btnEN2.active{background:var(--mg);border-color:var(--mg);color:#fff}
-#btnES.active,#btnES2.active{background:var(--gold);border-color:var(--gold);color:#fff}
-.mob-lang-wrap{padding:14px 24px 4px;border-bottom:1px solid rgba(0,0,0,.08)}
 
 /* ── FORM PAGE HEADER (registration.html + provider-referral.html) ── */
 .reg-hdr{background:linear-gradient(180deg,var(--dg) 0%,var(--mg) 100%);padding:56px 24px 42px;text-align:center;color:#fff}

@@ -20,21 +20,7 @@
 <link rel="stylesheet" href="styles.css">
 <style>
   .site-header{background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;box-shadow:none}
-
-  /* ── Relocation / telemedicine notice banner ── */
-  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px}
-  .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
-  .relocation-banner-in p{margin:0 0 12px}
-  .relocation-banner-in p:last-child{margin-bottom:0}
-  .relocation-banner-in strong{display:block;margin-bottom:4px}
-  .hide-relocation-banner .relocation-banner{display:none}
 </style>
-<script>
-  /* ══ RELOCATION BANNER TOGGLE ══
-     Set to false to hide the telemedicine/relocation banner instantly. */
-  var RELOCATION_BANNER_ENABLED = true;
-  if (!RELOCATION_BANNER_ENABLED) document.documentElement.classList.add('hide-relocation-banner');
-</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -60,16 +46,49 @@
 </head>
 <body>
 
-<!-- ══════ RELOCATION / TELEMEDICINE BANNER (toggle via RELOCATION_BANNER_ENABLED in <head>) ══════ -->
+<!-- SHARED:BANNER:START (kept in sync from partials/banner.html by scripts/sync-partials.js — edit the partial, not this block) -->
+<!-- ══════ RELOCATION / TELEMEDICINE BANNER ══════
+     Temporary, site-wide banner. Fully self-contained (styling + toggle
+     logic live right here) so it can be removed later by deleting this
+     file, removing the SHARED:BANNER markers from the 4 pages, and
+     dropping its entry from scripts/sync-partials.js's SECTIONS list --
+     nothing elsewhere depends on it.
+     To hide it instantly without any of that, set BANNER_ENABLED to
+     false below and re-run the sync. -->
+<style>
+  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px}
+  .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-in p{margin:0 0 12px}
+  .relocation-banner-in p:last-child{margin-bottom:0}
+  .relocation-banner-in strong{display:block;margin-bottom:4px}
+  .relocation-banner-more{display:none}
+  .relocation-banner-more.open{display:block}
+  .relocation-banner-toggle{background:none;border:none;padding:0;color:#7a1f1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:14px;font-family:'Montserrat',sans-serif}
+  .hide-relocation-banner .relocation-banner{display:none}
+</style>
 <div class="relocation-banner" id="relocation-banner">
   <div class="relocation-banner-in">
-    <p data-i18n="banner.p1">As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</p>
-    <p data-i18n="banner.p2">During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
-    <p data-i18n="banner.p3">Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
-    <p data-i18n="banner.p4"><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
-    <p data-i18n="banner.p5">We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+    <p><span>As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span> <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()">Read More</button></p>
+    <div class="relocation-banner-more" id="relocationBannerMore">
+      <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
+      <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
+      <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
+      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+    </div>
   </div>
 </div>
+<script>
+  var BANNER_ENABLED = true; // set to false to hide the banner on every page
+  if (!BANNER_ENABLED) document.documentElement.classList.add('hide-relocation-banner');
+
+  function toggleRelocationBannerMore() {
+    var more = document.getElementById('relocationBannerMore');
+    var btn = document.getElementById('relocationBannerToggle');
+    var open = more.classList.toggle('open');
+    btn.textContent = open ? 'Read Less' : 'Read More';
+  }
+</script>
+<!-- SHARED:BANNER:END -->
 
 <!-- SHARED:HEADER:START (kept in sync from partials/header.html by scripts/sync-partials.js — edit the partial, not this block) -->
 <!-- ══════ HEADER ══════ -->
@@ -77,32 +96,22 @@
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/" data-i18n="nav.home">Home</a></li>
-        <li><a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration" data-i18n="nav.reg">New Patient Registration</a></li>
-        <li><a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/referral">Provider Referral Intake</a></li>
       </ul>
     </nav>
-    <div class="lang-toggle" style="margin-left:auto">
-      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
-    </div>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()">
+    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/" data-i18n="nav.home">Home</a>
-  <a href="/about" data-i18n="nav.doctor">Meet Dr. Scuteri</a>
-  <a href="/registration" data-i18n="nav.reg">New Patient Registration</a>
-  <a href="/referral" data-i18n="nav.referral">Provider Referral Intake</a>
-  <div class="mob-lang-wrap">
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btnEN2" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btnES2" onclick="setLang('es')">ES</button>
-    </div>
-  </div>
+  <a href="/">Home</a>
+  <a href="/about">Meet Dr. Scuteri</a>
+  <a href="/registration">New Patient Registration</a>
+  <a href="/referral">Provider Referral Intake</a>
 </div>
 <!-- SHARED:HEADER:END -->
 
@@ -117,12 +126,12 @@
 <section class="tab-section">
   <div class="tab-header">
     <div class="tab-header-in">
-      <div class="sec-lbl" data-i18n="svc.lbl">What We Offer</div>
-      <h2 class="sec-ttl" data-i18n="svc.ttl">Services &amp; Insurance Coverage</h2>
-      <p class="tab-header-desc" data-i18n="svc.desc">Explore our full range of physician-supervised services and verify your insurance coverage below.</p>
+      <div class="sec-lbl">What We Offer</div>
+      <h2 class="sec-ttl">Services &amp; Insurance Coverage</h2>
+      <p class="tab-header-desc">Explore our full range of physician-supervised services and verify your insurance coverage below.</p>
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab(this,'services')" data-i18n="tab.svc">Services Offered</button>
-        <button class="tab-btn" onclick="switchTab(this,'insurance')" data-i18n="tab.ins">Insurances Accepted</button>
+        <button class="tab-btn active" onclick="switchTab(this,'services')">Services Offered</button>
+        <button class="tab-btn" onclick="switchTab(this,'insurance')">Insurances Accepted</button>
       </div>
     </div>
   </div>
@@ -134,8 +143,8 @@
         <table class="svc-main-table">
           <thead>
             <tr>
-              <th style="width:28%" data-i18n="th.svc">Service</th>
-              <th style="width:72%" data-i18n="th.desc">Description &amp; Highlights</th>
+              <th style="width:28%">Service</th>
+              <th style="width:72%">Description &amp; Highlights</th>
             </tr>
           </thead>
           <tbody>
@@ -143,11 +152,11 @@
               <td>
                 <div class="svc-name">
                   <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
-                  <span data-i18n="svc1.name">Sleep Medicine</span>
+                  <span>Sleep Medicine</span>
                 </div>
               </td>
               <td class="svc-desc-cell">
-                <span data-i18n="svc1.desc">Board-certified physicians diagnosing and treating the full spectrum of sleep disorders. State-of-the-art diagnostics with personalized treatment plans to restore healthy, restorative sleep.</span>
+                <span>Board-certified physicians diagnosing and treating the full spectrum of sleep disorders. State-of-the-art diagnostics with personalized treatment plans to restore healthy, restorative sleep.</span>
                 <div class="svc-tags">
                   <span class="svc-tag">Sleep Apnea (OSA &amp; CSA)</span>
                   <span class="svc-tag">CPAP / BiPAP</span>
@@ -166,11 +175,11 @@
               <td>
                 <div class="svc-name">
                   <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
-                  <span data-i18n="svc2.name">Weight Loss Program</span>
+                  <span>Weight Loss Program</span>
                 </div>
               </td>
               <td class="svc-desc-cell">
-                <span data-i18n="svc2.desc">Our Tirzepatide program combines clinically proven GLP-1/GIP receptor agonist injections with physician oversight, nutritional guidance, and lifestyle coaching for sustainable, real results.</span>
+                <span>Our Tirzepatide program combines clinically proven GLP-1/GIP receptor agonist injections with physician oversight, nutritional guidance, and lifestyle coaching for sustainable, real results.</span>
                 <div class="svc-tags">
                   <span class="svc-tag">Tirzepatide Injections</span>
                   <span class="svc-tag">Medical Evaluation &amp; Labs</span>
@@ -185,11 +194,11 @@
               <td>
                 <div class="svc-name">
                   <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg></div>
-                  <span data-i18n="svc3.name">IV Therapy</span>
+                  <span>IV Therapy</span>
                 </div>
               </td>
               <td class="svc-desc-cell">
-                <span data-i18n="svc3.desc">Vitamins, minerals, and hydration delivered directly into the bloodstream for maximum absorption and fast results. Each infusion is customized by our clinical team to meet your specific needs.</span>
+                <span>Vitamins, minerals, and hydration delivered directly into the bloodstream for maximum absorption and fast results. Each infusion is customized by our clinical team to meet your specific needs.</span>
                 <div class="svc-tags">
                   <span class="svc-tag">Hydration Therapy</span>
                   <span class="svc-tag">Vitamin C Infusion</span>
@@ -205,11 +214,11 @@
               <td>
                 <div class="svc-name">
                   <div class="svc-name-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                  <span data-i18n="svc4.name">Wellness &amp; More</span>
+                  <span>Wellness &amp; More</span>
                 </div>
               </td>
               <td class="svc-desc-cell">
-                <span data-i18n="svc4.desc">Whole-person care beyond our core services &mdash; a growing range of wellness treatments and consultations designed to support your long-term health journey.</span>
+                <span>Whole-person care beyond our core services &mdash; a growing range of wellness treatments and consultations designed to support your long-term health journey.</span>
                 <div class="svc-tags">
                   <span class="svc-tag">Wellness Consultations</span>
                   <span class="svc-tag">Longevity Medicine</span>
@@ -234,7 +243,7 @@
           <div class="ins-table-wrap">
             <table class="ins-table">
               <thead>
-                <tr><th colspan="2" data-i18n="ins.th">Currently Accepted Insurance Carriers</th></tr>
+                <tr><th colspan="2">Currently Accepted Insurance Carriers</th></tr>
               </thead>
               <tbody>
                 <tr>
@@ -278,12 +287,12 @@
           </div>
         </div>
         <div>
-          <div class="ins-badge"><span class="dot"></span><span data-i18n="badge">Now Accepting New Patients</span></div>
+          <div class="ins-badge"><span class="dot"></span><span>Now Accepting New Patients</span></div>
           <div class="ins-note-box">
-            <h4 data-i18n="ins.note.h4">Questions About Your Coverage?</h4>
-            <p data-i18n="ins.note.p1">We accept most major insurance plans. Coverage and benefits vary by plan. Our billing team is happy to verify your insurance benefits before your visit.</p>
-            <p style="margin-top:12px" data-i18n="ins.note.p2">Contact us at <strong style="color:var(--dg)">727-472-9112</strong> and we will work with you to understand your coverage, co-pays, and out-of-pocket costs.</p>
-            <p style="margin-top:12px;font-style:italic;color:var(--tl);font-size:13px" data-i18n="ins.note.p3">We believe finances should never be a barrier to good health.</p>
+            <h4>Questions About Your Coverage?</h4>
+            <p>We accept most major insurance plans. Coverage and benefits vary by plan. Our billing team is happy to verify your insurance benefits before your visit.</p>
+            <p style="margin-top:12px">Contact us at <strong style="color:var(--dg)">727-472-9112</strong> and we will work with you to understand your coverage, co-pays, and out-of-pocket costs.</p>
+            <p style="margin-top:12px;font-style:italic;color:var(--tl);font-size:13px">We believe finances should never be a barrier to good health.</p>
           </div>
         </div>
       </div>
@@ -297,20 +306,20 @@
 <section class="about-section">
   <div class="about-inner">
     <div>
-      <div class="sec-lbl" data-i18n="about.lbl">Who We Are</div>
-      <h2 class="sec-ttl" data-i18n="about.ttl">About West Coast Sleep Clinic</h2>
-      <p class="about-text" data-i18n="about.p1">At West Coast Sleep Clinic, we are committed to improving the lives of our patients through expert sleep medicine, innovative wellness programs, and compassionate, personalized care.</p>
-      <p class="about-text" data-i18n="about.p2">Sleep is the foundation of good health. When you sleep better, you feel better, think more clearly, and live more fully. Our team of board-certified physicians and dedicated clinical staff work together to ensure every patient receives the individualized attention and care they deserve.</p>
-      <p class="about-text" data-i18n="about.p3">Founded in 2023 and located in Largo, Florida, West Coast Sleep Clinic is proud to serve patients throughout Pinellas County and the surrounding Tampa Bay region.</p>
+      <div class="sec-lbl">Who We Are</div>
+      <h2 class="sec-ttl">About West Coast Sleep Clinic</h2>
+      <p class="about-text">At West Coast Sleep Clinic, we are committed to improving the lives of our patients through expert sleep medicine, innovative wellness programs, and compassionate, personalized care.</p>
+      <p class="about-text">Sleep is the foundation of good health. When you sleep better, you feel better, think more clearly, and live more fully. Our team of board-certified physicians and dedicated clinical staff work together to ensure every patient receives the individualized attention and care they deserve.</p>
+      <p class="about-text">Founded in 2023 and located in Largo, Florida, West Coast Sleep Clinic is proud to serve patients throughout Pinellas County and the surrounding Tampa Bay region.</p>
     </div>
     <div>
       <div class="info-card">
-        <div class="info-card-header"><h4 data-i18n="info.h4">Practice Information</h4></div>
-        <div class="irow"><span class="ilbl" data-i18n="info.loc.l">Location</span><span class="ival">11200 Seminole Blvd Suite 303, Largo, FL 33778</span></div>
-        <div class="irow"><span class="ilbl" data-i18n="info.phone.l">Phone / Text</span><span class="ival"><a href="tel:7274729112">727-472-9112</a></span></div>
-        <div class="irow"><span class="ilbl" data-i18n="info.hrs.l">Hours</span><span class="ival" data-i18n="info.hrs.v">Mon &ndash; Fri: 8 AM &ndash; 5 PM</span></div>
-        <div class="irow"><span class="ilbl" data-i18n="info.founded.l">Founded</span><span class="ival" data-i18n="info.founded.v">2023</span></div>
-        <div class="irow"><span class="ilbl" data-i18n="info.tele.l">Telehealth</span><span class="ival"><span class="info-accent" data-i18n="info.tele.v">Available</span></span></div>
+        <div class="info-card-header"><h4>Practice Information</h4></div>
+        <div class="irow"><span class="ilbl">Location</span><span class="ival">11200 Seminole Blvd Suite 303, Largo, FL 33778</span></div>
+        <div class="irow"><span class="ilbl">Phone / Text</span><span class="ival"><a href="tel:7274729112">727-472-9112</a></span></div>
+        <div class="irow"><span class="ilbl">Hours</span><span class="ival">Mon &ndash; Fri: 8 AM &ndash; 5 PM</span></div>
+        <div class="irow"><span class="ilbl">Founded</span><span class="ival">2023</span></div>
+        <div class="irow"><span class="ilbl">Telehealth</span><span class="ival"><span class="info-accent">Available</span></span></div>
       </div>
     </div>
   </div>
@@ -322,30 +331,30 @@
 <section class="promise-section">
   <div class="promise-inner">
     <div class="promise-head">
-      <span class="sec-lbl" data-i18n="promise.lbl">Our Promise</span>
-      <h2 class="sec-ttl" data-i18n="promise.ttl">Why Choose West Coast Sleep Clinic?</h2>
+      <span class="sec-lbl">Our Promise</span>
+      <h2 class="sec-ttl">Why Choose West Coast Sleep Clinic?</h2>
     </div>
     <div class="promise-grid">
       <div class="promise-card">
         <div class="promise-icon">
           <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-        <h4 data-i18n="p1.h4">Expert Care</h4>
-        <p data-i18n="p1.p">Board-certified physicians providing the highest standard of evidence-based clinical care for every patient, every visit.</p>
+        <h4>Expert Care</h4>
+        <p>Board-certified physicians providing the highest standard of evidence-based clinical care for every patient, every visit.</p>
       </div>
       <div class="promise-card">
         <div class="promise-icon">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <h4 data-i18n="p2.h4">Personalized Solutions</h4>
-        <p data-i18n="p2.p">Every patient is unique. We design individualized treatment plans tailored to your specific needs, goals, and lifestyle.</p>
+        <h4>Personalized Solutions</h4>
+        <p>Every patient is unique. We design individualized treatment plans tailored to your specific needs, goals, and lifestyle.</p>
       </div>
       <div class="promise-card">
         <div class="promise-icon">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
-        <h4 data-i18n="p3.h4">Your Health, Our Priority</h4>
-        <p data-i18n="p3.p">Your long-term health, comfort, and wellbeing are at the center of every decision we make. We are committed to real, lasting results.</p>
+        <h4>Your Health, Our Priority</h4>
+        <p>Your long-term health, comfort, and wellbeing are at the center of every decision we make. We are committed to real, lasting results.</p>
       </div>
     </div>
   </div>
@@ -382,14 +391,14 @@
       </div>
     </div>
     <div class="foot-bot">
-      <span data-i18n="foot.copy">&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
+      <span>&copy; 2023 West Coast Sleep Clinic &nbsp;&middot;&nbsp; Largo, Florida</span>
     </div>
   </div>
 </footer>
 
 <div class="call-fab">
   <div class="call-fab-pop" id="callFabPop">
-    <div class="call-fab-pop-lbl" data-i18n="fab.call">Call Us</div>
+    <div class="call-fab-pop-lbl">Call Us</div>
     <a href="tel:7274729112">727-472-9112</a>
   </div>
   <button class="call-fab-btn" aria-label="Call Us" onclick="toggleCallFab()">
@@ -399,6 +408,5 @@
 <!-- SHARED:FOOTER:END -->
 
 <script src="script.js"></script>
-<script src="lang.js"></script>
 </body>
 </html>

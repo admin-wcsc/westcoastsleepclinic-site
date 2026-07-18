@@ -9,6 +9,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PAGES = ['index.html', 'dr-scuteri.html', 'provider-referral.html', 'registration.html'];
 const SECTIONS = [
+  { name: 'BANNER', partial: 'partials/banner.html' },
   { name: 'HEADER', partial: 'partials/header.html' },
   { name: 'FOOTER', partial: 'partials/footer.html' },
 ];
