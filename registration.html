@@ -103,6 +103,11 @@ body{background:#f4f8fb}
 .btn-back:hover{border-color:var(--tm);color:var(--td)}
 .btn-nxt{background:var(--dg);color:#fff;border:none;padding:16px 40px;font-size:16px;font-weight:600;letter-spacing:.04em;border-radius:6px;cursor:pointer;transition:background .2s,transform .2s;display:flex;align-items:center;gap:10px;font-family:'Montserrat',sans-serif}
 .btn-nxt:hover{background:var(--mg);transform:translateX(2px)}
+/* Signals a modal has nothing left to fill in and can just be clicked
+   through — currently only used by the Insurance modal's Next button when
+   Self-Pay / Uninsured is selected. */
+.btn-nxt-ready{background:var(--gold);box-shadow:0 0 0 3px rgba(176,135,84,.25)}
+.btn-nxt-ready:hover{background:var(--gold2)}
 .btn-sub{background:var(--gold);color:#fff;border:none;padding:16px 44px;font-size:16px;font-weight:600;border-radius:6px;cursor:pointer;transition:background .2s;font-family:'Montserrat',sans-serif}
 .btn-sub:hover{background:var(--gold2)}
 .req-note{font-size:13px;color:var(--tl);margin-bottom:24px}
@@ -546,7 +551,7 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-body" id="s1secIns">
             <div class="fg fg2">
-              <div class="fld"><label data-i18n="s1.ins1">Primary Insurance Company <span class="req" style="display:none">*</span></label><select name="ins1" required onchange="toggleInsOther(this.value); toggleMemberIdRequired(this.value)">
+              <div class="fld"><label data-i18n="s1.ins1">Primary Insurance Company <span class="req" style="display:none">*</span></label><select name="ins1" required onchange="toggleInsOther(this.value); toggleSelfPayFields(this.value)">
                 <option value="" data-i18n="s1.ins1.placeholder">-- Select insurance --</option>
                 <option value="Self-Pay / Uninsured" data-i18n="s1.ins.selfpay">Self-Pay / Uninsured</option>
                 <option value="Medicare">Medicare</option>
@@ -592,7 +597,7 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="s1ModalNext(2)">Next</button>
+            <button class="btn-nxt" id="insNextBtn" onclick="s1ModalNext(2)">Next</button>
           </div>
         </div>
       </div>
@@ -1218,10 +1223,20 @@ function toggleInsOther(val) {
   if (other) other.required = show;
 }
 
-// Self-pay patients have no insurance card, so no Member ID exists to enter.
-function toggleMemberIdRequired(val) {
-  var memberId = document.querySelector('[name="member_id"]');
-  if (memberId) memberId.required = (val !== 'Self-Pay / Uninsured');
+// Self-pay patients have no insurance card and no policy holder to record —
+// none of the Insurance modal's fields apply, so the whole section becomes
+// optional and the Next button is highlighted to invite clicking straight
+// through (markEmptyRequired() naturally lets that happen once nothing in
+// the container is [required] anymore).
+var INS_SELF_PAY_FIELDS = ['ph_name', 'ph_dob', 'ph_rel', 'member_id'];
+function toggleSelfPayFields(val) {
+  var isSelfPay = (val === 'Self-Pay / Uninsured');
+  INS_SELF_PAY_FIELDS.forEach(function (name) {
+    var el = document.querySelector('[name="' + name + '"]');
+    if (el) el.required = !isSelfPay;
+  });
+  var nextBtn = document.getElementById('insNextBtn');
+  if (nextBtn) nextBtn.classList.toggle('btn-nxt-ready', isSelfPay);
 }
 
 // "Same as Patient" checkbox in the Insurance modal — one-time copy of the
