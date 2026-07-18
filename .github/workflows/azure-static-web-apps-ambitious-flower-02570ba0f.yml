@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
 
 jobs:
+  # Production deploy — completely untouched by the dev-preview job below.
+  # Guarded to main pushes/PRs only, exactly as before the dev preview was added.
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Build and Deploy Job (production)
     steps:
       - uses: actions/checkout@v3
         with:
@@ -33,6 +36,49 @@ jobs:
           output_location: "" # Built app content directory - optional
           skip_app_build: true # This is a plain static site with no build step — package.json at the root is only local dev tooling (Playwright, Azure Functions Core Tools, etc.), not something Oryx should try to build
           ###### End of Repository/Build Configurations ######
+
+  # Dev-only preview deploy — pushes the React registration-wizard migration
+  # (registration-app/) to a separate Azure Static Web Apps preview
+  # environment, isolated from the production slot above. The plain static
+  # pages are combined with the React build output into one deploy/ folder
+  # so both continue to be served from the same preview environment; the
+  # React app lands under /registration-preview, leaving the real
+  # /registration route (registration.html) untouched during the migration.
+  build_and_deploy_dev_preview_job:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job (dev preview)
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build React registration preview
+        run: |
+          cd registration-app
+          npm install
+          npm run build
+      - name: Assemble combined deploy folder
+        run: |
+          mkdir -p deploy
+          rsync -av --exclude='registration-app' --exclude='api' --exclude='node_modules' --exclude='.git' --exclude='.github' --exclude='deploy' ./ deploy/
+          mkdir -p deploy/registration-preview
+          cp -r registration-app/dist/* deploy/registration-preview/
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_FLOWER_02570BA0F }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "deploy" # Pre-assembled: static pages + React build output combined
+          api_location: "api" # Same, unmodified Azure Function
+          output_location: "" # deploy/ is already the final output, nothing further to build
+          skip_app_build: true # Already built manually in the step above
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
