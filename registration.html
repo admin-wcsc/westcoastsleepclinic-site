@@ -1308,6 +1308,11 @@ function toggleSelfPayFields(val) {
   if (nextBtn) nextBtn.classList.toggle('btn-nxt-ready', isSelfPay);
   var note = document.getElementById('insNextNote');
   if (note) note.textContent = isSelfPay ? 'Self-Pay/Uninsured selected, no further details needed' : '';
+  // Scroll the (possibly-scrolled-away) Next button + note into view so a
+  // patient who picked Self-Pay while scrolled up in the modal doesn't miss
+  // that there's nothing left to fill in. 'nearest' avoids jumping around
+  // if it's already visible.
+  if (isSelfPay && nextBtn) nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // "Same as Patient" checkbox in the Insurance modal — one-time copy of the
