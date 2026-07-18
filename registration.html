@@ -15,6 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <link rel="icon" type="image/png" href="westcoast sleep clinic logo for browser.png">
 <link rel="apple-touch-icon" href="westcoast sleep clinic logo for browser.png">
 <link rel="stylesheet" href="styles.css">
@@ -81,7 +83,12 @@ body{background:#f4f8fb}
 .policy-box p:last-child{margin-bottom:0}
 .policy-box ul{margin:10px 0 10px 18px}
 .policy-box ul li{margin-bottom:6px}
-.sig-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;margin-top:18px}
+.sig-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;margin-top:18px}
+.sigpad{border:1.5px solid var(--border);border-radius:6px;background:#fff;overflow:hidden}
+.sigpad-canvas{display:block;width:100%;height:140px;touch-action:none;cursor:crosshair}
+.sigpad-foot{display:flex;justify-content:flex-end;padding:6px 8px;border-top:1px solid var(--border);background:var(--cream)}
+.sigpad-clear{background:none;border:1.5px solid var(--border);color:var(--tm);font-size:11px;font-weight:600;padding:5px 12px;border-radius:14px;cursor:pointer;font-family:'Montserrat',sans-serif;transition:border-color .2s,color .2s}
+.sigpad-clear:hover{border-color:var(--mg);color:var(--dg)}
 @media(max-width:480px){.sig-row{grid-template-columns:1fr}}
 .ess-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
 .ess-table th{background:var(--dg);color:#fff;padding:12px 14px;text-align:left;font-size:12px;letter-spacing:.05em;font-weight:600}
@@ -115,6 +122,18 @@ body{background:#f4f8fb}
 .modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .modal-body{padding:28px}
 .modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* ── TREATMENT TYPE CARDS ── */
+.tt-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px}
+@media(max-width:480px){.tt-options{grid-template-columns:1fr}}
+.tt-card{border:1.5px solid var(--border);border-radius:8px;padding:22px 20px;cursor:pointer;transition:border-color .2s,background .2s;background:#fff;text-align:center}
+.tt-card:hover{border-color:var(--mg);background:rgba(44,125,160,.04)}
+.tt-card.selected{border-color:var(--dg);background:rgba(44,125,160,.08);box-shadow:0 0 0 2px rgba(29,86,110,.12)}
+.tt-card-ttl{font-size:16px;font-weight:600;color:var(--td)}
+.tt-card-sub{font-size:13px;color:var(--tl);margin-top:4px}
+.tt-summary-row{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--td);flex-wrap:wrap}
+.tt-change-btn{background:none;border:1.5px solid var(--border);color:var(--mg);padding:6px 14px;font-size:13px;font-weight:600;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif}
+.tt-change-btn:hover{border-color:var(--mg);color:var(--dg)}
 
 /* ── STEP 1 SECTION MENU ── */
 .s1-menu{display:flex;flex-direction:column;gap:12px;margin-bottom:8px}
@@ -229,7 +248,7 @@ footer{background:var(--cream)}
 <div class="stepper">
   <div class="stepper-in">
     <div class="step-row">
-      <div class="step-item" data-step="1"><div class="step-circ active" id="stepCircle1">1</div><div class="step-lbl active" id="stepLabel1" data-i18n="step.7">Patient Questionnaire</div></div>
+      <div class="step-item" data-step="1"><div class="step-circ active" id="stepCircle1">1</div><div class="step-lbl active" id="stepLabel1" data-i18n="step.7">Reason for Appointment</div></div>
       <div class="step-conn" id="stepConnector1"></div>
       <div class="step-item" data-step="2"><div class="step-circ" id="stepCircle2">2</div><div class="step-lbl" id="stepLabel2" data-i18n="step.1">Patient Demographics</div></div>
       <div class="step-conn" id="stepConnector2"></div>
@@ -244,13 +263,46 @@ footer{background:var(--cream)}
 
 <!-- ══════ FORM AREA ══════ -->
 <div id="regFormArea">
+
+  <!-- Treatment Type — shown as a modal the moment the patient enters
+       registration, before anything else; no close button/backdrop-dismiss
+       since picking one of the two cards is what closes it. -->
+  <div class="modal-bg" id="modalTreatmentType">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 data-i18n="s7.tt.label">What kind of treatment are you interested in?</h3>
+      </div>
+      <div class="modal-body">
+        <div class="tt-options">
+          <div class="tt-card" data-type="sleep_study" onclick="selectTreatmentType('sleep_study')">
+            <div class="tt-card-ttl" data-i18n="s7.tt.sleep">Sleep Study</div>
+            <div class="tt-card-sub" data-i18n="s7.tt.sleep_sub">Evaluation for snoring, insomnia, or other sleep concerns</div>
+          </div>
+          <div class="tt-card" data-type="weight_loss" onclick="selectTreatmentType('weight_loss')">
+            <div class="tt-card-ttl" data-i18n="s7.tt.weight">Weight Loss</div>
+            <div class="tt-card-sub" data-i18n="s7.tt.weight_sub">Medical weight management program</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="form-wrap">
 
     <!-- STEP 1: Questionnaire -->
     <div class="fstep active" id="fstep1">
-      <h2 class="fstep-ttl" data-i18n="s7.ttl">Patient Questionnaire</h2>
-      <p class="fstep-sub" data-i18n="s7.sub">This helps our physicians understand your health history and sleep concerns.</p>
+      <div class="fsec">
+        <div class="fsec-ttl" data-i18n="s7.tt.sec">Treatment Type</div>
+        <div class="tt-summary-row">
+          <span data-i18n="s7.tt.summary_label">Selected:</span>
+          <strong id="s7TreatmentSummaryVal" data-i18n="s7.tt.none">None selected</strong>
+          <button type="button" class="tt-change-btn" onclick="openFormModal('modalTreatmentType')" data-i18n="s7.tt.change">Change</button>
+        </div>
+        <input type="hidden" name="treatment_type" required>
+        <p class="ibox mt-16" id="s7WeightLossNote" style="display:none" data-i18n="s7.tt.wlnote">No additional questionnaire is required for the Weight Loss program. Click Next to continue with your registration.</p>
+      </div>
 
+      <div id="s7QuestionnaireBody">
       <div class="fsec">
         <div class="fsec-ttl" data-i18n="s7.cc.sec">Chief Complaint &amp; Sleep History</div>
         <div class="fld"><label data-i18n="s7.cc.label">What is your main reason for visiting today?</label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required></textarea></div>
@@ -340,6 +392,7 @@ footer{background:var(--cream)}
         </div>
         <div class="fld mt-16"><label data-i18n="s7.comments">Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
       </div>
+      </div>
 
       <div class="form-nav">
         <span></span>
@@ -398,37 +451,35 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-body" id="s1secDetails">
             <div class="fg fg3">
-              <div class="fld"><label data-i18n="s1.fn">First Name <span class="req">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
-              <div class="fld"><label data-i18n="s1.ln">Last Name <span class="req">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
+              <div class="fld"><label data-i18n="s1.fn">First Name <span class="req" style="display:none">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
+              <div class="fld"><label data-i18n="s1.ln">Last Name <span class="req" style="display:none">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
               <div class="fld"><label data-i18n="s1.mi">Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label data-i18n="s1.dob">Date of Birth <span class="req">*</span></label><div class="dpk" data-dpk="dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="dob" required><div class="dpk-pop" data-dpk-pop="dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="s1.dob">Date of Birth <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="dob" required><div class="dpk-pop" data-dpk-pop="dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
               <div class="fld"><label data-i18n="s1.age">Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
             </div>
             <div class="fld mt-16">
-              <label data-i18n="s1.sex">Sex</label>
+              <label data-i18n="s1.sex">Sex <span class="req" style="display:none">*</span></label>
               <div class="radio-row">
-                <label class="rlbl"><input type="radio" name="sex" value="Male"> <span data-i18n="s1.male">Male</span></label>
+                <label class="rlbl"><input type="radio" name="sex" value="Male" required> <span data-i18n="s1.male">Male</span></label>
                 <label class="rlbl"><input type="radio" name="sex" value="Female"> <span data-i18n="s1.female">Female</span></label>
                 <label class="rlbl"><input type="radio" name="sex" value="Other"> <span data-i18n="s1.other">Other</span></label>
               </div>
             </div>
-            <div class="fg fg2 mt-16">
-              <div class="fld"><label data-i18n="s1.ssn">Social Security #</label><input type="text" name="ssn" placeholder="XXX-XX-XXXX" maxlength="11"></div>
-              <div class="fld"><label data-i18n="s1.dl">Driver's License #</label><input type="text" name="dl" placeholder="License number"></div>
-            </div>
-            <div class="fld mt-16"><label data-i18n="s1.addr">Street Address</label><input type="text" name="address" placeholder="Street address"></div>
+            <div class="fld mt-16"><label data-i18n="s1.dl">Driver's License/ID #</label><input type="text" name="dl" placeholder="License number"></div>
+            <div class="fld mt-16"><label data-i18n="s1.addr">Street Address <span class="req" style="display:none">*</span></label><input type="text" name="address" placeholder="Street address" required></div>
             <div class="fg fg3 mt-16">
-              <div class="fld"><label data-i18n="s1.city">City</label><input type="text" name="city" placeholder="City"></div>
-              <div class="fld"><label data-i18n="s1.state">State</label><input type="text" name="state" placeholder="FL" maxlength="2"></div>
-              <div class="fld"><label data-i18n="s1.zip">Zip Code</label><input type="text" name="zip" placeholder="00000" maxlength="10"></div>
+              <div class="fld"><label data-i18n="s1.city">City <span class="req" style="display:none">*</span></label><input type="text" name="city" placeholder="City" required></div>
+              <div class="fld"><label data-i18n="s1.state">State <span class="req" style="display:none">*</span></label><input type="text" name="state" placeholder="FL" maxlength="2" required></div>
+              <div class="fld"><label data-i18n="s1.zip">Zip Code <span class="req" style="display:none">*</span></label><input type="text" name="zip" placeholder="00000" maxlength="10" required></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label data-i18n="s1.hphone">Home Phone</label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
-              <div class="fld"><label data-i18n="s1.cphone">Cell Phone</label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label data-i18n="s1.hphone">Home Phone <span class="req" style="display:none">*</span></label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label data-i18n="s1.cphone">Cell Phone <span class="req" style="display:none">*</span></label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
             </div>
-            <div class="fld mt-16"><label data-i18n="s1.email">Email Address <span class="req">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
+            <p class="req-note" style="margin:6px 0 0" data-i18n="s1.phone.note">At least one phone number is required.</p>
+            <div class="fld mt-16"><label data-i18n="s1.email">Email Address <span class="req" style="display:none">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
             <div class="fld mt-16">
               <label data-i18n="s1.marital">Marital Status</label>
               <div class="radio-row">
@@ -445,7 +496,7 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="closeS1Modal('modalS1Details')">Done</button>
+            <button class="btn-nxt" onclick="s1ModalNext(0)">Next</button>
           </div>
         </div>
       </div>
@@ -459,15 +510,22 @@ footer{background:var(--cream)}
             </button>
           </div>
           <div class="modal-body" id="s1secEc">
+            <div class="fsec-ttl" style="margin-bottom:14px" data-i18n="s1.ec.c1">Emergency Contact 1</div>
             <div class="fg fg3">
-              <div class="fld"><label data-i18n="s1.ec.name">Contact Name</label><input type="text" name="ec_name" placeholder="Full name"></div>
-              <div class="fld"><label data-i18n="s1.ec.rel">Relationship</label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc."></div>
-              <div class="fld"><label data-i18n="s1.ec.phone">Contact Phone</label><input type="tel" name="ec_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label data-i18n="s1.ec.name">Contact Name <span class="req" style="display:none">*</span></label><input type="text" name="ec_name" placeholder="Full name" required></div>
+              <div class="fld"><label data-i18n="s1.ec.rel">Relationship <span class="req" style="display:none">*</span></label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc." required></div>
+              <div class="fld"><label data-i18n="s1.ec.phone">Contact Phone <span class="req" style="display:none">*</span></label><input type="tel" name="ec_phone" placeholder="(000) 000-0000" required></div>
+            </div>
+            <div class="fsec-ttl" style="margin:24px 0 14px" data-i18n="s1.ec2.c2">Emergency Contact 2 (Optional)</div>
+            <div class="fg fg3">
+              <div class="fld"><label data-i18n="s1.ec2.name">Contact Name</label><input type="text" name="ec2_name" placeholder="Full name"></div>
+              <div class="fld"><label data-i18n="s1.ec2.rel">Relationship</label><input type="text" name="ec2_rel" placeholder="Spouse, Child, etc."></div>
+              <div class="fld"><label data-i18n="s1.ec2.phone">Contact Phone</label><input type="tel" name="ec2_phone" placeholder="(000) 000-0000"></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="closeS1Modal('modalS1Ec')">Done</button>
+            <button class="btn-nxt" onclick="s1ModalNext(1)">Next</button>
           </div>
         </div>
       </div>
@@ -482,12 +540,39 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-body" id="s1secIns">
             <div class="fg fg2">
-              <div class="fld"><label data-i18n="s1.ins1">Primary Insurance Company</label><input type="text" name="ins1" placeholder="Insurance company name"></div>
-              <div class="fld"><label data-i18n="s1.ph.name">Policy Holder Name</label><input type="text" name="ph_name" placeholder="Policy holder full name"></div>
+              <div class="fld"><label data-i18n="s1.ins1">Primary Insurance Company <span class="req" style="display:none">*</span></label><select name="ins1" required onchange="toggleInsOther(this.value)">
+                <option value="" data-i18n="s1.ins1.placeholder">-- Select insurance --</option>
+                <option value="Self-Pay / Uninsured" data-i18n="s1.ins.selfpay">Self-Pay / Uninsured</option>
+                <option value="Medicare">Medicare</option>
+                <option value="Florida Medicaid">Florida Medicaid</option>
+                <option value="Florida Blue (BCBS)">Florida Blue (BCBS)</option>
+                <option value="Aetna">Aetna</option>
+                <option value="Cigna">Cigna</option>
+                <option value="UnitedHealthcare">UnitedHealthcare</option>
+                <option value="Humana">Humana</option>
+                <option value="Tricare">Tricare</option>
+                <option value="Tricare for Life">Tricare for Life</option>
+                <option value="Sunshine Health">Sunshine Health</option>
+                <option value="WellCare">WellCare</option>
+                <option value="Simply Healthcare">Simply Healthcare</option>
+                <option value="Ambetter">Ambetter</option>
+                <option value="Oscar Health">Oscar Health</option>
+                <option value="AvMed">AvMed</option>
+                <option value="Coventry Health Care">Coventry Health Care</option>
+                <option value="MultiPlan / PHCS">MultiPlan / PHCS</option>
+                <option value="Other" data-i18n="s1.ins.other">Other</option>
+              </select></div>
+              <div class="fld">
+                <label data-i18n="s1.ph.name">Policy Holder Name <span class="req" style="display:none">*</span></label>
+                <input type="text" name="ph_name" placeholder="Policy holder full name" required>
+                <label class="clbl mt-16"><input type="checkbox" id="samePatientChk" onchange="toggleSameAsPatient(this.checked)"> <span data-i18n="s1.ph.same">Same as Patient</span></label>
+              </div>
             </div>
+            <div class="fld mt-16" id="ins1OtherWrap" style="display:none"><label data-i18n="s1.ins1.other">Please specify your insurance <span class="req" style="display:none">*</span></label><input type="text" name="ins1_other" placeholder="Insurance company name"></div>
+            <div class="fld mt-16"><label data-i18n="s1.ph.dob">Policy Holder Date of Birth <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="ph_dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="ph_dob" required><div class="dpk-pop" data-dpk-pop="ph_dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
             <div class="fg fg3 mt-16">
-              <div class="fld"><label data-i18n="s1.ph.rel">Relationship to Patient</label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc."></div>
-              <div class="fld"><label data-i18n="s1.member_id">Member ID #</label><input type="text" name="member_id" placeholder="Member ID"></div>
+              <div class="fld"><label data-i18n="s1.ph.rel">Relation to Patient <span class="req" style="display:none">*</span></label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc." required></div>
+              <div class="fld"><label data-i18n="s1.member_id">Member ID # <span class="req" style="display:none">*</span></label><input type="text" name="member_id" placeholder="Member ID" required></div>
               <div class="fld"><label data-i18n="s1.group">Group #</label><input type="text" name="group_num" placeholder="Group number"></div>
             </div>
             <div class="fg fg2 mt-16">
@@ -501,7 +586,7 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="closeS1Modal('modalS1Ins')">Done</button>
+            <button class="btn-nxt" onclick="s1ModalNext(2)">Next</button>
           </div>
         </div>
       </div>
@@ -523,7 +608,7 @@ footer{background:var(--cream)}
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="closeS1Modal('modalS1Pharm')">Done</button>
+            <button class="btn-nxt" onclick="s1ModalNext(3)">Next</button>
           </div>
         </div>
       </div>
@@ -595,7 +680,13 @@ footer{background:var(--cream)}
               <label class="clbl"><input type="checkbox" name="consent_treat" required> <span data-i18n="s2.chk">I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span><span class="req">*</span></label>
             </div>
             <div class="sig-row">
-              <div class="fld"><label data-i18n="s2.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig2" placeholder="Type full name as signature" required></div>
+              <div class="fld"><label data-i18n="s2.sig">Patient (or Guardian) Signature <span class="req">*</span></label>
+                <div class="sigpad" data-sigpad="sig2">
+                  <canvas class="sigpad-canvas"></canvas>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="sigpad.clear">Clear Signature</button></div>
+                  <input type="hidden" name="sig2" required>
+                </div>
+              </div>
               <div class="fld"><label data-i18n="s2.date">Date</label><div class="dpk" data-dpk="date2"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date2" required><div class="dpk-pop" data-dpk-pop="date2"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
@@ -629,7 +720,13 @@ footer{background:var(--cream)}
               <label class="clbl"><input type="checkbox" name="consent_financial" required> <span data-i18n="s3.chk">I have read and understand the Financial Policy above, and I agree to abide by its terms.</span><span class="req">*</span></label>
             </div>
             <div class="sig-row">
-              <div class="fld"><label data-i18n="s3.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig3" placeholder="Type full name as signature" required></div>
+              <div class="fld"><label data-i18n="s3.sig">Patient (or Guardian) Signature <span class="req">*</span></label>
+                <div class="sigpad" data-sigpad="sig3">
+                  <canvas class="sigpad-canvas"></canvas>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="sigpad.clear">Clear Signature</button></div>
+                  <input type="hidden" name="sig3" required>
+                </div>
+              </div>
               <div class="fld"><label data-i18n="s3.date">Date</label><div class="dpk" data-dpk="date3"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date3" required><div class="dpk-pop" data-dpk-pop="date3"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
@@ -665,7 +762,13 @@ footer{background:var(--cream)}
               <input type="text" name="hipaa_rep" placeholder="Leave blank if signing for yourself">
             </div>
             <div class="sig-row">
-              <div class="fld"><label data-i18n="s4.sig">Patient (or Representative) Signature <span class="req">*</span></label><input type="text" name="sig4" placeholder="Type full name as signature" required></div>
+              <div class="fld"><label data-i18n="s4.sig">Patient (or Representative) Signature <span class="req">*</span></label>
+                <div class="sigpad" data-sigpad="sig4">
+                  <canvas class="sigpad-canvas"></canvas>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="sigpad.clear">Clear Signature</button></div>
+                  <input type="hidden" name="sig4" required>
+                </div>
+              </div>
               <div class="fld"><label data-i18n="s4.date">Date</label><div class="dpk" data-dpk="date4"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date4" required><div class="dpk-pop" data-dpk-pop="date4"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
@@ -712,7 +815,13 @@ footer{background:var(--cream)}
               </div>
             </div>
             <div class="sig-row">
-              <div class="fld"><label data-i18n="s5.sig">Patient (or Guardian) Signature <span class="req" id="req-sig5" style="display:none">*</span></label><input type="text" name="sig5" placeholder="Type full name as signature"></div>
+              <div class="fld"><label data-i18n="s5.sig">Patient (or Guardian) Signature <span class="req" id="req-sig5" style="display:none">*</span></label>
+                <div class="sigpad" data-sigpad="sig5">
+                  <canvas class="sigpad-canvas"></canvas>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="sigpad.clear">Clear Signature</button></div>
+                  <input type="hidden" name="sig5">
+                </div>
+              </div>
               <div class="fld"><label data-i18n="s5.date">Date</label><div class="dpk" data-dpk="date5"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date5"><div class="dpk-pop" data-dpk-pop="date5"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
@@ -735,34 +844,8 @@ footer{background:var(--cream)}
       <p class="fstep-sub" data-i18n="s6.sub">Complete this form to authorize release of your medical records.</p>
       <div class="ibox" data-i18n="s6.ibox">This authorization allows West Coast Sleep Clinic to release your medical records. You may leave optional fields blank if not applicable. You have the right to revoke this authorization at any time by notifying us in writing.</div>
       <div class="fsec">
-        <div class="fsec-ttl" data-i18n="s6.rel.sec">Release To</div>
+        <div class="fsec-ttl" data-i18n="s6.det.sec">Expiration</div>
         <div class="fg fg2">
-          <div class="fld"><label data-i18n="s6.rel.to">Name or Organization <span class="req">*</span></label><input type="text" name="rel_to" placeholder="Name or organization receiving records" required></div>
-          <div class="fld"><label data-i18n="s6.rel.phone">Phone / Fax</label><input type="tel" name="rel_phone" placeholder="(000) 000-0000"></div>
-        </div>
-        <div class="fld mt-16"><label data-i18n="s6.rel.addr">Address</label><input type="text" name="rel_addr" placeholder="Address"></div>
-      </div>
-      <div class="fsec">
-        <div class="fsec-ttl" data-i18n="s6.info.sec">Information to Release</div>
-        <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="rel_entire"> <span data-i18n="s6.entire">Entire Medical Record</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_notes"> <span data-i18n="s6.notes">Office Visit Notes / Progress Notes</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_labs"> <span data-i18n="s6.labs">Lab Results</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_imaging"> <span data-i18n="s6.imaging">Imaging / Radiology Reports</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_sleep"> <span data-i18n="s6.sleep">Sleep Study Reports</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_rx"> <span data-i18n="s6.rx">Prescription / Medication History</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_billing"> <span data-i18n="s6.billing">Billing Records</span></label>
-          <label class="clbl"><input type="checkbox" name="rel_other"> <span data-i18n="s6.other_chk">Other:</span></label>
-        </div>
-        <div class="fld" style="margin-top:10px"><label data-i18n="s6.other_spec">Other (specify)</label><input type="text" name="rel_other_desc" placeholder="Specify other records"></div>
-      </div>
-      <div class="fsec">
-        <div class="fsec-ttl" data-i18n="s6.det.sec">Details</div>
-        <div class="fg fg2">
-          <div class="fld"><label data-i18n="s6.purpose">Purpose of Release</label><input type="text" name="rel_purpose" placeholder="Continuing care, personal use, etc."></div>
-          <div class="fld"><label data-i18n="s6.dates">Date Range of Records</label><input type="text" name="rel_dates" placeholder="e.g. All records, or date range"></div>
-        </div>
-        <div class="fg fg2 mt-16">
           <div class="fld"><label data-i18n="s6.exp">Authorization Expiration Date</label><div class="dpk" data-dpk="rel_exp"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="rel_exp"><div class="dpk-pop" data-dpk-pop="rel_exp"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
           <div class="fld" style="align-self:center;padding-top:22px"><label class="clbl" style="font-size:14px"><input type="checkbox" name="rel_no_exp"> <span data-i18n="s6.no_exp">No Expiration (one-year default)</span></label></div>
         </div>
@@ -771,7 +854,13 @@ footer{background:var(--cream)}
         <label class="clbl"><input type="checkbox" name="consent_release" required> <span data-i18n="s6.chk">I authorize the release of the medical information described above. I understand I may revoke this authorization at any time in writing. I understand that a photocopy or electronic copy of this authorization is as valid as the original.</span></label>
       </div>
       <div class="sig-row">
-        <div class="fld"><label data-i18n="s6.sig">Patient (or Guardian) Signature <span class="req">*</span></label><input type="text" name="sig6" placeholder="Type full name as signature" required></div>
+        <div class="fld"><label data-i18n="s6.sig">Patient (or Guardian) Signature <span class="req">*</span></label>
+          <div class="sigpad" data-sigpad="sig6">
+            <canvas class="sigpad-canvas"></canvas>
+            <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="sigpad.clear">Clear Signature</button></div>
+            <input type="hidden" name="sig6" required>
+          </div>
+        </div>
         <div class="fld"><label data-i18n="s6.date">Date</label><div class="dpk" data-dpk="date6"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date6" required><div class="dpk-pop" data-dpk-pop="date6"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
       </div>
       <div class="form-nav">
@@ -786,7 +875,7 @@ footer{background:var(--cream)}
       <p class="fstep-sub">Please review your information below before submitting. Click Edit on any section to make changes.</p>
 
       <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Patient Questionnaire</div><button class="rv-edit" type="button" onclick="goStep(1)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl">Reason for Appointment</div><button class="rv-edit" type="button" onclick="goStep(1)">Edit</button></div>
         <div id="rvQuestionnaire"></div>
       </div>
 
@@ -913,11 +1002,56 @@ function setStep5Conditional() {
   if (reqSig5)  reqSig5.style.display  = teleChecked ? '' : 'none';
 }
 
+function selectTreatmentType(type) {
+  var input = document.querySelector('[name="treatment_type"]');
+  if (input) input.value = type;
+
+  document.querySelectorAll('.tt-card').forEach(function (card) {
+    card.classList.toggle('selected', card.getAttribute('data-type') === type);
+  });
+
+  var isWeightLoss = (type === 'weight_loss');
+  var body = document.getElementById('s7QuestionnaireBody');
+  var note = document.getElementById('s7WeightLossNote');
+  if (body) body.style.display = isWeightLoss ? 'none' : '';
+  if (note) note.style.display = isWeightLoss ? '' : 'none';
+  var cc = document.querySelector('[name="chief_complaint"]');
+  if (cc) cc.required = !isWeightLoss;
+
+  // Pull the label from the card itself (already in the patient's chosen
+  // language) rather than re-deriving it from lang.js, so the summary line
+  // always matches what's on the card they clicked.
+  var selectedTtl = document.querySelector('.tt-card.selected .tt-card-ttl');
+  var summaryVal = document.getElementById('s7TreatmentSummaryVal');
+  if (summaryVal && selectedTtl) summaryVal.textContent = selectedTtl.textContent;
+
+  closeFormModal('modalTreatmentType');
+}
+
 var visitedSteps = { 1: true };
+
+// "At least one of N groups must be fully filled" — used where no single
+// field is individually mandatory, but the group as a whole is (home phone
+// vs cell phone; Emergency Contact 1 vs Emergency Contact 2). Keyed by the
+// modal-body container id it applies to.
+var S1_ANY_GROUPS = {
+  s1secDetails: [ ['home_phone'], ['cell_phone'] ]
+};
+
+function groupFilled(names, container) {
+  return names.every(function (name) {
+    var el = container.querySelector('[name="' + name + '"]');
+    return !!(el && el.value && el.value.trim());
+  });
+}
+function anyGroupFilled(groups, container) {
+  return groups.some(function (names) { return groupFilled(names, container); });
+}
 
 // Shared by isStepComplete() and sectionOk() below: true if every
 // [required] field inside the given container is filled in (checked, for
-// checkboxes/radios; non-blank, for everything else).
+// checkboxes/radios; non-blank, for everything else), and any S1_ANY_GROUPS
+// rule configured for this container is satisfied.
 function areRequiredFieldsFilled(container) {
   var required = container.querySelectorAll('[required]');
   var radiosSeen = {};
@@ -933,6 +1067,8 @@ function areRequiredFieldsFilled(container) {
       if (!(el.value && el.value.trim())) return false;
     }
   }
+  var groups = S1_ANY_GROUPS[container.id];
+  if (groups && !anyGroupFilled(groups, container)) return false;
   return true;
 }
 
@@ -946,7 +1082,12 @@ function isStepComplete(n) {
 }
 
 // ---------------- STEP 1 SECTION MODALS ----------------
-var S1_SECTIONS = ['s1secDetails', 's1secEc', 's1secIns', 's1secPharm'];
+var S1_SECTIONS = [
+  { modal: 'modalS1Details', container: 's1secDetails' },
+  { modal: 'modalS1Ec',      container: 's1secEc' },
+  { modal: 'modalS1Ins',     container: 's1secIns' },
+  { modal: 'modalS1Pharm',   container: 's1secPharm' }
+];
 
 function sectionOk(containerId) {
   var container = document.getElementById(containerId);
@@ -955,12 +1096,13 @@ function sectionOk(containerId) {
 }
 
 function renderS1Menu() {
-  S1_SECTIONS.forEach(function (containerId) {
+  S1_SECTIONS.forEach(function (s) {
+    var containerId = s.container;
     var badge = document.querySelector('[data-s1-status="' + containerId + '"]');
     var container = document.getElementById(containerId);
     if (!badge || !container) return;
     var required = container.querySelectorAll('[required]');
-    if (required.length === 0) {
+    if (required.length === 0 && !S1_ANY_GROUPS[containerId]) {
       badge.textContent = 'Optional';
       badge.className = 's1-menu-status s1-optional';
       return;
@@ -989,6 +1131,115 @@ function openS1Modal(id) { openFormModal(id); }
 function closeS1Modal(id) { closeFormModal(id, renderS1Menu); }
 function s1Backdrop(e, id) {
   if (e.target === document.getElementById(id)) closeS1Modal(id);
+}
+
+// Like areRequiredFieldsFilled, but as a side effect shows/hides each empty
+// required field's .req asterisk — only ever called from a modal's own
+// Next click (and live input/change events already inside an "attempted"
+// modal, wired up below), never from the passive renderS1Menu() poll, so
+// asterisks stay hidden until the patient actually tries to advance.
+function markEmptyRequired(container) {
+  var required = container.querySelectorAll('[required]');
+  var radiosSeen = {};
+  var allFilled = true;
+  for (var i = 0; i < required.length; i++) {
+    var el = required[i];
+    var isEmpty;
+    if (el.type === 'radio') {
+      if (radiosSeen[el.name]) continue;
+      radiosSeen[el.name] = true;
+      isEmpty = !container.querySelector('input[name="' + el.name + '"]:checked');
+    } else if (el.type === 'checkbox') {
+      isEmpty = !el.checked;
+    } else {
+      isEmpty = !(el.value && el.value.trim());
+    }
+    var fld = el.closest('.fld');
+    var reqSpan = fld ? fld.querySelector('.req') : null;
+    if (reqSpan) reqSpan.style.display = isEmpty ? '' : 'none';
+    if (isEmpty) allFilled = false;
+  }
+  if (!markAnyGroup(container)) allFilled = false;
+  return allFilled;
+}
+
+// Side-effecting counterpart to anyGroupFilled(): toggles the .req span for
+// every field in every configured group for this container — shows all of
+// them when no group is fully satisfied, hides all when one is.
+function markAnyGroup(container) {
+  var groups = S1_ANY_GROUPS[container.id];
+  if (!groups) return true;
+  var satisfied = anyGroupFilled(groups, container);
+  groups.forEach(function (names) {
+    names.forEach(function (name) {
+      var el = container.querySelector('[name="' + name + '"]');
+      var fld = el ? el.closest('.fld') : null;
+      var reqSpan = fld ? fld.querySelector('.req') : null;
+      if (reqSpan) reqSpan.style.display = satisfied ? 'none' : '';
+    });
+  });
+  return satisfied;
+}
+
+// Called by each Patient Demographics modal's own "Next" button. Validates
+// the modal just filled in and, if complete, advances straight to the next
+// one in sequence (bypassing the menu) — mirroring s2ModalNext() below.
+function s1ModalNext(idx) {
+  var current = S1_SECTIONS[idx];
+  var container = document.getElementById(current.container);
+  var ok = markEmptyRequired(container);
+  if (!ok) {
+    container.dataset.attempted = 'true';
+    return;
+  }
+  document.getElementById(current.modal).classList.remove('open');
+  var next = S1_SECTIONS[idx + 1];
+  if (next) {
+    document.getElementById(next.modal).classList.add('open');
+  } else {
+    document.body.style.overflow = '';
+  }
+  renderS1Menu();
+}
+
+// Reveals/requires the free-text "Please specify" field only when the
+// patient picks "Other" from the primary-insurance dropdown.
+function toggleInsOther(val) {
+  var wrap = document.getElementById('ins1OtherWrap');
+  var other = document.querySelector('[name="ins1_other"]');
+  var show = (val === 'Other');
+  if (wrap) wrap.style.display = show ? '' : 'none';
+  if (other) other.required = show;
+}
+
+// "Same as Patient" checkbox in the Insurance modal — one-time copy of the
+// patient's name/DOB from Step 2's own Patient Details fields into the
+// Policy Holder fields, locking them while checked so the two can't drift
+// apart; unchecking clears them back to blank for manual entry.
+function toggleSameAsPatient(checked) {
+  var phName = document.querySelector('[name="ph_name"]');
+  var phRel = document.querySelector('[name="ph_rel"]');
+  var phDobWrap = document.querySelector('[data-dpk="ph_dob"]');
+  var phDobVisible = phDobWrap.querySelector('.dpk-input');
+  var phDobHidden = phDobWrap.querySelector('input[type="hidden"]');
+  var patientDobWrap = document.querySelector('[data-dpk="dob"]');
+  var patientDobVisible = patientDobWrap.querySelector('.dpk-input');
+  var patientDobHidden = patientDobWrap.querySelector('input[type="hidden"]');
+
+  if (checked) {
+    phName.value = [val('first_name'), val('mi'), val('last_name')].filter(Boolean).join(' ');
+    phDobVisible.value = patientDobVisible.value;
+    phDobHidden.value = patientDobHidden.value;
+    phRel.value = 'Self';
+  } else {
+    phName.value = '';
+    phDobVisible.value = '';
+    phDobHidden.value = '';
+    phRel.value = '';
+  }
+  phName.disabled = checked;
+  phDobVisible.disabled = checked;
+  phRel.disabled = checked;
 }
 
 // ---------------- STEP 2: CONSENTS & SIGNATURES (sequential modals) ----------------
@@ -1118,6 +1369,13 @@ function getCheckbox(name) {
   return el ? el.checked : false;
 }
 
+// Questionnaire-gated variants — return blank/false instead of the field's
+// actual value when Weight Loss is selected, since that path has no
+// questionnaire to submit.
+function qVal(name)   { return val('treatment_type') === 'weight_loss' ? '' : val(name); }
+function qRadio(name) { return val('treatment_type') === 'weight_loss' ? '' : getRadioValue(name); }
+function qCheck(name) { return val('treatment_type') === 'weight_loss' ? false : getCheckbox(name); }
+
 function showSubmitError(msg) {
   var errEl = document.getElementById('submitError');
   errEl.textContent = msg;
@@ -1172,26 +1430,170 @@ function generateReferenceNumber() {
   return 'WCSC-' + rand + mm + yy;
 }
 
+function blobToFile(blob, filename) {
+  return new File([blob], filename, { type: 'application/pdf' });
+}
+
+// Builds one consent PDF: title, patient info, the full disclosure text
+// (read live from the DOM via .textContent, never .innerText — the source
+// elements are inside steps/modals that are display:none at submit time,
+// and .innerText returns empty for anything not actually rendered visible),
+// then the signature image and date signed near the bottom, like a
+// traditional paper consent.
+// Reads a disclosure container's text as separate blocks (heading /
+// paragraph / list-item) rather than one flattened .textContent string —
+// adjacent block elements like <h4><p> have no whitespace text node
+// between them in the source markup, so a single textContent read glues
+// "HeadingFirst paragraph..." together with no separator. Falls back to
+// treating the whole container as one paragraph if it has no element
+// children at all (e.g. the plain .ibox / checkbox-label text used for
+// Authorization to Release, which has no h4/p/ul structure).
+function extractDisclosureBlocks(container) {
+  var blocks = [];
+  var children = container.children;
+  if (!children || children.length === 0) {
+    var whole = container.textContent.replace(/\s+/g, ' ').trim();
+    if (whole) blocks.push({ text: whole, bold: false });
+    return blocks;
+  }
+  Array.prototype.forEach.call(children, function (child) {
+    if (child.tagName === 'H4') {
+      blocks.push({ text: child.textContent.trim(), bold: true });
+    } else if (child.tagName === 'UL') {
+      Array.prototype.forEach.call(child.children, function (li) {
+        blocks.push({ text: '• ' + li.textContent.replace(/\s+/g, ' ').trim(), bold: false });
+      });
+    } else {
+      var t = child.textContent.replace(/\s+/g, ' ').trim();
+      if (t) blocks.push({ text: t, bold: false });
+    }
+  });
+  return blocks;
+}
+
+function buildConsentPdf(opts) {
+  var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
+  var pageWidth = doc.internal.pageSize.getWidth();
+  var pageHeight = doc.internal.pageSize.getHeight();
+  var margin = 54;
+  var maxWidth = pageWidth - margin * 2;
+  var y = margin;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+  doc.text(opts.title, margin, y); y += 26;
+
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  var patientName = [val('first_name'), val('mi'), val('last_name')].filter(Boolean).join(' ');
+  doc.text('Patient: ' + patientName + '    DOB: ' + dpkDisplayVal('dob'), margin, y);
+  y += 22;
+
+  opts.disclosureEls.forEach(function (el) {
+    if (!el) return;
+    extractDisclosureBlocks(el).forEach(function (block) {
+      doc.setFont('helvetica', block.bold ? 'bold' : 'normal');
+      doc.setFontSize(block.bold ? 12 : 10.5);
+      var lines = doc.splitTextToSize(block.text, maxWidth);
+      lines.forEach(function (line) {
+        if (y > pageHeight - margin) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
+        y += block.bold ? 15 : 14;
+      });
+      y += block.bold ? 4 : 8;
+    });
+    y += 8;
+  });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+
+  (opts.extraLines || []).forEach(function (line) {
+    if (y > pageHeight - margin) { doc.addPage(); y = margin; }
+    doc.text(line, margin, y); y += 14;
+  });
+
+  var sigBlockHeight = 120;
+  if (y > pageHeight - margin - sigBlockHeight) { doc.addPage(); y = margin; }
+  y += 26;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+  doc.text('Signature', margin, y); y += 8;
+
+  var pad = SignaturePads[opts.sigName];
+  if (pad && pad.isSigned()) {
+    doc.addImage(pad.toDataURL(), 'PNG', margin, y, 200, 65);
+  }
+  y += 75;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text('Date Signed: ' + (dpkDisplayVal(opts.dateName) || '—'), margin, y);
+
+  return doc.output('blob');
+}
+
+// Builds a PDF for each consent the patient actually signed — skipped
+// entirely if the jsPDF CDN failed to load, since a flaky third-party CDN
+// must never block registration.
+function buildAllConsentPdfFiles() {
+  var files = [];
+  if (!window.jspdf) return files;
+
+  if (getCheckbox('consent_treat') && SignaturePads.sig2 && SignaturePads.sig2.isSigned()) {
+    files.push(blobToFile(buildConsentPdf({
+      title: 'Consent to Treatment',
+      disclosureEls: [document.querySelector('#s2secTreat .policy-box')],
+      sigName: 'sig2', dateName: 'date2'
+    }), 'consent-to-treat.pdf'));
+  }
+  if (getCheckbox('consent_financial') && SignaturePads.sig3 && SignaturePads.sig3.isSigned()) {
+    files.push(blobToFile(buildConsentPdf({
+      title: 'Patient Financial Policy',
+      disclosureEls: [document.querySelector('#s2secFinancial .policy-box')],
+      sigName: 'sig3', dateName: 'date3'
+    }), 'financial-policy.pdf'));
+  }
+  if (getCheckbox('consent_hipaa') && SignaturePads.sig4 && SignaturePads.sig4.isSigned()) {
+    files.push(blobToFile(buildConsentPdf({
+      title: 'Notice of Privacy Practices — Acknowledgment',
+      disclosureEls: [document.querySelector('#s2secHipaa .policy-box')],
+      sigName: 'sig4', dateName: 'date4',
+      extraLines: val('hipaa_rep') ? ['Signed on behalf of patient — relationship: ' + val('hipaa_rep')] : []
+    }), 'hipaa-notice.pdf'));
+  }
+  if ((getCheckbox('consent_text') || getCheckbox('consent_telehealth')) && SignaturePads.sig5 && SignaturePads.sig5.isSigned()) {
+    files.push(blobToFile(buildConsentPdf({
+      title: 'Text Message & Telehealth Consent',
+      disclosureEls: Array.prototype.slice.call(document.querySelectorAll('#s2secTextTele .policy-box')),
+      sigName: 'sig5', dateName: 'date5'
+    }), 'text-telehealth-consent.pdf'));
+  }
+  if (getCheckbox('consent_release') && SignaturePads.sig6 && SignaturePads.sig6.isSigned()) {
+    files.push(blobToFile(buildConsentPdf({
+      title: 'Authorization to Release Medical Information',
+      disclosureEls: [document.querySelector('#fstep4 .ibox'), document.querySelector('#fstep4 [data-i18n="s6.chk"]')],
+      sigName: 'sig6', dateName: 'date6'
+    }), 'authorization-to-release.pdf'));
+  }
+  return files;
+}
+
 function submitForms() {
   var btn = document.querySelector('.btn-sub');
   if (btn) { btn.disabled = true; btn.textContent = stepLabel('ui.submitting', 'Submitting…'); }
 
   var refNum = generateReferenceNumber();
   var essTotal = 0;
-  for (var i = 1; i <= EPWORTH_ITEMS; i++) {
-    var v = parseInt(getRadioValue('ess' + i), 10);
-    if (!isNaN(v)) essTotal += v;
+  if (val('treatment_type') !== 'weight_loss') {
+    for (var i = 1; i <= EPWORTH_ITEMS; i++) {
+      var v = parseInt(getRadioValue('ess' + i), 10);
+      if (!isNaN(v)) essTotal += v;
+    }
   }
 
   var payload = {
     reference_number:        refNum,
+    treatment_type:          val('treatment_type'),
     first_name:              val('first_name'),
     last_name:               val('last_name'),
     middle_initial:          val('mi'),
     date_of_birth:           val('dob'),
     age:                     val('age'),
     sex:                     getRadioValue('sex'),
-    ssn:                     val('ssn'),
     drivers_license:         val('dl'),
     address:                 val('address'),
     city:                    val('city'),
@@ -1206,8 +1608,12 @@ function submitForms() {
     ec_name:                 val('ec_name'),
     ec_relationship:         val('ec_rel'),
     ec_phone:                val('ec_phone'),
-    primary_insurance:       val('ins1'),
+    ec2_name:                val('ec2_name'),
+    ec2_relationship:        val('ec2_rel'),
+    ec2_phone:               val('ec2_phone'),
+    primary_insurance:       (val('ins1') === 'Other' ? val('ins1_other') : val('ins1')),
     policy_holder:           val('ph_name'),
+    policy_holder_dob:       val('ph_dob'),
     ph_relationship:         val('ph_rel'),
     member_id:               val('member_id'),
     group_number:            val('group_num'),
@@ -1233,76 +1639,62 @@ function submitForms() {
     consent_telehealth:      getCheckbox('consent_telehealth'),
     sig_tele:                val('sig5'),
     date_tele:               val('date5'),
-    release_to:              val('rel_to'),
-    release_phone:           val('rel_phone'),
-    release_address:         val('rel_addr'),
-    release_entire_record:   getCheckbox('rel_entire'),
-    release_notes:           getCheckbox('rel_notes'),
-    release_labs:            getCheckbox('rel_labs'),
-    release_imaging:         getCheckbox('rel_imaging'),
-    release_sleep:           getCheckbox('rel_sleep'),
-    release_rx:              getCheckbox('rel_rx'),
-    release_billing:         getCheckbox('rel_billing'),
-    release_other:           getCheckbox('rel_other'),
-    release_other_desc:      val('rel_other_desc'),
-    release_purpose:         val('rel_purpose'),
-    release_date_range:      val('rel_dates'),
     release_expiration:      val('rel_exp'),
     release_no_expiration:   getCheckbox('rel_no_exp'),
     consent_release:         getCheckbox('consent_release'),
     sig_release:             val('sig6'),
     date_release:            val('date6'),
-    chief_complaint:         val('chief_complaint'),
-    sleep_hours:             val('sleep_hrs'),
-    concern_duration:        val('concern_duration'),
-    bedtime:                 val('bedtime'),
-    wake_time:               val('waketime'),
-    sym_sleep_onset:         getCheckbox('sym_sleep_onset'),
-    sym_wake_night:          getCheckbox('sym_wake_night'),
-    sym_early_wake:          getCheckbox('sym_early_wake'),
-    sym_snore:               getCheckbox('sym_snore'),
-    sym_witnessed:           getCheckbox('sym_witnessed'),
-    sym_not_refreshed:       getCheckbox('sym_not_refreshed'),
-    sym_daytime:             getCheckbox('sym_daytime'),
-    sym_rls:                 getCheckbox('sym_rls'),
-    sym_grind:               getCheckbox('sym_grind'),
-    sym_walk:                getCheckbox('sym_walk'),
-    prev_sleep_study:        getRadioValue('prev_study'),
-    cpap_use:                getRadioValue('cpap_use'),
-    ess1:                    getRadioValue('ess1'),
-    ess2:                    getRadioValue('ess2'),
-    ess3:                    getRadioValue('ess3'),
-    ess4:                    getRadioValue('ess4'),
-    ess5:                    getRadioValue('ess5'),
-    ess6:                    getRadioValue('ess6'),
-    ess7:                    getRadioValue('ess7'),
-    ess8:                    getRadioValue('ess8'),
+    chief_complaint:         qVal('chief_complaint'),
+    sleep_hours:             qVal('sleep_hrs'),
+    concern_duration:        qVal('concern_duration'),
+    bedtime:                 qVal('bedtime'),
+    wake_time:               qVal('waketime'),
+    sym_sleep_onset:         qCheck('sym_sleep_onset'),
+    sym_wake_night:          qCheck('sym_wake_night'),
+    sym_early_wake:          qCheck('sym_early_wake'),
+    sym_snore:               qCheck('sym_snore'),
+    sym_witnessed:           qCheck('sym_witnessed'),
+    sym_not_refreshed:       qCheck('sym_not_refreshed'),
+    sym_daytime:             qCheck('sym_daytime'),
+    sym_rls:                 qCheck('sym_rls'),
+    sym_grind:               qCheck('sym_grind'),
+    sym_walk:                qCheck('sym_walk'),
+    prev_sleep_study:        qRadio('prev_study'),
+    cpap_use:                qRadio('cpap_use'),
+    ess1:                    qRadio('ess1'),
+    ess2:                    qRadio('ess2'),
+    ess3:                    qRadio('ess3'),
+    ess4:                    qRadio('ess4'),
+    ess5:                    qRadio('ess5'),
+    ess6:                    qRadio('ess6'),
+    ess7:                    qRadio('ess7'),
+    ess8:                    qRadio('ess8'),
     ess_total:               essTotal,
-    hx_hypertension:         getCheckbox('hx_htn'),
-    hx_diabetes:             getCheckbox('hx_dm'),
-    hx_heart_disease:        getCheckbox('hx_heart'),
-    hx_afib:                 getCheckbox('hx_afib'),
-    hx_stroke:               getCheckbox('hx_stroke'),
-    hx_asthma:               getCheckbox('hx_asthma'),
-    hx_copd:                 getCheckbox('hx_copd'),
-    hx_anxiety:              getCheckbox('hx_anxiety'),
-    hx_depression:           getCheckbox('hx_depression'),
-    hx_thyroid:              getCheckbox('hx_thyroid'),
-    hx_obesity:              getCheckbox('hx_obesity'),
-    hx_reflux:               getCheckbox('hx_reflux'),
-    hx_cancer:               getCheckbox('hx_cancer'),
-    hx_kidney:               getCheckbox('hx_kidney'),
-    hx_liver:                getCheckbox('hx_liver'),
-    hx_other:                val('hx_other'),
-    medications:             val('medications'),
-    allergies:               val('allergies'),
-    height:                  val('height'),
-    weight:                  val('weight'),
-    comments:                val('comments'),
+    hx_hypertension:         qCheck('hx_htn'),
+    hx_diabetes:             qCheck('hx_dm'),
+    hx_heart_disease:        qCheck('hx_heart'),
+    hx_afib:                 qCheck('hx_afib'),
+    hx_stroke:               qCheck('hx_stroke'),
+    hx_asthma:               qCheck('hx_asthma'),
+    hx_copd:                 qCheck('hx_copd'),
+    hx_anxiety:              qCheck('hx_anxiety'),
+    hx_depression:           qCheck('hx_depression'),
+    hx_thyroid:              qCheck('hx_thyroid'),
+    hx_obesity:              qCheck('hx_obesity'),
+    hx_reflux:               qCheck('hx_reflux'),
+    hx_cancer:               qCheck('hx_cancer'),
+    hx_kidney:               qCheck('hx_kidney'),
+    hx_liver:                qCheck('hx_liver'),
+    hx_other:                qVal('hx_other'),
+    medications:             qVal('medications'),
+    allergies:               qVal('allergies'),
+    height:                  qVal('height'),
+    weight:                  qVal('weight'),
+    comments:                qVal('comments'),
     submitted_at:            new Date().toISOString()
   };
 
-  StorageClient.submitIntake('registration', payload, regUpload.getFiles())
+  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()))
     .then(function (result) {
       // mergedIntoType === 'registration' means this name + DOB already had
       // a registration on file before this submission — as opposed to
@@ -1325,6 +1717,7 @@ document.querySelector('.step-row').addEventListener('click', function(e) {
 
 </script>
 <script src="date-picker.js"></script>
+<script src="signature-pad.js"></script>
 <script src="upload-widget.js"></script>
 <script>
 
@@ -1367,10 +1760,25 @@ document.getElementById('fstep2').addEventListener('input', renderS1Menu);
 document.getElementById('fstep2').addEventListener('change', renderS1Menu);
 renderS1Menu();
 
+// Once a modal's Next button has flagged it (dataset.attempted), keep
+// re-validating live so asterisks clear the moment a flagged field is
+// fixed, without waiting for another Next click.
+document.getElementById('fstep2').addEventListener('input', function (e) {
+  var container = e.target.closest('.modal-body');
+  if (container && container.dataset.attempted === 'true') markEmptyRequired(container);
+});
+document.getElementById('fstep2').addEventListener('change', function (e) {
+  var container = e.target.closest('.modal-body');
+  if (container && container.dataset.attempted === 'true') markEmptyRequired(container);
+});
+
 // ---------------- STEP 2 MENU: live status + initial paint ----------------
 document.getElementById('fstep3').addEventListener('input', renderS2);
 document.getElementById('fstep3').addEventListener('change', renderS2);
 renderS2();
+
+// ---------------- TREATMENT TYPE: ask immediately on entry ----------------
+openFormModal('modalTreatmentType');
 
 // ---------------- AUTO-FILL SIGNATURE DATE ----------------
 // Once a patient types a signature, auto-fill that consent's date with
@@ -1419,6 +1827,10 @@ function dpkDisplayVal(name) {
 }
 
 function renderReviewCards() {
+  if (val('treatment_type') === 'weight_loss') {
+    document.getElementById('rvQuestionnaire').innerHTML =
+      '<p>' + stepLabel('s7.tt.wlreview', 'Weight Loss program selected \u2014 no questionnaire required.') + '</p>';
+  } else {
   var essLabels = ['Sitting and reading', 'Watching TV', 'Sitting inactive in a public place', 'As a passenger in a car for an hour', 'Lying down in the afternoon when possible', 'Sitting and talking to someone', 'Sitting quietly after lunch (no alcohol)', 'In a car stopped for a few minutes in traffic'];
   var essTotal = 0, essAny = false, essHtml = '';
   for (var i = 1; i <= EPWORTH_ITEMS; i++) {
@@ -1455,6 +1867,7 @@ function renderReviewCards() {
       rvRow('Weight', val('weight')) +
       rvRow('Additional Comments', val('comments')) +
     '</div>';
+  }
 
   document.getElementById('rvDemographics').innerHTML =
     '<div class="rv-grid">' +
@@ -1462,8 +1875,7 @@ function renderReviewCards() {
       rvRow('Date of Birth', dpkDisplayVal('dob')) +
       rvRow('Age', val('age')) +
       rvRow('Sex', getRadioValue('sex')) +
-      rvRow('Social Security #', val('ssn')) +
-      rvRow('Driver\'s License #', val('dl')) +
+      rvRow('Driver\'s License/ID #', val('dl')) +
       rvRow('Address', [val('address'), val('city'), val('state'), val('zip')].filter(Boolean).join(', ')) +
       rvRow('Home Phone', val('home_phone')) +
       rvRow('Cell Phone', val('cell_phone')) +
@@ -1474,8 +1886,12 @@ function renderReviewCards() {
       rvRow('Emergency Contact', val('ec_name')) +
       rvRow('EC Relationship', val('ec_rel')) +
       rvRow('EC Phone', val('ec_phone')) +
-      rvRow('Primary Insurance', val('ins1')) +
+      rvRow('Emergency Contact 2', val('ec2_name')) +
+      rvRow('EC2 Relationship', val('ec2_rel')) +
+      rvRow('EC2 Phone', val('ec2_phone')) +
+      rvRow('Primary Insurance', (val('ins1') === 'Other' ? val('ins1_other') : val('ins1'))) +
       rvRow('Policy Holder', val('ph_name')) +
+      rvRow('Policy Holder DOB', dpkDisplayVal('ph_dob')) +
       rvRow('Member ID', val('member_id')) +
       rvRow('Group #', val('group_num')) +
       rvRow('Secondary Insurance', val('ins2')) +
@@ -1489,27 +1905,18 @@ function renderReviewCards() {
 
   document.getElementById('rvConsents').innerHTML =
     '<div class="rv-list">' +
-      'Consent to Treat: ' + (getCheckbox('consent_treat') ? 'Signed (' + escHtml(val('sig2')) + ', ' + escHtml(dpkDisplayVal('date2')) + ')' : 'Not signed') + '<br>' +
-      'Financial Agreement: ' + (getCheckbox('consent_financial') ? 'Signed (' + escHtml(val('sig3')) + ', ' + escHtml(dpkDisplayVal('date3')) + ')' : 'Not signed') + '<br>' +
-      'HIPAA Acknowledgment: ' + (getCheckbox('consent_hipaa') ? 'Signed (' + escHtml(val('sig4')) + ', ' + escHtml(dpkDisplayVal('date4')) + ')' : 'Not signed') + (val('hipaa_rep') ? ' &mdash; Representative: ' + escHtml(val('hipaa_rep')) : '') + '<br>' +
+      'Consent to Treat: ' + (getCheckbox('consent_treat') ? 'Signed on ' + escHtml(dpkDisplayVal('date2')) : 'Not signed') + '<br>' +
+      'Financial Agreement: ' + (getCheckbox('consent_financial') ? 'Signed on ' + escHtml(dpkDisplayVal('date3')) : 'Not signed') + '<br>' +
+      'HIPAA Acknowledgment: ' + (getCheckbox('consent_hipaa') ? 'Signed on ' + escHtml(dpkDisplayVal('date4')) : 'Not signed') + (val('hipaa_rep') ? ' &mdash; Representative: ' + escHtml(val('hipaa_rep')) : '') + '<br>' +
       'Text Message Consent: ' + (getCheckbox('consent_text') ? 'Yes (' + escHtml(val('text_phone')) + ')' : 'Declined') + '<br>' +
-      'Telehealth Consent: ' + (getCheckbox('consent_telehealth') ? 'Signed (' + escHtml(val('sig5')) + ', ' + escHtml(dpkDisplayVal('date5')) + ')' : 'Declined') +
+      'Telehealth Consent: ' + (getCheckbox('consent_telehealth') ? 'Signed on ' + escHtml(dpkDisplayVal('date5')) : 'Declined') +
     '</div>';
 
-  var releaseItems = [['rel_entire', 'Entire Medical Record'], ['rel_notes', 'Office Visit Notes'], ['rel_labs', 'Lab Results'], ['rel_imaging', 'Imaging / Radiology Reports'], ['rel_sleep', 'Sleep Study Reports'], ['rel_rx', 'Prescription / Medication History'], ['rel_billing', 'Billing Records'], ['rel_other', 'Other']];
-  var releaseChecked = releaseItems.filter(function (r) { return getCheckbox(r[0]); }).map(function (r) { return r[1]; });
   document.getElementById('rvRelease').innerHTML =
     '<div class="rv-grid">' +
-      rvRow('Release To', val('rel_to')) +
-      rvRow('Phone / Fax', val('rel_phone')) +
-      rvRow('Address', val('rel_addr')) +
-      rvRow('Purpose', val('rel_purpose')) +
-      rvRow('Date Range', val('rel_dates')) +
       rvRow('Expiration Date', getCheckbox('rel_no_exp') ? 'No Expiration' : dpkDisplayVal('rel_exp')) +
-      rvRow('Authorization Signature', val('sig6') + (val('date6') ? ' (' + dpkDisplayVal('date6') + ')' : '')) +
-    '</div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Information to Release</div>' +
-    '<div class="rv-list">' + (releaseChecked.length ? releaseChecked.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + (val('rel_other_desc') ? '<br>Other: ' + escHtml(val('rel_other_desc')) : '') + '</div>';
+      rvRow('Authorization Signature', val('sig6') ? ('Signed on ' + dpkDisplayVal('date6')) : '') +
+    '</div>';
 }
 
 // ---------------- STEP 5: DOCUMENT UPLOAD ----------------
