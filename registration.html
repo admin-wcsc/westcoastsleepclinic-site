@@ -1876,6 +1876,34 @@ if (heightInput) {
   });
 }
 
+// ---------------- AGE AUTO-CALCULATE FROM DOB ----------------
+function calcAge(isoDate) {
+  var parts = isoDate.split('-');
+  if (parts.length !== 3) return null;
+  var dob = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  var today = new Date();
+  var age = today.getFullYear() - dob.getFullYear();
+  var hadBirthdayThisYear = (today.getMonth() > dob.getMonth()) ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+  if (!hadBirthdayThisYear) age--;
+  return age;
+}
+
+// Delegated on the modal so it catches both ways the dob hidden input gets
+// set: typing (DatePicker's own 'input' handler sets it directly) and
+// clicking a calendar day (which explicitly dispatches 'input' on the
+// hidden field) -- both have already updated the value by the time this
+// bubbles up. Only fills in Age on a complete date; doesn't clear an
+// existing value while the patient is still mid-typing an incomplete one.
+document.getElementById('modalS1Details').addEventListener('input', function (e) {
+  if (!e.target.closest('[data-dpk="dob"]')) return;
+  var dobVal = document.querySelector('[name="dob"]').value;
+  if (!dobVal) return;
+  var ageInput = document.querySelector('[name="age"]');
+  var age = calcAge(dobVal);
+  if (ageInput && age !== null && age >= 0) ageInput.value = age;
+});
+
 // ---------------- STEP 1 MENU: live status + initial paint ----------------
 document.getElementById('fstep2').addEventListener('input', renderS1Menu);
 document.getElementById('fstep2').addEventListener('change', renderS1Menu);
