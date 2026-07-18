@@ -80,13 +80,13 @@ body{background:#f4f8fb}
 .policy-box p:last-child{margin-bottom:0}
 .policy-box ul{margin:10px 0 10px 18px}
 .policy-box ul li{margin-bottom:6px}
-.sig-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;margin-top:18px}
+.sig-row{display:flex;flex-direction:column;gap:18px;margin-top:18px}
+.sig-row .fld:last-child{max-width:240px}
 .sigpad{border:1.5px solid var(--border);border-radius:6px;background:#fff;overflow:hidden}
 .sigpad-canvas{display:block;width:100%;height:140px;touch-action:none;cursor:crosshair}
 .sigpad-foot{display:flex;justify-content:flex-end;padding:6px 8px;border-top:1px solid var(--border);background:var(--cream)}
 .sigpad-clear{background:none;border:1.5px solid var(--border);color:var(--tm);font-size:11px;font-weight:600;padding:5px 12px;border-radius:14px;cursor:pointer;font-family:'Montserrat',sans-serif;transition:border-color .2s,color .2s}
 .sigpad-clear:hover{border-color:var(--mg);color:var(--dg)}
-@media(max-width:480px){.sig-row{grid-template-columns:1fr}}
 .ess-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
 .ess-table th{background:var(--dg);color:#fff;padding:12px 14px;text-align:left;font-size:12px;letter-spacing:.05em;font-weight:600}
 .ess-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
@@ -130,6 +130,13 @@ body{background:#f4f8fb}
    width; they're short enough that the single-column layout reads fine. */
 #modalS1Ins .modal-card,
 #modalS1Details .modal-card{max-width:760px}
+/* Consent modals (Step 3) -- widened for the same reason, and so the
+   signature pad below has more room to be a real signature-length strip
+   instead of squeezed to half the row next to the date field. */
+#modalS2Treat .modal-card,
+#modalS2Financial .modal-card,
+#modalS2Hipaa .modal-card,
+#modalS2TextTele .modal-card{max-width:760px}
 .modal-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .modal-head h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg)}
 .modal-close{background:none;border:none;cursor:pointer;color:var(--tl);line-height:1;padding:4px;border-radius:4px;transition:color .2s,background .2s}
