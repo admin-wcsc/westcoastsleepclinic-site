@@ -116,6 +116,13 @@ body{background:#f4f8fb}
    classes, ported here since this page needs 4 modals instead of 1) ── */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(10,30,50,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
+/* Treatment Type is the very first thing shown on page load -- unlike the
+   later Step 2/3/4 modals (which intentionally block the whole page), the
+   nav bar and floating call button should stay usable while it's up. Sits
+   below the header (z-index:100) and call button (z-index:150), and starts
+   below the header instead of the full viewport so it never renders behind
+   it. */
+#modalTreatmentType{z-index:60;top:var(--nav-height)}
 .modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
 /* Insurance and Patient Details are the two longest Step 2 modals — widened
    so their fg2/fg3 rows can lay out side by side instead of cramming into
