@@ -144,6 +144,7 @@ body{background:#f4f8fb}
 .modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .modal-body{padding:28px}
 .modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal-foot-note{font-size:13px;color:var(--tl);font-weight:500}
 
 /* ── TREATMENT TYPE CARDS ── */
 .tt-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px}
@@ -642,7 +643,7 @@ footer{background:var(--cream)}
             </div>
           </div>
           <div class="modal-foot">
-            <span></span>
+            <span class="modal-foot-note" id="insNextNote"></span>
             <button class="btn-nxt" id="insNextBtn" onclick="s1ModalNext(2)">Next</button>
           </div>
         </div>
@@ -1305,6 +1306,8 @@ function toggleSelfPayFields(val) {
   });
   var nextBtn = document.getElementById('insNextBtn');
   if (nextBtn) nextBtn.classList.toggle('btn-nxt-ready', isSelfPay);
+  var note = document.getElementById('insNextNote');
+  if (note) note.textContent = isSelfPay ? 'Self-Pay/Uninsured selected, no further details needed' : '';
 }
 
 // "Same as Patient" checkbox in the Insurance modal — one-time copy of the
