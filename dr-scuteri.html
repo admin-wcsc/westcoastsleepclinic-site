@@ -147,7 +147,7 @@ body{background:#fff}
       <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
       <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
       <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
-      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office. <button type="button" class="relocation-banner-toggle" id="relocationBannerToggleEnd" onclick="toggleRelocationBannerMore()">Read Less</button></p>
     </div>
   </div>
 </div>
@@ -157,9 +157,12 @@ body{background:#fff}
 
   function toggleRelocationBannerMore() {
     var more = document.getElementById('relocationBannerMore');
-    var btn = document.getElementById('relocationBannerToggle');
+    var topBtn = document.getElementById('relocationBannerToggle');
     var open = more.classList.toggle('open');
-    btn.textContent = open ? 'Read Less' : 'Read More';
+    // The top "Read More" is only for opening -- once expanded, closing
+    // happens via the "Read Less" link at the end of the panel instead, so
+    // the top button hides rather than relabeling itself.
+    topBtn.style.display = open ? 'none' : '';
   }
 </script>
 <!-- SHARED:BANNER:END -->
