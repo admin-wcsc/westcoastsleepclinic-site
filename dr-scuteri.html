@@ -120,22 +120,30 @@ body{background:#fff}
      dropping its entry from scripts/sync-partials.js's SECTIONS list --
      nothing elsewhere depends on it.
      To hide it instantly without any of that, set BANNER_ENABLED to
-     false below and re-run the sync. -->
+     false below and re-run the sync.
+     The collapsed bar (summary line + Read More) is the only part that
+     takes up document flow space, so the nav below it never moves. The
+     "more" panel is an absolutely-positioned dropdown, layered above the
+     header (z-index 120 > .site-header's 100), that overlays the nav and
+     page content underneath instead of pushing them down when opened. -->
 <style>
-  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px}
+  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px;position:relative}
   .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
-  .relocation-banner-in p{margin:0 0 12px}
-  .relocation-banner-in p:last-child{margin-bottom:0}
-  .relocation-banner-in strong{display:block;margin-bottom:4px}
-  .relocation-banner-more{display:none}
-  .relocation-banner-more.open{display:block}
   .relocation-banner-toggle{background:none;border:none;padding:0;color:#7a1f1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:14px;font-family:'Montserrat',sans-serif}
+  .relocation-banner-more{display:none;position:absolute;top:100%;left:0;right:0;background:#fbe3e1;border-bottom:1px solid #f0bcb8;box-shadow:0 16px 32px rgba(0,0,0,.18);z-index:120;max-height:min(70vh,520px);overflow-y:auto}
+  .relocation-banner-more.open{display:block}
+  .relocation-banner-more-in{max-width:800px;margin:0 auto;padding:0 20px 20px;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-more-in p{margin:0 0 12px}
+  .relocation-banner-more-in p:last-child{margin-bottom:0}
+  .relocation-banner-more-in strong{display:block;margin-bottom:4px}
   .hide-relocation-banner .relocation-banner{display:none}
 </style>
 <div class="relocation-banner" id="relocation-banner">
   <div class="relocation-banner-in">
     <p><span>As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span> <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()">Read More</button></p>
-    <div class="relocation-banner-more" id="relocationBannerMore">
+  </div>
+  <div class="relocation-banner-more" id="relocationBannerMore">
+    <div class="relocation-banner-more-in">
       <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
       <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
       <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
