@@ -88,14 +88,6 @@ app.http('availability', {
     const earliestIso = addDaysIso(todayIso(), MIN_LEAD_DAYS);
     const horizonIso = addDaysIso(todayIso(), WINDOW_DAYS);
 
-    // openDates and slots are deliberately separate: openDates is every date
-    // the office is actually open for this treatment type (a real practice
-    // weekday, not a BayCare day) -- the calendar stays clickable on those
-    // regardless of how booked they are. slots is what's actually left after
-    // subtracting busy-calendar overlaps -- that's only used to populate the
-    // time list once a specific open day is clicked. A fully-booked day is
-    // still in openDates (clickable) even though it contributes zero slots.
-    const openDates = [];
     const slots = [];
     if (blockoutWindowEnd) {
       for (let iso = earliestIso; iso <= horizonIso; iso = addDaysIso(iso, 1)) {
@@ -103,11 +95,8 @@ app.http('availability', {
         if (blockedDates.has(iso)) continue;
 
         const drDay = jsWeekdayToDrChrono(new Date(iso + 'T00:00:00Z').getUTCDay());
-        const dayTemplates = profileTemplates.filter((tmpl) => Array.isArray(tmpl.weekDays) && tmpl.weekDays.includes(drDay));
-        if (dayTemplates.length === 0) continue; // not a practice day for this treatment type (e.g. a weekend)
-
-        openDates.push(iso);
-        for (const tmpl of dayTemplates) {
+        for (const tmpl of profileTemplates) {
+          if (!Array.isArray(tmpl.weekDays) || !tmpl.weekDays.includes(drDay)) continue;
           const overlapsBusy = busyAppointments.some(
             (b) => b.date === iso && timesOverlap(tmpl.scheduledTime, tmpl.durationMinutes, b.startTime, b.durationMinutes)
           );
@@ -118,6 +107,6 @@ app.http('availability', {
     }
     slots.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
-    return { status: 200, jsonBody: { available: true, stale: false, asOf: busy.generatedAt || null, openDates, slots } };
+    return { status: 200, jsonBody: { available: true, stale: false, asOf: busy.generatedAt || null, slots } };
   }
 });

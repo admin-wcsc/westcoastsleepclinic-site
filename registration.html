@@ -209,25 +209,12 @@ body{background:#f4f8fb}
 /* ── SCHEDULE APPOINTMENT ── */
 .slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
 .slotpicker-fallback{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 24px;font-size:14.5px;color:var(--tm);line-height:1.7}
+.slot-day-group{margin-bottom:24px}
 .slot-day-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:10px}
 .slot-day-times{display:flex;flex-wrap:wrap;gap:10px}
 .slot-btn{background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif}
 .slot-btn:hover{border-color:var(--mg);color:var(--dg)}
 .slot-btn-selected,.slot-btn-selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
-.cal-months{display:flex;gap:36px;flex-wrap:wrap}
-.cal-month{flex:1 1 260px;min-width:260px}
-.cal-month-label{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--dg);margin-bottom:14px}
-.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--tl);margin-bottom:8px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;border-radius:8px;border:1.5px solid transparent;font-family:'Montserrat',sans-serif;padding:0}
-.cal-day-pad{visibility:hidden}
-.cal-day-available{background:#fff;border-color:var(--border);color:var(--td);cursor:pointer;transition:border-color .2s,color .2s,background .2s}
-.cal-day-available:hover{border-color:var(--mg);color:var(--dg)}
-.cal-day-unavailable{background:var(--cream);color:var(--tl);cursor:default}
-.cal-day-selected,.cal-day-selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
-.cal-times{margin-top:28px}
-.cal-times-empty{font-size:14px;color:var(--tl);font-style:italic}
-@media(max-width:480px){.cal-day{font-size:12.5px}.cal-grid,.cal-weekdays{gap:4px}.cal-months{gap:28px}}
 
 /* ── REVIEW & SUBMIT ── */
 .rv-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:24px 26px;margin-bottom:20px}
@@ -969,25 +956,7 @@ footer{background:var(--cream)}
         <div class="slotpicker-fallback" id="apptSlotFallback" style="display:none">
           <p>We're unable to show real-time availability right now. Our office will call you to confirm your appointment time.</p>
         </div>
-        <div class="slotpicker-calendar" id="apptSlotCalendar" style="display:none">
-          <div class="cal-months">
-            <div class="cal-month">
-              <div class="cal-month-label" id="apptCalMonthLabel1"></div>
-              <div class="cal-weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
-              <div class="cal-grid" id="apptCalGrid1"></div>
-            </div>
-            <div class="cal-month">
-              <div class="cal-month-label" id="apptCalMonthLabel2"></div>
-              <div class="cal-weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
-              <div class="cal-grid" id="apptCalGrid2"></div>
-            </div>
-          </div>
-          <div class="cal-times" id="apptCalTimes" style="display:none">
-            <div class="slot-day-heading" id="apptCalTimesHeading"></div>
-            <div class="slot-day-times" id="apptCalTimesRow"></div>
-            <p class="cal-times-empty" id="apptCalTimesEmpty" style="display:none">No remaining times for this day &mdash; please choose another available date.</p>
-          </div>
-        </div>
+        <div class="slotpicker-days" id="apptSlotDays" style="display:none"></div>
         <input type="hidden" name="appointment_date">
         <input type="hidden" name="appointment_time">
         <input type="hidden" name="appointment_duration_minutes">
