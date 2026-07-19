@@ -206,6 +206,16 @@ body{background:#f4f8fb}
 .upload-err{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:4px;padding:10px 14px;margin-top:14px}
 @media(max-width:600px){.drop-zone{display:none}.dz-or{display:none}.btn-browse{width:100%;justify-content:center;padding:16px 24px;font-size:15px}}
 
+/* ── SCHEDULE APPOINTMENT ── */
+.slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
+.slotpicker-fallback{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 24px;font-size:14.5px;color:var(--tm);line-height:1.7}
+.slot-day-group{margin-bottom:24px}
+.slot-day-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:10px}
+.slot-day-times{display:flex;flex-wrap:wrap;gap:10px}
+.slot-btn{background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif}
+.slot-btn:hover{border-color:var(--mg);color:var(--dg)}
+.slot-btn-selected,.slot-btn-selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
+
 /* ── REVIEW & SUBMIT ── */
 .rv-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:24px 26px;margin-bottom:20px}
 .rv-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
@@ -320,7 +330,9 @@ footer{background:var(--cream)}
       <div class="step-conn" id="stepConnector3"></div>
       <div class="step-item" data-step="4"><div class="step-circ" id="stepCircle4">4</div><div class="step-lbl" id="stepLabel4">Authorization to Release</div></div>
       <div class="step-conn" id="stepConnector4"></div>
-      <div class="step-item" data-step="5"><div class="step-circ" id="stepCircle5">5</div><div class="step-lbl" id="stepLabel5">Review &amp; Submit</div></div>
+      <div class="step-item" data-step="5"><div class="step-circ" id="stepCircle5">5</div><div class="step-lbl" id="stepLabel5">Schedule Appointment</div></div>
+      <div class="step-conn" id="stepConnector5"></div>
+      <div class="step-item" data-step="6"><div class="step-circ" id="stepCircle6">6</div><div class="step-lbl" id="stepLabel6">Review &amp; Submit</div></div>
     </div>
   </div>
 </div>
@@ -930,12 +942,34 @@ footer{background:var(--cream)}
       </div>
       <div class="form-nav">
         <button class="btn-back" onclick="goStep(3)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(5)">Next: Review &amp; Submit &rarr;</button>
+        <button class="btn-nxt" onclick="goStep(5)">Next: Schedule Appointment &rarr;</button>
       </div>
     </div>
 
-    <!-- STEP 5: Review & Submit -->
+    <!-- STEP 5: Schedule Appointment -->
     <div class="fstep" id="fstep5">
+      <h2 class="fstep-ttl">Schedule Appointment</h2>
+      <p class="fstep-sub">Pick a time that works for you. Availability reflects the doctor's real schedule.</p>
+
+      <div class="slotpicker" id="apptSlotPicker">
+        <div class="slotpicker-loading" id="apptSlotLoading">Loading available appointment times&hellip;</div>
+        <div class="slotpicker-fallback" id="apptSlotFallback" style="display:none">
+          <p>We're unable to show real-time availability right now. Our office will call you to confirm your appointment time.</p>
+        </div>
+        <div class="slotpicker-days" id="apptSlotDays" style="display:none"></div>
+        <input type="hidden" name="appointment_date">
+        <input type="hidden" name="appointment_time">
+        <input type="hidden" name="appointment_duration_minutes">
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-back" onclick="goStep(4)">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(6)">Next: Review &amp; Submit &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Review & Submit -->
+    <div class="fstep" id="fstep6">
       <h2 class="fstep-ttl">Review &amp; Submit</h2>
       <p class="fstep-sub">Please review your information below before submitting. Click Edit on any section to make changes.</p>
 
@@ -957,6 +991,11 @@ footer{background:var(--cream)}
       <div class="rv-card">
         <div class="rv-card-hd"><div class="rv-card-ttl">Authorization to Release</div><button class="rv-edit" type="button" onclick="goStep(4)">Edit</button></div>
         <div id="rvRelease"></div>
+      </div>
+
+      <div class="rv-card">
+        <div class="rv-card-hd"><div class="rv-card-ttl">Scheduled Appointment</div><button class="rv-edit" type="button" onclick="goStep(5)">Edit</button></div>
+        <div id="rvAppointment"></div>
       </div>
 
       <div class="rv-card">
@@ -989,7 +1028,7 @@ footer{background:var(--cream)}
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(4)">&larr; Back</button>
+        <button class="btn-back" onclick="goStep(5)">&larr; Back</button>
         <button class="btn-sub" onclick="submitForms()">Submit Registration &#10003;</button>
       </div>
     </div>
@@ -1072,7 +1111,7 @@ var EPWORTH_ITEMS = 8;
 
 var curStep = 1;
 var maxStep = 1;
-var totalSteps = 5;
+var totalSteps = 6;
 
 function setStep5Conditional() {
   var textChecked = !!(document.querySelector('input[name="consent_text"]') && document.querySelector('input[name="consent_text"]').checked);
@@ -1487,13 +1526,23 @@ function goToConsentsStep() {
   openFirstIncompleteS2Modal();
 }
 
+// Called by goStep() every time the patient enters Step 5. Re-fetches each
+// time (rather than caching) so a patient who goes Back and picks a
+// different treatment type, or who sits on an earlier step long enough for
+// the mirror to update, always sees current availability for their actual
+// treatment_type.
+function renderAvailabilitySlots() {
+  AppointmentSlotPicker.refresh(val('treatment_type'));
+}
+
 function goStep(n) {
   document.getElementById('fstep' + curStep).classList.remove('active');
   curStep = n;
   visitedSteps[n] = true;
   if (n > maxStep) maxStep = n;
   document.getElementById('fstep' + curStep).classList.add('active');
-  if (n === 5) renderReviewCards();
+  if (n === 5) renderAvailabilitySlots();
+  if (n === 6) renderReviewCards();
 
   for (var i = 1; i <= totalSteps; i++) {
     var circ = document.getElementById('stepCircle' + i);
@@ -1802,6 +1851,10 @@ function submitForms() {
     consent_release:         getCheckbox('consent_release'),
     sig_release:             val('sig6'),
     date_release:            val('date6'),
+    appointment_date:        val('appointment_date'),
+    appointment_time:        val('appointment_time'),
+    appointment_duration_minutes: val('appointment_duration_minutes'),
+    appointment_slot_confirmed:   !!val('appointment_date'),
     chief_complaint:         qVal('chief_complaint'),
     sleep_hours:             qVal('sleep_hrs'),
     concern_duration:        qVal('concern_duration'),
@@ -1877,6 +1930,7 @@ document.querySelector('.step-row').addEventListener('click', function(e) {
 <script src="date-picker.js"></script>
 <script src="signature-pad.js"></script>
 <script src="upload-widget.js"></script>
+<script src="slot-picker.js"></script>
 <script>
 
 // A single shared Escape handler: an open calendar popup takes priority
@@ -2130,6 +2184,25 @@ function renderReviewCards() {
       rvRow('Expiration Date', getCheckbox('rel_no_exp') ? 'No Expiration' : dpkDisplayVal('rel_exp')) +
       rvRow('Authorization Signature', val('sig6') ? ('Signed on ' + dpkDisplayVal('date6')) : '') +
     '</div>';
+
+  document.getElementById('rvAppointment').innerHTML = val('appointment_date')
+    ? '<div class="rv-grid">' + rvRow('Appointment', formatReviewAppointment(val('appointment_date'), val('appointment_time'))) + '</div>'
+    : '<p class="rv-empty">Our office will contact you to schedule.</p>';
+}
+
+// Small local formatter for the review card only -- appointment_date/time
+// are plain ISO values (not a .dpk widget like every other date on this
+// page), so dpkDisplayVal() doesn't apply here.
+function formatReviewAppointment(dateIso, timeHhmm) {
+  if (!dateIso) return '';
+  var d = new Date(dateIso + 'T00:00:00');
+  var dateStr = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  if (!timeHhmm) return dateStr;
+  var parts = timeHhmm.split(':');
+  var h = parseInt(parts[0], 10);
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  var h12 = h % 12 || 12;
+  return dateStr + ' at ' + h12 + ':' + parts[1] + ' ' + ampm;
 }
 
 // ---------------- STEP 5: DOCUMENT UPLOAD ----------------

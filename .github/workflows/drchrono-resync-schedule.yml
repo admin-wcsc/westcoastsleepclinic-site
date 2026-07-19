@@ -1,0 +1,37 @@
+name: DrChrono Availability Resync (backstop)
+
+# Calls the drchrono-resync HTTP endpoint every 15 minutes -- the backstop
+# that rebuilds the availability mirror from live DrChrono data regardless
+# of webhook activity, so a missed webhook delivery self-heals within one
+# cycle. This is HTTP-triggered (not a native Azure Functions timer trigger)
+# because Azure Static Web Apps' managed Functions -- the tier this project
+# uses, with no separate Function App resource to provision or pay for --
+# only support HTTP triggers. Scheduling it here reuses tooling this repo
+# already runs (GitHub Actions) instead of provisioning new Azure
+# infrastructure just to run a cron job.
+#
+# Requires a repository secret DRCHRONO_RESYNC_FUNCTION_KEY, set to the
+# drchronoResync function's key from the deployed dev Azure Static Web App
+# (Azure Portal -> the Static Web App -> Functions -> drchronoResync ->
+# Function Keys). This doesn't exist until the code in this PR/commit is
+# actually deployed to dev -- add the secret once that's done.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {} # lets a human trigger a manual resync from the Actions tab, e.g. right after configuring the secret
+
+jobs:
+  resync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call drchrono-resync endpoint
+        run: |
+          status=$(curl -s -o /tmp/resync-response.json -w "%{http_code}" -X POST \
+            "https://ambitious-flower-02570ba0f-dev.eastus2.7.azurestaticapps.net/api/drchrono/resync?code=${{ secrets.DRCHRONO_RESYNC_FUNCTION_KEY }}")
+          echo "Response body:"
+          cat /tmp/resync-response.json
+          echo ""
+          if [ "$status" -ge 300 ]; then
+            echo "drchrono-resync returned HTTP $status"
+            exit 1
+          fi
