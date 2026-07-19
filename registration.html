@@ -144,7 +144,13 @@ body{background:#f4f8fb}
 .modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .modal-body{padding:28px}
 .modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
-.modal-foot-note{font-size:13px;color:var(--tl);font-weight:500}
+/* Floating callout anchored (via JS, see toggleSelfPayFields) just above the
+   Insurance modal's bottom-left corner when Self-Pay is selected -- stays
+   visible the whole time that's the case, not a hover tooltip. position:fixed
+   (not relative to .modal-card) so it isn't clipped by the card's own
+   overflow-y:auto scrolling. */
+.ins-selfpay-pop{display:none;position:fixed;z-index:210;background:#fff;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:14px 18px;font-size:13px;font-weight:600;color:var(--tl);max-width:280px;line-height:1.5}
+.ins-selfpay-pop.open{display:block}
 
 /* ── TREATMENT TYPE CARDS ── */
 .tt-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px}
@@ -643,11 +649,12 @@ footer{background:var(--cream)}
             </div>
           </div>
           <div class="modal-foot">
-            <span class="modal-foot-note" id="insNextNote"></span>
+            <span></span>
             <button class="btn-nxt" id="insNextBtn" onclick="s1ModalNext(2)">Next</button>
           </div>
         </div>
       </div>
+      <div class="ins-selfpay-pop" id="insSelfPayPop">Self-Pay/Uninsured selected, no further details needed</div>
 
       <div class="modal-bg" id="modalS1Pharm" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Pharm')">
         <div class="modal-card">
@@ -1208,7 +1215,12 @@ function closeFormModal(id, afterClose) {
 }
 
 function openS1Modal(id) { openFormModal(id); }
-function closeS1Modal(id) { closeFormModal(id, renderS1Menu); }
+function closeS1Modal(id) {
+  // insSelfPayPop is position:fixed, not nested inside the modal -- it
+  // won't disappear on its own just because the modal's .open class does.
+  if (id === 'modalS1Ins') hideInsSelfPayPop();
+  closeFormModal(id, renderS1Menu);
+}
 
 // A click's target is decided by where the mouse is RELEASED, not where it
 // was pressed -- so selecting text inside a field and dragging past the
@@ -1285,6 +1297,7 @@ function s1ModalNext(idx) {
     return;
   }
   document.getElementById(current.modal).classList.remove('open');
+  if (current.modal === 'modalS1Ins') hideInsSelfPayPop();
   var next = S1_SECTIONS[idx + 1];
   if (next) {
     document.getElementById(next.modal).classList.add('open');
@@ -1310,6 +1323,28 @@ function toggleInsOther(val) {
 // through (markEmptyRequired() naturally lets that happen once nothing in
 // the container is [required] anymore).
 var INS_SELF_PAY_FIELDS = ['ph_name', 'ph_dob', 'ph_rel', 'member_id'];
+var insSelfPayPopTimer = null;
+
+function hideInsSelfPayPop() {
+  clearTimeout(insSelfPayPopTimer);
+  var pop = document.getElementById('insSelfPayPop');
+  if (pop) pop.classList.remove('open');
+}
+
+// Positioned via getBoundingClientRect() rather than CSS anchored to
+// .modal-card, since the card's own overflow-y:auto would clip anything
+// positioned to stick out above its scrolled content. The card's on-screen
+// box position doesn't move when its internal content scrolls, so this
+// stays correct even after the scrollIntoView() in toggleSelfPayFields.
+function positionInsSelfPayPop() {
+  var pop = document.getElementById('insSelfPayPop');
+  var card = document.querySelector('#modalS1Ins .modal-card');
+  if (!pop || !card) return;
+  var cardRect = card.getBoundingClientRect();
+  pop.style.left = (cardRect.left + 20) + 'px';
+  pop.style.bottom = (window.innerHeight - cardRect.bottom + 16) + 'px';
+}
+
 function toggleSelfPayFields(val) {
   var isSelfPay = (val === 'Self-Pay / Uninsured');
   INS_SELF_PAY_FIELDS.forEach(function (name) {
@@ -1318,12 +1353,29 @@ function toggleSelfPayFields(val) {
   });
   var nextBtn = document.getElementById('insNextBtn');
   if (nextBtn) nextBtn.classList.toggle('btn-nxt-ready', isSelfPay);
-  var note = document.getElementById('insNextNote');
-  if (note) note.textContent = isSelfPay ? 'Self-Pay/Uninsured selected, no further details needed' : '';
-  // Scroll the (possibly-scrolled-away) Next button + note into view so a
-  // patient who picked Self-Pay while scrolled up in the modal doesn't miss
-  // that there's nothing left to fill in. 'nearest' avoids jumping around
-  // if it's already visible.
+  if (isSelfPay) {
+    var pop = document.getElementById('insSelfPayPop');
+    if (pop) {
+      // Wait out the native <select> dropdown's own closing behavior before
+      // measuring: the modal card's rect is transiently wrong (measured
+      // ~70px narrower, shifted down) for roughly the first 50-100ms right
+      // after picking an option, apparently blocked on that native close.
+      // Positioning first and revealing only afterward (rather than showing
+      // immediately and correcting) avoids a visible jump for something
+      // this brief.
+      clearTimeout(insSelfPayPopTimer);
+      insSelfPayPopTimer = setTimeout(function () {
+        positionInsSelfPayPop();
+        pop.classList.add('open');
+      }, 150);
+    }
+  } else {
+    hideInsSelfPayPop();
+  }
+  // Scroll the (possibly-scrolled-away) Next button into view so a patient
+  // who picked Self-Pay while scrolled up in the modal doesn't miss that
+  // there's nothing left to fill in. 'nearest' avoids jumping around if
+  // it's already visible.
   if (isSelfPay && nextBtn) nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
