@@ -13,7 +13,6 @@ const BUSY_BLOB = '_drchrono/busy-calendar.json';
 const BLOCKOUT_BLOB = '_schedule/baycare-blockout.json';
 const WINDOW_DAYS = 30;
 const MIN_LEAD_DAYS = 3; // doctors need at least 3 days' notice -- no same-day/next-day/2-day-out bookings
-const BUSY_STALE_MS = 30 * 60 * 1000; // 30 min -- 2x the resync timer's 15-min cadence
 
 async function readJsonBlob(containerClient, name) {
   try {
@@ -63,13 +62,19 @@ app.http('availability', {
       readJsonBlob(containerClient, BLOCKOUT_BLOB)
     ]);
 
-    const busyStale = !busy || !busy.generatedAt || (Date.now() - new Date(busy.generatedAt).getTime()) > BUSY_STALE_MS;
     const templateReady = template && template.profiles && template.profiles[treatmentType];
-
-    if (busyStale || !templateReady) {
+    // No busy-calendar data at all (never synced even once) is a hard block,
+    // same as a missing template -- there's nothing to compute overlaps
+    // against. Once it HAS synced at least once, it's trusted regardless of
+    // how long ago that was: the webhook (real-time) and resync (15-min
+    // backstop) automations are what keep it current, and the scheduler
+    // never writes directly into DrChrono anyway (staff finalizes the real
+    // appointment manually) -- so there's no need to block patients over a
+    // timestamp. `asOf` is still returned so a future admin alert can watch it.
+    if (!templateReady || !busy) {
       return {
         status: 200,
-        jsonBody: { available: false, stale: true, asOf: busy && busy.generatedAt ? busy.generatedAt : null, slots: [] }
+        jsonBody: { available: false, stale: true, asOf: null, slots: [] }
       };
     }
 
@@ -102,6 +107,6 @@ app.http('availability', {
     }
     slots.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
-    return { status: 200, jsonBody: { available: true, stale: false, asOf: busy.generatedAt, slots } };
+    return { status: 200, jsonBody: { available: true, stale: false, asOf: busy.generatedAt || null, slots } };
   }
 });

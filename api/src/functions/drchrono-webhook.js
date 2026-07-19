@@ -156,7 +156,7 @@ app.http('drchronoWebhook', {
           const split = splitScheduledTime(appt.scheduled_time);
           if (split) {
             await upsertBusyCalendarEntry(containerClient, appointmentId, {
-              date: split.date, startTime: split.time, durationMinutes: appt.duration, status: appt.status || ''
+              date: split.date, startTime: split.time, durationMinutes: appt.duration
             });
           }
         }

@@ -112,8 +112,7 @@ async function rebuildBusyCalendar(containerClient, accessToken, doctorId, offic
     appointments[String(r.id)] = {
       date: split.date,
       startTime: split.time,
-      durationMinutes: r.duration,
-      status: r.status || ''
+      durationMinutes: r.duration
     };
   }
   await writeJsonBlob(containerClient, BUSY_BLOB, {
