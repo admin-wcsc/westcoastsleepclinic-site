@@ -121,7 +121,11 @@ body{background:#f4f8fb}
    nav bar and floating call button should stay usable while it's up. Sits
    below the header (z-index:100) and call button (z-index:150), and starts
    below the header instead of the full viewport so it never renders behind
-   it. */
+   it. top defaults to --nav-height but is overridden inline by
+   positionTreatmentTypeModal() -- the relocation banner above the header
+   isn't a fixed height (it can wrap to more lines, or be disabled), so the
+   real offset has to be measured from the header's rendered position, not
+   assumed. */
 #modalTreatmentType{z-index:60;top:var(--nav-height)}
 .modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
 /* Insurance and Patient Details are the two longest Step 2 modals — widened
@@ -1241,8 +1245,20 @@ function renderS1Menu() {
 
 // Shared by the Step 1 (any order) and Step 2 (fixed sequence) modals below —
 // both just open/close a .modal-bg and re-render their own menu afterward.
+// The relocation banner above the header can be 1-3 lines depending on
+// viewport width and whether "Read More" is expanded, so its height can't be
+// hardcoded -- measure the header's actual rendered bottom edge instead.
+function positionTreatmentTypeModal() {
+  var bottom = document.querySelector('.site-header').getBoundingClientRect().bottom;
+  document.getElementById('modalTreatmentType').style.top = Math.max(bottom, 0) + 'px';
+}
+window.addEventListener('resize', function () {
+  if (document.getElementById('modalTreatmentType').classList.contains('open')) positionTreatmentTypeModal();
+});
+
 function openFormModal(id, afterOpen) {
   document.querySelectorAll('.dpk-pop.open').forEach(function (p) { p.classList.remove('open'); });
+  if (id === 'modalTreatmentType') positionTreatmentTypeModal();
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
   if (afterOpen) afterOpen();
