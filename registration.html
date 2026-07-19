@@ -499,7 +499,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS1Details" onclick="s1Backdrop(event,'modalS1Details')">
+      <div class="modal-bg" id="modalS1Details" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Details')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Patient Details</h3>
@@ -559,7 +559,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS1Ec" onclick="s1Backdrop(event,'modalS1Ec')">
+      <div class="modal-bg" id="modalS1Ec" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Ec')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Emergency Contact</h3>
@@ -588,7 +588,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS1Ins" onclick="s1Backdrop(event,'modalS1Ins')">
+      <div class="modal-bg" id="modalS1Ins" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Ins')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Insurance Information</h3>
@@ -649,7 +649,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS1Pharm" onclick="s1Backdrop(event,'modalS1Pharm')">
+      <div class="modal-bg" id="modalS1Pharm" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Pharm')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Preferred Pharmacy</h3>
@@ -717,7 +717,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS2Treat" onclick="s2Backdrop(event,'modalS2Treat')">
+      <div class="modal-bg" id="modalS2Treat" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Treat')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Consent to Treat</h3>
@@ -755,7 +755,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS2Financial" onclick="s2Backdrop(event,'modalS2Financial')">
+      <div class="modal-bg" id="modalS2Financial" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Financial')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Financial Policy</h3>
@@ -795,7 +795,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS2Hipaa" onclick="s2Backdrop(event,'modalS2Hipaa')">
+      <div class="modal-bg" id="modalS2Hipaa" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Hipaa')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>HIPAA Notice of Privacy Practices</h3>
@@ -837,7 +837,7 @@ footer{background:var(--cream)}
         </div>
       </div>
 
-      <div class="modal-bg" id="modalS2TextTele" onclick="s2Backdrop(event,'modalS2TextTele')">
+      <div class="modal-bg" id="modalS2TextTele" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2TextTele')">
         <div class="modal-card">
           <div class="modal-head">
             <h3>Text &amp; Telehealth Consent</h3>
@@ -1209,8 +1209,20 @@ function closeFormModal(id, afterClose) {
 
 function openS1Modal(id) { openFormModal(id); }
 function closeS1Modal(id) { closeFormModal(id, renderS1Menu); }
+
+// A click's target is decided by where the mouse is RELEASED, not where it
+// was pressed -- so selecting text inside a field and dragging past the
+// modal card's edge before letting go fires a "click" on the backdrop
+// itself, incorrectly closing the modal mid-selection. Requiring the
+// mousedown to have ALSO started on the bare backdrop (not bubbled up from
+// a drag that began inside the card) fixes that without losing the
+// intended "click outside to dismiss" behavior.
+var modalBackdropMouseDownOnBg = false;
+function modalBackdropMouseDown(e) {
+  modalBackdropMouseDownOnBg = (e.target === e.currentTarget);
+}
 function s1Backdrop(e, id) {
-  if (e.target === document.getElementById(id)) closeS1Modal(id);
+  if (e.target === document.getElementById(id) && modalBackdropMouseDownOnBg) closeS1Modal(id);
 }
 
 // Like areRequiredFieldsFilled, but as a side effect shows/hides each empty
@@ -1382,7 +1394,7 @@ function renderS2() {
 function openS2Modal(id) { openFormModal(id, renderS2); }
 function closeS2Modal(id) { closeFormModal(id, renderS2); }
 function s2Backdrop(e, id) {
-  if (e.target === document.getElementById(id)) closeS2Modal(id);
+  if (e.target === document.getElementById(id) && modalBackdropMouseDownOnBg) closeS2Modal(id);
 }
 
 // Called by each consent modal's own "Next"/"Done" button. Advances straight
