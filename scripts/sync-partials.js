@@ -1,8 +1,8 @@
 // Stamps partials/header.html and partials/footer.html into the marked
-// section of every page listed below. Run this after editing a partial —
-// it's also wired up to run automatically before `npm start` (see
-// package.json's "prestart") and as a step in the dev-branch GitHub Actions
-// build, so the deployed site can never drift from what's in partials/.
+// section of every page listed below. Run this (`npm run sync-partials`)
+// after editing a partial — it also runs as a step in the dev-branch GitHub
+// Actions build, so the deployed site can never drift from what's in
+// partials/.
 const fs = require('fs');
 const path = require('path');
 

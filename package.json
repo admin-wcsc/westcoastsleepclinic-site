@@ -2,16 +2,6 @@
   "name": "wcsc-site-dev",
   "private": true,
   "scripts": {
-    "sync-partials": "node scripts/sync-partials.js",
-    "prestart": "node scripts/sync-partials.js",
-    "start": "swa start . --api-location api"
-  },
-  "devDependencies": {
-    "@azure/static-web-apps-cli": "^2.0.9",
-    "azure-functions-core-tools": "^4.12.1"
-  },
-  "allowScripts": {
-    "azure-functions-core-tools@4.12.1": true,
-    "keytar@7.9.0": true
+    "sync-partials": "node scripts/sync-partials.js"
   }
 }
