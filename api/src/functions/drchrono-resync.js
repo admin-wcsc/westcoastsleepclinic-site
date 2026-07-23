@@ -101,7 +101,9 @@ async function rebuildScheduleTemplate(containerClient, accessToken, doctorId, o
 async function rebuildBusyCalendar(containerClient, accessToken, doctorId, officeId) {
   const windowStart = todayIso();
   const windowEnd = addDaysIso(windowStart, WINDOW_DAYS);
-  const url = `${DRCHRONO_BASE_URL}/api/appointments?date_range=${windowStart},${windowEnd}&doctor=${encodeURIComponent(doctorId)}&office=${encodeURIComponent(officeId)}`;
+  // DrChrono's "date range" type is slash-separated (e.g. "2014-02-24/2014-02-28"),
+  // not comma-separated -- confirmed against their published API docs.
+  const url = `${DRCHRONO_BASE_URL}/api/appointments?date_range=${windowStart}/${windowEnd}&doctor=${encodeURIComponent(doctorId)}&office=${encodeURIComponent(officeId)}`;
   const rows = await fetchAllPages(url, accessToken);
 
   const appointments = {};
