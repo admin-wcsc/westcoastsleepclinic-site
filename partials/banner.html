@@ -12,27 +12,45 @@
      header (z-index 120 > .site-header's 100), that overlays the nav and
      page content underneath instead of pushing them down when opened. -->
 <style>
-  .relocation-banner{background:#fbe3e1;border-bottom:1px solid #f0bcb8;padding:20px 20px;position:relative}
-  .relocation-banner-in{max-width:800px;margin:0 auto;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
-  .relocation-banner-toggle{background:none;border:none;padding:0;color:#7a1f1a;font-weight:700;text-decoration:underline;cursor:pointer;font-size:14px;font-family:'Montserrat',sans-serif}
-  .relocation-banner-more{display:none;position:absolute;top:100%;left:0;right:0;background:#fbe3e1;border-bottom:1px solid #f0bcb8;box-shadow:0 16px 32px rgba(0,0,0,.18);z-index:120;max-height:min(70vh,520px);overflow-y:auto}
+  .relocation-banner{background:#fbe3e1;border:1px solid #f0bcb8;border-radius:16px;padding:18px 22px;position:relative;width:calc(100% - 32px);max-width:900px;margin:16px auto 0;box-shadow:0 8px 24px rgba(122,31,26,.12)}
+  .relocation-banner-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-icon{flex-shrink:0;margin-top:2px}
+  .relocation-banner-text{flex:1 1 240px}
+  .relocation-banner-toggle{display:inline-flex;align-items:center;gap:6px;background:#7a1f1a;color:#fff;border:none;border-radius:999px;padding:7px 16px;font-weight:600;font-size:13px;font-family:'Montserrat',sans-serif;letter-spacing:.2px;cursor:pointer;white-space:nowrap;transition:background .15s ease;margin-left:auto}
+  .relocation-banner-toggle:hover{background:#5e1712}
+  .relocation-banner-chevron--up{transform:rotate(180deg)}
+  .relocation-banner-more{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fbe3e1;border:1px solid #f0bcb8;border-radius:16px;box-shadow:0 16px 40px rgba(122,31,26,.18);z-index:120;max-height:min(70vh,520px);overflow-y:auto}
   .relocation-banner-more.open{display:block}
-  .relocation-banner-more-in{max-width:800px;margin:0 auto;padding:0 20px 20px;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
+  .relocation-banner-more-in{font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a;padding:20px 22px}
   .relocation-banner-more-in p{margin:0 0 12px}
   .relocation-banner-more-in p:last-child{margin-bottom:0}
   .relocation-banner-more-in strong{display:block;margin-bottom:4px}
+  .relocation-banner-more-actions{display:flex;justify-content:flex-end;margin-top:14px}
   .hide-relocation-banner .relocation-banner{display:none}
 </style>
 <div class="relocation-banner" id="relocation-banner">
-  <div class="relocation-banner-in">
-    <p><span>As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span> <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()">Read More</button></p>
+  <div class="relocation-banner-row">
+    <span class="relocation-banner-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#7a1f1a" stroke-width="1.4"/><rect x="9.1" y="8.4" width="1.8" height="6" rx="0.9" fill="#7a1f1a"/><rect x="9.1" y="5.2" width="1.8" height="1.8" rx="0.9" fill="#7a1f1a"/></svg>
+    </span>
+    <span class="relocation-banner-text">As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span>
+    <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()" aria-expanded="false" aria-controls="relocationBannerMore">
+      Read More
+      <svg class="relocation-banner-chevron" width="10" height="7" viewBox="0 0 10 7" fill="none" aria-hidden="true"><path d="M1 1.2L5 5.2L9 1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
   <div class="relocation-banner-more" id="relocationBannerMore">
     <div class="relocation-banner-more-in">
       <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
       <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
-      <p><strong>Important for Medicare Patients:</strong>Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
-      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office. <button type="button" class="relocation-banner-toggle" id="relocationBannerToggleEnd" onclick="toggleRelocationBannerMore()">Read Less</button></p>
+      <p><strong>Important for Medicare Patients:</strong> Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
+      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+      <div class="relocation-banner-more-actions">
+        <button type="button" class="relocation-banner-toggle" id="relocationBannerToggleEnd" onclick="toggleRelocationBannerMore()" aria-expanded="true" aria-controls="relocationBannerMore">
+          Show Less
+          <svg class="relocation-banner-chevron relocation-banner-chevron--up" width="10" height="7" viewBox="0 0 10 7" fill="none" aria-hidden="true"><path d="M1 1.2L5 5.2L9 1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -40,13 +58,38 @@
   var BANNER_ENABLED = true; // set to false to hide the banner on every page
   if (!BANNER_ENABLED) document.documentElement.classList.add('hide-relocation-banner');
 
+  function closeRelocationBannerMore() {
+    document.getElementById('relocationBannerMore').classList.remove('open');
+    var topBtn = document.getElementById('relocationBannerToggle');
+    topBtn.style.display = '';
+    topBtn.setAttribute('aria-expanded', 'false');
+  }
+
   function toggleRelocationBannerMore() {
     var more = document.getElementById('relocationBannerMore');
+    if (more.classList.contains('open')) {
+      closeRelocationBannerMore();
+      return;
+    }
+    more.classList.add('open');
     var topBtn = document.getElementById('relocationBannerToggle');
-    var open = more.classList.toggle('open');
     // The top "Read More" is only for opening -- once expanded, closing
-    // happens via the "Read Less" link at the end of the panel instead, so
-    // the top button hides rather than relabeling itself.
-    topBtn.style.display = open ? 'none' : '';
+    // happens via the "Show Less" button, clicking outside the card, or Esc,
+    // so the top button hides rather than relabeling itself.
+    topBtn.style.display = 'none';
+    topBtn.setAttribute('aria-expanded', 'true');
   }
+
+  // Close on outside click and on Escape, so "Show Less" is a convenience, not a requirement.
+  document.addEventListener('click', function (e) {
+    var more = document.getElementById('relocationBannerMore');
+    if (more.classList.contains('open') && !document.getElementById('relocation-banner').contains(e.target)) {
+      closeRelocationBannerMore();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('relocationBannerMore').classList.contains('open')) {
+      closeRelocationBannerMore();
+    }
+  });
 </script>
