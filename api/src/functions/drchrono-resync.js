@@ -1,7 +1,6 @@
 // ---------------- DRCHRONO RESYNC (backstop, HTTP-triggered) ----------------
-// Backstop sync for the two DrChrono-derived availability blobs
-// (_drchrono/schedule-template.json, _drchrono/busy-calendar.json) --
-// rebuilds them from live DrChrono data regardless of webhook activity, so
+// Backstop sync for the busy-calendar mirror blob (_drchrono/busy-calendar.json)
+// -- rebuilds it from live DrChrono data regardless of webhook activity, so
 // even a 100%-missed-webhook scenario self-heals within one cycle.
 //
 // This is HTTP-triggered, not timer-triggered: Azure Static Web Apps'
@@ -12,23 +11,22 @@
 // reusing the deploy pipeline's existing tooling rather than provisioning
 // a separate Azure resource just to run a cron job.
 //
-// NOTE: field names/shapes below (week_days, scheduled_time, results/next
+// NOTE: field names/shapes below (date_range, scheduled_time, results/next
 // pagination) are taken from DrChrono's published API docs, not a live
 // account -- flagged in the project plan as needing a one-time check
 // against a real authenticated call before this is considered done.
+//
+// This used to also rebuild a DrChrono "Appointment Templates" mirror
+// (schedule-template.json), but that DrChrono feature is confirmed empty
+// for this doctor/office -- his schedule isn't a recurring weekly pattern,
+// so a template can't represent it. Availability now comes from the office
+// manager's curated date list instead (see manager-availability.js /
+// availability.js), so that rebuild path was removed.
 const { app } = require('@azure/functions');
 const { getContainerClient, fetchWithTimeout, getDrChronoAccessToken, appendAudit, DRCHRONO_BASE_URL, DRCHRONO_TIMEOUT_MS } = require('../shared/drchrono');
 
-const TEMPLATE_BLOB = '_drchrono/schedule-template.json';
 const BUSY_BLOB = '_drchrono/busy-calendar.json';
 const WINDOW_DAYS = 30;
-const TEMPLATE_STALE_MS = 24 * 60 * 60 * 1000; // 24h -- the weekly pattern changes rarely, no need to re-pull every cycle
-
-// treatment_type (as used throughout registration.html) -> which app setting holds that DrChrono profile ID.
-const TREATMENT_PROFILE_SETTINGS = {
-  sleep_study: 'DrChronoProfileIdSleepStudy',
-  weight_loss: 'DrChronoProfileIdWeightLoss'
-};
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -37,15 +35,6 @@ function addDaysIso(iso, days) {
   const d = new Date(iso + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
-}
-
-async function readJsonBlob(containerClient, name) {
-  try {
-    const buffer = await containerClient.getBlockBlobClient(name).downloadToBuffer();
-    return JSON.parse(buffer.toString('utf8'));
-  } catch (e) {
-    return null;
-  }
 }
 
 async function writeJsonBlob(containerClient, name, value) {
@@ -77,25 +66,6 @@ async function fetchAllPages(url, accessToken) {
 function splitScheduledTime(scheduledTime) {
   const m = String(scheduledTime || '').match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
   return m ? { date: m[1], time: m[2] } : null;
-}
-
-async function rebuildScheduleTemplate(containerClient, accessToken, doctorId, officeId) {
-  const profiles = {};
-  for (const treatmentType of Object.keys(TREATMENT_PROFILE_SETTINGS)) {
-    const profileId = process.env[TREATMENT_PROFILE_SETTINGS[treatmentType]];
-    if (!profileId) continue; // not configured yet -- skip rather than fail the whole resync
-    const url = `${DRCHRONO_BASE_URL}/api/appointment_templates?doctor=${encodeURIComponent(doctorId)}&office=${encodeURIComponent(officeId)}&profile=${encodeURIComponent(profileId)}`;
-    const rows = await fetchAllPages(url, accessToken);
-    profiles[treatmentType] = {
-      profileId,
-      templates: rows.map((r) => ({
-        weekDays: Array.isArray(r.week_days) ? r.week_days : [],
-        scheduledTime: r.scheduled_time,
-        durationMinutes: r.duration
-      }))
-    };
-  }
-  await writeJsonBlob(containerClient, TEMPLATE_BLOB, { generatedAt: new Date().toISOString(), profiles });
 }
 
 async function rebuildBusyCalendar(containerClient, accessToken, doctorId, officeId) {
@@ -137,16 +107,8 @@ async function runResync(context) {
 
   await rebuildBusyCalendar(containerClient, accessToken, doctorId, officeId);
 
-  const existingTemplate = await readJsonBlob(containerClient, TEMPLATE_BLOB);
-  const templateAge = existingTemplate ? Date.now() - new Date(existingTemplate.generatedAt).getTime() : Infinity;
-  let templateRebuilt = false;
-  if (!existingTemplate || templateAge > TEMPLATE_STALE_MS) {
-    await rebuildScheduleTemplate(containerClient, accessToken, doctorId, officeId);
-    templateRebuilt = true;
-  }
-
-  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'drchrono_resync_completed', details: { templateRebuilt } });
-  return { skipped: false, templateRebuilt };
+  await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'drchrono_resync_completed', details: {} });
+  return { skipped: false };
 }
 
 app.http('drchronoResync', {

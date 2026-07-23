@@ -1,18 +1,45 @@
 // ---------------- PATIENT-FACING AVAILABILITY READ ----------------
 // GET /api/availability?treatment_type=sleep_study
 // Deliberately has NO DrChrono fetch anywhere in this file -- it only ever
-// reads the three mirror blobs (schedule-template.json, busy-calendar.json,
-// baycare-blockout.json) kept fresh by drchrono-resync-timer.js and
-// drchrono-webhook.js. This is what guarantees the scheduling step never
-// depends on DrChrono's uptime at the moment a patient reaches it.
+// reads two mirror blobs: doctor-availability.json (the office manager's
+// curated list of days Dr. Scuteri is actually in, maintained via
+// manager-availability.html/manager-availability.js) and busy-calendar.json
+// (kept fresh by drchrono-resync.js and drchrono-webhook.js). This is what
+// guarantees the scheduling step never depends on DrChrono's uptime at the
+// moment a patient reaches it.
+//
+// Earlier version of this file derived slots from DrChrono's own
+// "Appointment Templates" -- confirmed empty for this doctor/office because
+// his schedule isn't a recurring weekly pattern (he splits time with another
+// job), so a template can't represent it. The office manager's curated date
+// list replaced that entirely.
 const { app } = require('@azure/functions');
 const { getContainerClient } = require('../shared/drchrono');
 
-const TEMPLATE_BLOB = '_drchrono/schedule-template.json';
+const AVAILABILITY_BLOB = '_schedule/doctor-availability.json';
 const BUSY_BLOB = '_drchrono/busy-calendar.json';
-const BLOCKOUT_BLOB = '_schedule/baycare-blockout.json';
-const WINDOW_DAYS = 30;
 const MIN_LEAD_DAYS = 3; // doctors need at least 3 days' notice -- no same-day/next-day/2-day-out bookings
+
+// Fixed daily hours, same for every treatment type: 9:00-5:30, one slot per
+// hour. `treatment_type` is still a required query param (kept for API
+// contract stability with existing callers) but no longer changes which
+// slots come back -- both profiles use this same daily pattern for now.
+const DAY_START_MINUTES = 9 * 60; // 9:00am
+const DAY_END_MINUTES = 17 * 60 + 30; // 5:30pm -- a slot must fit entirely before this
+const SLOT_DURATION_MINUTES = 60;
+
+function pad2(n) {
+  return String(n).length < 2 ? '0' + n : String(n);
+}
+
+function dailySlotTimes() {
+  const times = [];
+  for (let start = DAY_START_MINUTES; start + SLOT_DURATION_MINUTES <= DAY_END_MINUTES; start += SLOT_DURATION_MINUTES) {
+    times.push(pad2(Math.floor(start / 60)) + ':' + pad2(start % 60));
+  }
+  return times;
+}
+const DAILY_SLOT_TIMES = dailySlotTimes();
 
 async function readJsonBlob(containerClient, name) {
   try {
@@ -30,10 +57,6 @@ function addDaysIso(iso, days) {
   const d = new Date(iso + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
-}
-// JS Date.getUTCDay(): 0=Sun..6=Sat. DrChrono's week_days: 0=Mon..6=Sun.
-function jsWeekdayToDrChrono(jsDay) {
-  return (jsDay + 6) % 7;
 }
 function timeToMinutes(hhmm) {
   const [h, m] = String(hhmm).split(':').map(Number);
@@ -56,53 +79,34 @@ app.http('availability', {
     }
 
     const containerClient = getContainerClient();
-    const [template, busy, blockout] = await Promise.all([
-      readJsonBlob(containerClient, TEMPLATE_BLOB),
-      readJsonBlob(containerClient, BUSY_BLOB),
-      readJsonBlob(containerClient, BLOCKOUT_BLOB)
+    const [availability, busy] = await Promise.all([
+      readJsonBlob(containerClient, AVAILABILITY_BLOB),
+      readJsonBlob(containerClient, BUSY_BLOB)
     ]);
 
-    const templateReady = template && template.profiles && template.profiles[treatmentType];
-    // No busy-calendar data at all (never synced even once) is a hard block,
-    // same as a missing template -- there's nothing to compute overlaps
-    // against. Once it HAS synced at least once, it's trusted regardless of
-    // how long ago that was: the webhook (real-time) and resync (15-min
-    // backstop) automations are what keep it current, and the scheduler
-    // never writes directly into DrChrono anyway (staff finalizes the real
-    // appointment manually) -- so there's no need to block patients over a
-    // timestamp. `asOf` is still returned so a future admin alert can watch it.
-    if (!templateReady || !busy) {
+    // No curated availability at all (manager hasn't saved anything yet) or
+    // no busy-calendar data (never synced) is a hard block -- same
+    // fail-closed posture as before: there's nothing to compute overlaps
+    // against, so don't guess.
+    if (!availability || !Array.isArray(availability.availableDates) || !busy) {
       return {
         status: 200,
         jsonBody: { available: false, stale: true, asOf: null, slots: [] }
       };
     }
 
-    const profileTemplates = templateReady.templates || [];
     const busyAppointments = Object.values(busy.appointments || {});
-    const blockedDates = new Set((blockout && blockout.blockedDates) || []);
-    // No confirmed BayCare window at all -> nothing is confirmed available,
-    // don't guess. Fails closed, same as everywhere else in this feature.
-    const blockoutWindowEnd = blockout && blockout.windowEnd;
-
     const earliestIso = addDaysIso(todayIso(), MIN_LEAD_DAYS);
-    const horizonIso = addDaysIso(todayIso(), WINDOW_DAYS);
 
     const slots = [];
-    if (blockoutWindowEnd) {
-      for (let iso = earliestIso; iso <= horizonIso; iso = addDaysIso(iso, 1)) {
-        if (iso > blockoutWindowEnd) break; // beyond the manager's known BayCare window
-        if (blockedDates.has(iso)) continue;
-
-        const drDay = jsWeekdayToDrChrono(new Date(iso + 'T00:00:00Z').getUTCDay());
-        for (const tmpl of profileTemplates) {
-          if (!Array.isArray(tmpl.weekDays) || !tmpl.weekDays.includes(drDay)) continue;
-          const overlapsBusy = busyAppointments.some(
-            (b) => b.date === iso && timesOverlap(tmpl.scheduledTime, tmpl.durationMinutes, b.startTime, b.durationMinutes)
-          );
-          if (overlapsBusy) continue;
-          slots.push({ date: iso, time: tmpl.scheduledTime, durationMinutes: tmpl.durationMinutes });
-        }
+    for (const iso of availability.availableDates) {
+      if (iso < earliestIso) continue;
+      for (const time of DAILY_SLOT_TIMES) {
+        const overlapsBusy = busyAppointments.some(
+          (b) => b.date === iso && timesOverlap(time, SLOT_DURATION_MINUTES, b.startTime, b.durationMinutes)
+        );
+        if (overlapsBusy) continue;
+        slots.push({ date: iso, time, durationMinutes: SLOT_DURATION_MINUTES });
       }
     }
     slots.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
