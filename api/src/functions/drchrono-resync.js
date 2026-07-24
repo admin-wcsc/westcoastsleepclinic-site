@@ -18,10 +18,13 @@
 // instead (DrChronoResyncSecret, sent as the x-resync-secret header),
 // same pattern already used for DrChronoWebhookSecret/DrChronoOAuthState.
 //
-// NOTE: field names/shapes below (date_range, scheduled_time, results/next
-// pagination) are taken from DrChrono's published API docs, not a live
-// account -- flagged in the project plan as needing a one-time check
-// against a real authenticated call before this is considered done.
+// Confirmed against a real authenticated call on 2026-07-24: a manually
+// triggered resync correctly pulled appointment 404930605 into
+// busy-calendar.json with the right date/time/duration, cross-checked
+// against that same appointment's real webhook delivery payload (see
+// drchrono-webhook.js). date_range, scheduled_time, duration, id, and the
+// results/next pagination shape are all confirmed correct for this account
+// -- no longer just taken from DrChrono's published docs.
 //
 // This used to also rebuild a DrChrono "Appointment Templates" mirror
 // (schedule-template.json), but that DrChrono feature is confirmed empty
