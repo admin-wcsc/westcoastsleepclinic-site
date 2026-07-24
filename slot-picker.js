@@ -10,12 +10,12 @@
 // the patient reaches the Schedule Appointment step.
 //
 // Calendar-style: a month grid where only dates with real open slots are
-// clickable. Picking one reveals that day's open times grouped into
-// Morning/Afternoon/Evening sections, each a compact wrapped grid -- avoids
-// both an overwhelming flat list when the availability window spans
-// multiple months, and the carousel/horizontal-scroll pattern this
-// originally shipped with (dropped after 44+ slots/day made it feel like
-// too much scrolling for something this simple).
+// clickable. Picking one reveals that day's open times as a compact,
+// height-constrained scrollable list (swipe/scroll up-down, tap to select)
+// rather than dumping everything on the page at once -- went through a
+// horizontal-scroll-strip version and a Morning/Afternoon/Evening grouped
+// grid first, both replaced after feedback that they still felt like too
+// much for something this simple.
 //
 // Hidden inputs (appointment_date/appointment_time/appointment_duration_minutes)
 // hold the canonical value, same convention as every other widget here --
@@ -25,14 +25,8 @@
 var AppointmentSlotPicker = (function () {
   var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  var TIME_GROUPS = [
-    { label: 'Morning', test: function (mins) { return mins < 12 * 60; } },
-    { label: 'Afternoon', test: function (mins) { return mins >= 12 * 60 && mins < 17 * 60; } },
-    { label: 'Evening', test: function (mins) { return mins >= 17 * 60; } }
-  ];
-
   var loadingEl, fallbackEl, calEl, dateInput, timeInput, durationInput;
-  var calTitle, calGrid, prevBtn, nextBtn, timesWrap, timesHeadingEl, timesGroupsEl;
+  var calTitle, calGrid, prevBtn, nextBtn, timesWrap, timesHeadingEl, timesListEl;
   var slotsByDate = {};
   var minMonth, maxMonth; // {year, month} bounds derived from the actual slots
   var viewYear, viewMonth;
@@ -77,11 +71,6 @@ var AppointmentSlotPicker = (function () {
     var h12 = h % 12 || 12;
     return h12 + ':' + parts[1] + ' ' + ampm;
   }
-  function timeToMinutes(hhmm) {
-    var parts = hhmm.split(':');
-    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-  }
-
   function buildSkeleton() {
     calEl.innerHTML =
       '<div class="slotpicker-cal-head">' +
@@ -92,7 +81,8 @@ var AppointmentSlotPicker = (function () {
       '<div class="slotpicker-cal-grid"></div>' +
       '<div class="slotpicker-times-wrap" style="display:none">' +
         '<div class="slotpicker-times-heading"></div>' +
-        '<div class="slotpicker-times-groups"></div>' +
+        '<div class="slotpicker-times-instructions">Swipe up or down to browse available times, then tap one to select it.</div>' +
+        '<div class="slotpicker-time-list"></div>' +
       '</div>';
 
     calTitle = calEl.querySelector('.slotpicker-cal-title');
@@ -101,7 +91,7 @@ var AppointmentSlotPicker = (function () {
     nextBtn = calEl.querySelector('[data-nav="next"]');
     timesWrap = calEl.querySelector('.slotpicker-times-wrap');
     timesHeadingEl = calEl.querySelector('.slotpicker-times-heading');
-    timesGroupsEl = calEl.querySelector('.slotpicker-times-groups');
+    timesListEl = calEl.querySelector('.slotpicker-time-list');
 
     prevBtn.addEventListener('click', function () {
       if (prevBtn.disabled) return;
@@ -164,36 +154,21 @@ var AppointmentSlotPicker = (function () {
     durationInput.value = '';
     dateInput.dispatchEvent(new Event('input', { bubbles: true }));
     renderMonth();
-    renderTimeGroups(iso);
+    renderTimeList(iso);
   }
 
-  function renderTimeGroups(iso) {
+  function renderTimeList(iso) {
     timesHeadingEl.textContent = formatDateHeading(iso);
-    timesGroupsEl.innerHTML = '';
+    timesListEl.innerHTML = '';
+    timesListEl.scrollTop = 0;
 
-    TIME_GROUPS.forEach(function (group) {
-      var slotsInGroup = slotsByDate[iso].filter(function (s) { return group.test(timeToMinutes(s.time)); });
-      if (slotsInGroup.length === 0) return;
-
-      var groupEl = document.createElement('div');
-      groupEl.className = 'slotpicker-time-group';
-      var labelEl = document.createElement('div');
-      labelEl.className = 'slotpicker-time-group-label';
-      labelEl.textContent = group.label;
-      groupEl.appendChild(labelEl);
-
-      var gridEl = document.createElement('div');
-      gridEl.className = 'slotpicker-time-grid';
-      slotsInGroup.forEach(function (slot) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'slot-btn';
-        btn.textContent = formatTime(slot.time);
-        btn.addEventListener('click', function () { selectSlot(btn, slot); });
-        gridEl.appendChild(btn);
-      });
-      groupEl.appendChild(gridEl);
-      timesGroupsEl.appendChild(groupEl);
+    slotsByDate[iso].forEach(function (slot) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-btn';
+      btn.textContent = formatTime(slot.time);
+      btn.addEventListener('click', function () { selectSlot(btn, slot); });
+      timesListEl.appendChild(btn);
     });
 
     timesWrap.style.display = '';
