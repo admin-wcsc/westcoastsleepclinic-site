@@ -11,6 +11,13 @@
 // reusing the deploy pipeline's existing tooling rather than provisioning
 // a separate Azure resource just to run a cron job.
 //
+// Auth: authLevel:'function' looks like it should require a Function-key
+// (?code=), but Azure Static Web Apps' managed Functions don't actually
+// enforce that -- a known platform limitation, confirmed live (an
+// unauthenticated call got 200 OK). So this checks its own shared secret
+// instead (DrChronoResyncSecret, sent as the x-resync-secret header),
+// same pattern already used for DrChronoWebhookSecret/DrChronoOAuthState.
+//
 // NOTE: field names/shapes below (date_range, scheduled_time, results/next
 // pagination) are taken from DrChrono's published API docs, not a live
 // account -- flagged in the project plan as needing a one-time check
@@ -23,10 +30,19 @@
 // manager's curated date list instead (see manager-availability.js /
 // availability.js), so that rebuild path was removed.
 const { app } = require('@azure/functions');
+const crypto = require('crypto');
 const { getContainerClient, fetchWithTimeout, getDrChronoAccessToken, appendAudit, DRCHRONO_BASE_URL, DRCHRONO_TIMEOUT_MS } = require('../shared/drchrono');
 
 const BUSY_BLOB = '_drchrono/busy-calendar.json';
 const WINDOW_DAYS = 30;
+
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -113,9 +129,16 @@ async function runResync(context) {
 
 app.http('drchronoResync', {
   methods: ['POST'],
-  authLevel: 'function', // called only by the scheduled GitHub Actions workflow, via its ?code= function key
+  authLevel: 'anonymous', // real auth is the x-resync-secret check below -- see file header comment
   route: 'drchrono/resync',
   handler: async (request, context) => {
+    const expectedSecret = process.env.DrChronoResyncSecret;
+    const givenSecret = request.headers.get('x-resync-secret');
+    if (!expectedSecret || !safeEqual(givenSecret, expectedSecret)) {
+      context.warn('drchrono-resync: missing/invalid x-resync-secret, rejecting');
+      return { status: 401, jsonBody: { error: 'Invalid or missing secret' } };
+    }
+
     try {
       const result = await runResync(context);
       return { status: 200, jsonBody: { ok: true, ...result } };

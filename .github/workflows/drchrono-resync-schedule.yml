@@ -10,11 +10,11 @@ name: DrChrono Availability Resync (backstop)
 # already runs (GitHub Actions) instead of provisioning new Azure
 # infrastructure just to run a cron job.
 #
-# Requires a repository secret DRCHRONO_RESYNC_FUNCTION_KEY, set to the
-# drchronoResync function's key from the deployed dev Azure Static Web App
-# (Azure Portal -> the Static Web App -> Functions -> drchronoResync ->
-# Function Keys). This doesn't exist until the code in this PR/commit is
-# actually deployed to dev -- add the secret once that's done.
+# Requires a repository secret DRCHRONO_RESYNC_SECRET, matching the
+# DrChronoResyncSecret app setting on the dev Azure Static Web App. Azure
+# Static Web Apps' managed Functions don't actually enforce Function-key
+# auth (a platform limitation), so the endpoint checks this shared secret
+# itself instead -- same pattern as the DrChrono webhook's own secret.
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -27,7 +27,8 @@ jobs:
       - name: Call drchrono-resync endpoint
         run: |
           status=$(curl -s -o /tmp/resync-response.json -w "%{http_code}" -X POST \
-            "https://ambitious-flower-02570ba0f-dev.eastus2.7.azurestaticapps.net/api/drchrono/resync?code=${{ secrets.DRCHRONO_RESYNC_FUNCTION_KEY }}")
+            -H "x-resync-secret: ${{ secrets.DRCHRONO_RESYNC_SECRET }}" \
+            "https://ambitious-flower-02570ba0f-dev.eastus2.7.azurestaticapps.net/api/drchrono/resync")
           echo "Response body:"
           cat /tmp/resync-response.json
           echo ""
