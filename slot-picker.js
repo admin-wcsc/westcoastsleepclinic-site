@@ -9,20 +9,33 @@
 // page calls AppointmentSlotPicker.refresh(treatmentType) explicitly when
 // the patient reaches the Schedule Appointment step.
 //
+// Calendar-style: a month grid where only dates with real open slots are
+// clickable. Picking one reveals that day's open times as a horizontal
+// scrollable strip (swipe/drag, or the arrow buttons) instead of a long
+// wrapped list of every date's times at once -- avoids an overwhelming
+// page when the availability window spans multiple months.
+//
 // Hidden inputs (appointment_date/appointment_time/appointment_duration_minutes)
 // hold the canonical value, same convention as every other widget here --
 // existing required-field/payload code just reads them via
 // document.querySelector('[name="..."]') like any other field.
 
 var AppointmentSlotPicker = (function () {
-  var loadingEl, fallbackEl, daysEl, dateInput, timeInput, durationInput;
-  var selectedBtn = null;
+  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  var loadingEl, fallbackEl, calEl, dateInput, timeInput, durationInput;
+  var calTitle, calGrid, prevBtn, nextBtn, stripWrap, stripHeadingEl, stripEl;
+  var slotsByDate = {};
+  var minMonth, maxMonth; // {year, month} bounds derived from the actual slots
+  var viewYear, viewMonth;
+  var selectedDate = null;
+  var selectedTimeBtn = null;
 
   function els() {
     if (!loadingEl) {
       loadingEl = document.getElementById('apptSlotLoading');
       fallbackEl = document.getElementById('apptSlotFallback');
-      daysEl = document.getElementById('apptSlotDays');
+      calEl = document.getElementById('apptSlotDays');
       dateInput = document.querySelector('[name="appointment_date"]');
       timeInput = document.querySelector('[name="appointment_time"]');
       durationInput = document.querySelector('[name="appointment_duration_minutes"]');
@@ -32,24 +45,18 @@ var AppointmentSlotPicker = (function () {
   function showState(state) {
     loadingEl.style.display = state === 'loading' ? '' : 'none';
     fallbackEl.style.display = state === 'fallback' ? '' : 'none';
-    daysEl.style.display = state === 'slots' ? '' : 'none';
-    // Only meaningful to require a slot when there are real slots to pick
+    calEl.style.display = state === 'calendar' ? '' : 'none';
+    // Only meaningful to require a slot when there's a real calendar to pick
     // from -- matches how Step 4 (Authorization to Release) already leaves
     // its own plain, non-modal step ungated beyond the `required` attribute
     // itself, no separate JS blocking logic.
-    var isSlots = state === 'slots';
-    [dateInput, timeInput, durationInput].forEach(function (el) { if (el) el.required = isSlots; });
+    var isReady = state === 'calendar';
+    [dateInput, timeInput, durationInput].forEach(function (el) { if (el) el.required = isReady; });
   }
 
-  function selectSlot(btn, slot) {
-    if (selectedBtn) selectedBtn.classList.remove('slot-btn-selected');
-    selectedBtn = btn;
-    btn.classList.add('slot-btn-selected');
-    dateInput.value = slot.date;
-    timeInput.value = slot.time;
-    durationInput.value = slot.durationMinutes;
-    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
-  }
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  function isoOf(y, m, d) { return y + '-' + pad2(m + 1) + '-' + pad2(d); }
+  function monthKey(y, m) { return y * 12 + m; }
 
   function formatDateHeading(iso) {
     var d = new Date(iso + 'T00:00:00');
@@ -63,35 +70,131 @@ var AppointmentSlotPicker = (function () {
     return h12 + ':' + parts[1] + ' ' + ampm;
   }
 
-  function renderSlots(slots) {
-    daysEl.innerHTML = '';
-    var byDate = {};
-    slots.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
-    Object.keys(byDate).sort().forEach(function (date) {
-      var group = document.createElement('div');
-      group.className = 'slot-day-group';
-      var heading = document.createElement('div');
-      heading.className = 'slot-day-heading';
-      heading.textContent = formatDateHeading(date);
-      group.appendChild(heading);
-      var row = document.createElement('div');
-      row.className = 'slot-day-times';
-      byDate[date].forEach(function (slot) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'slot-btn';
-        btn.textContent = formatTime(slot.time);
-        btn.addEventListener('click', function () { selectSlot(btn, slot); });
-        row.appendChild(btn);
-      });
-      group.appendChild(row);
-      daysEl.appendChild(group);
+  function buildSkeleton() {
+    calEl.innerHTML =
+      '<div class="slotpicker-cal-head">' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="prev" aria-label="Previous month">&larr;</button>' +
+        '<div class="slotpicker-cal-title"></div>' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="Next month">&rarr;</button>' +
+      '</div>' +
+      '<div class="slotpicker-cal-grid"></div>' +
+      '<div class="slotpicker-strip-wrap" style="display:none">' +
+        '<div class="slotpicker-strip-heading"></div>' +
+        '<div class="slotpicker-strip-outer">' +
+          '<button type="button" class="slotpicker-strip-arrow" data-scroll="-1" aria-label="Scroll to earlier times">&lsaquo;</button>' +
+          '<div class="slotpicker-strip"></div>' +
+          '<button type="button" class="slotpicker-strip-arrow" data-scroll="1" aria-label="Scroll to later times">&rsaquo;</button>' +
+        '</div>' +
+      '</div>';
+
+    calTitle = calEl.querySelector('.slotpicker-cal-title');
+    calGrid = calEl.querySelector('.slotpicker-cal-grid');
+    prevBtn = calEl.querySelector('[data-nav="prev"]');
+    nextBtn = calEl.querySelector('[data-nav="next"]');
+    stripWrap = calEl.querySelector('.slotpicker-strip-wrap');
+    stripHeadingEl = calEl.querySelector('.slotpicker-strip-heading');
+    stripEl = calEl.querySelector('.slotpicker-strip');
+
+    prevBtn.addEventListener('click', function () {
+      if (prevBtn.disabled) return;
+      viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      renderMonth();
     });
+    nextBtn.addEventListener('click', function () {
+      if (nextBtn.disabled) return;
+      viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      renderMonth();
+    });
+    calEl.querySelectorAll('.slotpicker-strip-arrow').forEach(function (arrow) {
+      arrow.addEventListener('click', function () {
+        stripEl.scrollBy({ left: 160 * Number(arrow.getAttribute('data-scroll')), behavior: 'smooth' });
+      });
+    });
+  }
+
+  function renderMonth() {
+    calTitle.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+    prevBtn.disabled = monthKey(viewYear, viewMonth) <= monthKey(minMonth.year, minMonth.month);
+    nextBtn.disabled = monthKey(viewYear, viewMonth) >= monthKey(maxMonth.year, maxMonth.month);
+
+    calGrid.innerHTML = '';
+    ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(function (l) {
+      var el = document.createElement('div');
+      el.className = 'slotpicker-cal-dow';
+      el.textContent = l;
+      calGrid.appendChild(el);
+    });
+
+    var firstDow = new Date(viewYear, viewMonth, 1).getDay();
+    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    for (var k = 0; k < firstDow; k++) {
+      var blank = document.createElement('div');
+      blank.className = 'slotpicker-cal-day other';
+      calGrid.appendChild(blank);
+    }
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var iso = isoOf(viewYear, viewMonth, d);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slotpicker-cal-day';
+      btn.textContent = d;
+      if (slotsByDate[iso]) {
+        btn.classList.add('has-slots');
+        if (iso === selectedDate) btn.classList.add('selected');
+        btn.addEventListener('click', function (isoForClick) {
+          return function () { selectDate(isoForClick); };
+        }(iso));
+      } else {
+        btn.disabled = true;
+      }
+      calGrid.appendChild(btn);
+    }
+  }
+
+  function selectDate(iso) {
+    selectedDate = iso;
+    selectedTimeBtn = null;
+    dateInput.value = '';
+    timeInput.value = '';
+    durationInput.value = '';
+    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+    renderMonth();
+    renderStrip(iso);
+  }
+
+  function renderStrip(iso) {
+    stripHeadingEl.textContent = formatDateHeading(iso);
+    stripEl.innerHTML = '';
+    stripEl.scrollLeft = 0;
+
+    slotsByDate[iso].forEach(function (slot) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-btn';
+      btn.textContent = formatTime(slot.time);
+      btn.addEventListener('click', function () { selectSlot(btn, slot); });
+      stripEl.appendChild(btn);
+    });
+
+    stripWrap.style.display = '';
+  }
+
+  function selectSlot(btn, slot) {
+    if (selectedTimeBtn) selectedTimeBtn.classList.remove('slot-btn-selected');
+    selectedTimeBtn = btn;
+    btn.classList.add('slot-btn-selected');
+    dateInput.value = slot.date;
+    timeInput.value = slot.time;
+    durationInput.value = slot.durationMinutes;
+    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
   function refresh(treatmentType) {
     els();
-    selectedBtn = null;
+    selectedDate = null;
+    selectedTimeBtn = null;
     dateInput.value = '';
     timeInput.value = '';
     durationInput.value = '';
@@ -101,8 +204,21 @@ var AppointmentSlotPicker = (function () {
         showState('fallback');
         return;
       }
-      renderSlots(result.slots);
-      showState('slots');
+
+      slotsByDate = {};
+      result.slots.forEach(function (s) { (slotsByDate[s.date] = slotsByDate[s.date] || []).push(s); });
+
+      var dates = Object.keys(slotsByDate).sort();
+      var first = new Date(dates[0] + 'T00:00:00');
+      var last = new Date(dates[dates.length - 1] + 'T00:00:00');
+      minMonth = { year: first.getFullYear(), month: first.getMonth() };
+      maxMonth = { year: last.getFullYear(), month: last.getMonth() };
+      viewYear = minMonth.year;
+      viewMonth = minMonth.month;
+
+      buildSkeleton();
+      renderMonth();
+      showState('calendar');
     }).catch(function () {
       showState('fallback');
     });

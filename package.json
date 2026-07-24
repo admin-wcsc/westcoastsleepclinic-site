@@ -3,5 +3,8 @@
   "private": true,
   "scripts": {
     "sync-partials": "node scripts/sync-partials.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
   }
 }

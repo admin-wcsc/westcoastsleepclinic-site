@@ -213,12 +213,32 @@ body{background:#f4f8fb}
 /* ── SCHEDULE APPOINTMENT ── */
 .slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
 .slotpicker-fallback{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 24px;font-size:14.5px;color:var(--tm);line-height:1.7}
-.slot-day-group{margin-bottom:24px}
-.slot-day-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:10px}
-.slot-day-times{display:flex;flex-wrap:wrap;gap:10px}
-.slot-btn{background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif}
+
+.slotpicker-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;max-width:420px}
+.slotpicker-cal-nav{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--dg);font-family:'Montserrat',sans-serif}
+.slotpicker-cal-nav:hover{background:var(--cream)}
+.slotpicker-cal-nav:disabled{opacity:.35;cursor:default;background:none}
+.slotpicker-cal-title{font-size:16px;font-weight:700;color:var(--dg)}
+.slotpicker-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:24px;max-width:420px}
+.slotpicker-cal-dow{font-size:11px;text-transform:uppercase;color:var(--tl);text-align:center;padding-bottom:4px;letter-spacing:.05em}
+.slotpicker-cal-day{aspect-ratio:1;border:1px solid var(--border);border-radius:8px;background:var(--cream);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:#c4c9cc;cursor:default;font-family:'Montserrat',sans-serif}
+.slotpicker-cal-day.other{visibility:hidden}
+.slotpicker-cal-day.has-slots{cursor:pointer;font-weight:600;color:var(--dg);background:#fff;border-color:var(--border)}
+.slotpicker-cal-day.has-slots:hover{border-color:var(--mg);color:var(--mg)}
+.slotpicker-cal-day.selected,.slotpicker-cal-day.selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
+
+.slotpicker-strip-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:10px}
+.slotpicker-strip-outer{display:flex;align-items:center;gap:8px}
+.slotpicker-strip{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x proximity;padding:2px 2px 10px;-webkit-overflow-scrolling:touch}
+.slotpicker-strip::-webkit-scrollbar{height:6px}
+.slotpicker-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.slotpicker-strip-arrow{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dg);font-size:16px}
+.slotpicker-strip-arrow:hover{border-color:var(--mg);color:var(--mg)}
+.slot-btn{background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif;flex:0 0 auto;scroll-snap-align:start}
 .slot-btn:hover{border-color:var(--mg);color:var(--dg)}
 .slot-btn-selected,.slot-btn-selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
+@media(max-width:600px){.slotpicker-cal-grid{gap:4px}.slotpicker-cal-day{font-size:13px}}
 
 /* ── REVIEW & SUBMIT ── */
 .rv-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:24px 26px;margin-bottom:20px}
