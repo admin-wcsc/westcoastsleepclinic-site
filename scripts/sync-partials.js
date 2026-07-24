@@ -9,7 +9,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PAGES = ['index.html', 'dr-scuteri.html', 'provider-referral.html', 'registration.html'];
 const SECTIONS = [
-  { name: 'BANNER', partial: 'partials/banner.html' },
+  // Home-page only -- the other 3 pages had this block removed entirely
+  // (no SHARED:BANNER markers left in them), not just skipped.
+  { name: 'BANNER', partial: 'partials/banner.html', pages: ['index.html'] },
   { name: 'HEADER', partial: 'partials/header.html' },
   { name: 'FOOTER', partial: 'partials/footer.html' },
 ];
@@ -33,6 +35,7 @@ for (const page of PAGES) {
   const original = fs.readFileSync(pagePath, 'utf8');
   let updated = original;
   for (const section of SECTIONS) {
+    if (section.pages && !section.pages.includes(page)) continue;
     updated = syncSection(updated, page, section);
   }
   if (updated !== original) {

@@ -1,7 +1,9 @@
 <!-- ══════ RELOCATION / TELEMEDICINE BANNER ══════
-     Temporary, site-wide banner. Fully self-contained (styling + toggle
+     Temporary, home-page-only banner (removed from the other 3 pages --
+     no SHARED:BANNER markers left in them, see sync-partials.js's
+     per-section `pages` list). Fully self-contained (styling + toggle
      logic live right here) so it can be removed later by deleting this
-     file, removing the SHARED:BANNER markers from the 4 pages, and
+     file, removing the SHARED:BANNER markers from index.html, and
      dropping its entry from scripts/sync-partials.js's SECTIONS list --
      nothing elsewhere depends on it.
      To hide it instantly without any of that, set BANNER_ENABLED to
@@ -12,14 +14,14 @@
      header (z-index 120 > .site-header's 100), that overlays the nav and
      page content underneath instead of pushing them down when opened. -->
 <style>
-  .relocation-banner{background:#fbe3e1;border:1px solid #f0bcb8;border-radius:16px;padding:18px 22px;position:relative;width:calc(100% - 32px);max-width:900px;margin:16px auto 0;box-shadow:0 8px 24px rgba(122,31,26,.12)}
+  .relocation-banner{background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;border:1px solid var(--border);border-radius:16px;padding:18px 22px;position:relative;width:calc(100% - 32px);max-width:900px;margin:16px auto 0;box-shadow:0 2px 12px rgba(29,86,110,.08)}
   .relocation-banner-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a}
   .relocation-banner-icon{flex-shrink:0;margin-top:2px}
   .relocation-banner-text{flex:1 1 240px}
   .relocation-banner-toggle{display:inline-flex;align-items:center;gap:6px;background:#7a1f1a;color:#fff;border:none;border-radius:999px;padding:7px 16px;font-weight:600;font-size:13px;font-family:'Montserrat',sans-serif;letter-spacing:.2px;cursor:pointer;white-space:nowrap;transition:background .15s ease;margin-left:auto}
   .relocation-banner-toggle:hover{background:#5e1712}
   .relocation-banner-chevron--up{transform:rotate(180deg)}
-  .relocation-banner-more{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fbe3e1;border:1px solid #f0bcb8;border-radius:16px;box-shadow:0 16px 40px rgba(122,31,26,.18);z-index:120;max-height:min(70vh,520px);overflow-y:auto}
+  .relocation-banner-more{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:linear-gradient(90deg,#ddf0f8,#ffffff,#f2ece0,#faf8f5,#ddf0f8);background-size:400% 100%;animation:heroWave 8s ease-in-out infinite;border:1px solid var(--border);border-radius:16px;box-shadow:0 16px 40px rgba(29,86,110,.14);z-index:120;max-height:min(70vh,520px);overflow-y:auto}
   .relocation-banner-more.open{display:block}
   .relocation-banner-more-in{font-family:'Montserrat',sans-serif;font-size:14px;line-height:1.65;color:#7a1f1a;padding:20px 22px}
   .relocation-banner-more-in p{margin:0 0 12px}
