@@ -10,10 +10,12 @@
 // the patient reaches the Schedule Appointment step.
 //
 // Calendar-style: a month grid where only dates with real open slots are
-// clickable. Picking one reveals that day's open times as a horizontal
-// scrollable strip (swipe/drag, or the arrow buttons) instead of a long
-// wrapped list of every date's times at once -- avoids an overwhelming
-// page when the availability window spans multiple months.
+// clickable. Picking one reveals that day's open times grouped into
+// Morning/Afternoon/Evening sections, each a compact wrapped grid -- avoids
+// both an overwhelming flat list when the availability window spans
+// multiple months, and the carousel/horizontal-scroll pattern this
+// originally shipped with (dropped after 44+ slots/day made it feel like
+// too much scrolling for something this simple).
 //
 // Hidden inputs (appointment_date/appointment_time/appointment_duration_minutes)
 // hold the canonical value, same convention as every other widget here --
@@ -23,8 +25,14 @@
 var AppointmentSlotPicker = (function () {
   var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+  var TIME_GROUPS = [
+    { label: 'Morning', test: function (mins) { return mins < 12 * 60; } },
+    { label: 'Afternoon', test: function (mins) { return mins >= 12 * 60 && mins < 17 * 60; } },
+    { label: 'Evening', test: function (mins) { return mins >= 17 * 60; } }
+  ];
+
   var loadingEl, fallbackEl, calEl, dateInput, timeInput, durationInput;
-  var calTitle, calGrid, prevBtn, nextBtn, stripWrap, stripHeadingEl, stripEl;
+  var calTitle, calGrid, prevBtn, nextBtn, timesWrap, timesHeadingEl, timesGroupsEl;
   var slotsByDate = {};
   var minMonth, maxMonth; // {year, month} bounds derived from the actual slots
   var viewYear, viewMonth;
@@ -69,6 +77,10 @@ var AppointmentSlotPicker = (function () {
     var h12 = h % 12 || 12;
     return h12 + ':' + parts[1] + ' ' + ampm;
   }
+  function timeToMinutes(hhmm) {
+    var parts = hhmm.split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  }
 
   function buildSkeleton() {
     calEl.innerHTML =
@@ -78,22 +90,18 @@ var AppointmentSlotPicker = (function () {
         '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="Next month">&rarr;</button>' +
       '</div>' +
       '<div class="slotpicker-cal-grid"></div>' +
-      '<div class="slotpicker-strip-wrap" style="display:none">' +
-        '<div class="slotpicker-strip-heading"></div>' +
-        '<div class="slotpicker-strip-outer">' +
-          '<button type="button" class="slotpicker-strip-arrow" data-scroll="-1" aria-label="Scroll to earlier times">&lsaquo;</button>' +
-          '<div class="slotpicker-strip"></div>' +
-          '<button type="button" class="slotpicker-strip-arrow" data-scroll="1" aria-label="Scroll to later times">&rsaquo;</button>' +
-        '</div>' +
+      '<div class="slotpicker-times-wrap" style="display:none">' +
+        '<div class="slotpicker-times-heading"></div>' +
+        '<div class="slotpicker-times-groups"></div>' +
       '</div>';
 
     calTitle = calEl.querySelector('.slotpicker-cal-title');
     calGrid = calEl.querySelector('.slotpicker-cal-grid');
     prevBtn = calEl.querySelector('[data-nav="prev"]');
     nextBtn = calEl.querySelector('[data-nav="next"]');
-    stripWrap = calEl.querySelector('.slotpicker-strip-wrap');
-    stripHeadingEl = calEl.querySelector('.slotpicker-strip-heading');
-    stripEl = calEl.querySelector('.slotpicker-strip');
+    timesWrap = calEl.querySelector('.slotpicker-times-wrap');
+    timesHeadingEl = calEl.querySelector('.slotpicker-times-heading');
+    timesGroupsEl = calEl.querySelector('.slotpicker-times-groups');
 
     prevBtn.addEventListener('click', function () {
       if (prevBtn.disabled) return;
@@ -104,11 +112,6 @@ var AppointmentSlotPicker = (function () {
       if (nextBtn.disabled) return;
       viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
       renderMonth();
-    });
-    calEl.querySelectorAll('.slotpicker-strip-arrow').forEach(function (arrow) {
-      arrow.addEventListener('click', function () {
-        stripEl.scrollBy({ left: 160 * Number(arrow.getAttribute('data-scroll')), behavior: 'smooth' });
-      });
     });
   }
 
@@ -161,24 +164,39 @@ var AppointmentSlotPicker = (function () {
     durationInput.value = '';
     dateInput.dispatchEvent(new Event('input', { bubbles: true }));
     renderMonth();
-    renderStrip(iso);
+    renderTimeGroups(iso);
   }
 
-  function renderStrip(iso) {
-    stripHeadingEl.textContent = formatDateHeading(iso);
-    stripEl.innerHTML = '';
-    stripEl.scrollLeft = 0;
+  function renderTimeGroups(iso) {
+    timesHeadingEl.textContent = formatDateHeading(iso);
+    timesGroupsEl.innerHTML = '';
 
-    slotsByDate[iso].forEach(function (slot) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'slot-btn';
-      btn.textContent = formatTime(slot.time);
-      btn.addEventListener('click', function () { selectSlot(btn, slot); });
-      stripEl.appendChild(btn);
+    TIME_GROUPS.forEach(function (group) {
+      var slotsInGroup = slotsByDate[iso].filter(function (s) { return group.test(timeToMinutes(s.time)); });
+      if (slotsInGroup.length === 0) return;
+
+      var groupEl = document.createElement('div');
+      groupEl.className = 'slotpicker-time-group';
+      var labelEl = document.createElement('div');
+      labelEl.className = 'slotpicker-time-group-label';
+      labelEl.textContent = group.label;
+      groupEl.appendChild(labelEl);
+
+      var gridEl = document.createElement('div');
+      gridEl.className = 'slotpicker-time-grid';
+      slotsInGroup.forEach(function (slot) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'slot-btn';
+        btn.textContent = formatTime(slot.time);
+        btn.addEventListener('click', function () { selectSlot(btn, slot); });
+        gridEl.appendChild(btn);
+      });
+      groupEl.appendChild(gridEl);
+      timesGroupsEl.appendChild(groupEl);
     });
 
-    stripWrap.style.display = '';
+    timesWrap.style.display = '';
   }
 
   function selectSlot(btn, slot) {

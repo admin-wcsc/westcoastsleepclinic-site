@@ -38,17 +38,18 @@ const OUT = 'C:\\Users\\steph\\AppData\\Local\\Temp\\claude\\c--Users-steph-OneD
 
   // Click the first available day.
   await page.locator('.slotpicker-cal-day.has-slots').first().click();
-  await page.waitForSelector('.slotpicker-strip .slot-btn', { timeout: 10000 });
-  await page.screenshot({ path: OUT + '\\2-strip-open.png' });
-  const stripHeading = await page.textContent('.slotpicker-strip-heading');
-  const timeCount = await page.locator('.slotpicker-strip .slot-btn').count();
-  console.log('Strip opened for:', stripHeading, '| times available:', timeCount);
+  await page.waitForSelector('.slotpicker-times-groups .slot-btn', { timeout: 10000 });
+  await page.screenshot({ path: OUT + '\\2-times-open.png' });
+  const timesHeading = await page.textContent('.slotpicker-times-heading');
+  const timeCount = await page.locator('.slotpicker-times-groups .slot-btn').count();
+  const groupLabels = await page.locator('.slotpicker-time-group-label').allTextContents();
+  console.log('Times shown for:', timesHeading, '| total times:', timeCount, '| groups:', groupLabels.join(', '));
 
   // Click the first time.
-  await page.locator('.slotpicker-strip .slot-btn').first().click();
+  await page.locator('.slotpicker-times-groups .slot-btn').first().click();
   await page.waitForTimeout(400); // let the .2s background/color transition settle before screenshotting
   await page.screenshot({ path: OUT + '\\3-time-selected.png' });
-  const bg = await page.locator('.slotpicker-strip .slot-btn').first().evaluate((el) => getComputedStyle(el).backgroundColor);
+  const bg = await page.locator('.slotpicker-times-groups .slot-btn').first().evaluate((el) => getComputedStyle(el).backgroundColor);
   console.log('Selected button computed background-color:', bg);
 
   const values = await page.evaluate(() => ({
@@ -58,7 +59,7 @@ const OUT = 'C:\\Users\\steph\\AppData\\Local\\Temp\\claude\\c--Users-steph-OneD
   }));
   console.log('Hidden inputs after selecting a time:', JSON.stringify(values));
 
-  const selectedBtnClass = await page.locator('.slotpicker-strip .slot-btn').first().getAttribute('class');
+  const selectedBtnClass = await page.locator('.slotpicker-times-groups .slot-btn').first().getAttribute('class');
   console.log('Selected button class:', selectedBtnClass);
 
   // Test month navigation.
