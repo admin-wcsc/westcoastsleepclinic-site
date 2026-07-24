@@ -67,12 +67,6 @@ function timesOverlap(startA, durA, startB, durB) {
   const bStart = timeToMinutes(startB), bEnd = bStart + durB;
   return aStart < bEnd && bStart < aEnd;
 }
-// Clinic is closed Saturdays (open Sundays). Enforced here rather than only
-// in the manager calendar's UI, so it holds regardless of what ends up in
-// doctor-availability.json.
-function isSaturday(iso) {
-  return new Date(iso + 'T00:00:00Z').getUTCDay() === 6;
-}
 
 app.http('availability', {
   methods: ['GET'],
@@ -107,7 +101,6 @@ app.http('availability', {
     const slots = [];
     for (const iso of availability.availableDates) {
       if (iso < earliestIso) continue;
-      if (isSaturday(iso)) continue;
       for (const time of DAILY_SLOT_TIMES) {
         const overlapsBusy = busyAppointments.some(
           (b) => b.date === iso && timesOverlap(time, SLOT_DURATION_MINUTES, b.startTime, b.durationMinutes)
