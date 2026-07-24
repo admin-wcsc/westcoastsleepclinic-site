@@ -136,6 +136,14 @@ app.http('drchronoWebhook', {
     const appointmentId = extractAppointmentId(body);
     if (!appointmentId) {
       context.warn('drchrono-webhook: could not find an appointment ID in the payload, ignoring');
+      // Written to the audit log (not just context.warn) because there's no
+      // Application Insights wired up for this project -- the audit log is
+      // the only place to actually see what DrChrono sent when the payload
+      // shape guess in extractAppointmentId() turns out wrong.
+      await appendAudit(containerClient, {
+        kind: 'event', ts: Date.now(), type: 'drchrono_webhook_unrecognized_payload',
+        details: { event: request.headers.get('x-drchrono-event'), bodyKeys: body && typeof body === 'object' ? Object.keys(body) : null, body }
+      });
       return { status: 200, jsonBody: { ok: true, ignored: true } };
     }
 
