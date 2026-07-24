@@ -24,12 +24,13 @@
 //                                  (a delivery ID). Every POST is checked
 //                                  against DrChronoWebhookSecret before
 //                                  anything else runs.
-// NOTE: DrChrono's docs describe X-drchrono-signature simply as "the secret
-// token associated with the webhook" (a direct match), not an HMAC of the
-// payload the way the verification handshake works -- implemented as a
-// direct compare below, but this should be double-checked against a real
-// delivery (use the "Ping webhook" button once configured) before trusting
-// it in production.
+// Confirmed against a real APPOINTMENT_MODIFY delivery on 2026-07-24:
+// X-drchrono-signature is indeed a direct match against the secret (not an
+// HMAC) -- the direct compare below is correct. Real body shape is
+// { practice_group_id, object: { id, scheduled_time, duration, status,
+// doctor, office, ... }, receiver: {...} } -- the appointment record is
+// nested under `object`, not at the top level or under `data` as originally
+// guessed.
 const { app } = require('@azure/functions');
 const crypto = require('crypto');
 const { getContainerClient, fetchWithTimeout, getDrChronoAccessToken, appendAudit, streamToBuffer, DRCHRONO_BASE_URL, DRCHRONO_TIMEOUT_MS } = require('../shared/drchrono');
@@ -42,12 +43,13 @@ function splitScheduledTime(scheduledTime) {
   return m ? { date: m[1], time: m[2] } : null;
 }
 
-// Payload shape for a real delivery is unconfirmed -- check the plausible
-// places an ID could be; the appointment gets re-fetched from DrChrono
+// body.object.id is the confirmed real shape (see file header). The other
+// guesses stay as fallbacks in case a different event type ever shapes its
+// payload differently -- the appointment gets re-fetched from DrChrono
 // regardless, so this only needs to find the ID, not trust anything else.
 function extractAppointmentId(body) {
   if (!body || typeof body !== 'object') return null;
-  const candidate = body.id || body.appointment_id || body.object_id || (body.data && body.data.id);
+  const candidate = (body.object && body.object.id) || body.id || body.appointment_id || body.object_id || (body.data && body.data.id);
   return candidate ? String(candidate) : null;
 }
 
