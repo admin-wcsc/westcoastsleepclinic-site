@@ -79,7 +79,7 @@ var AppointmentSlotPicker = (function () {
         '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="Next month">&rarr;</button>' +
       '</div>' +
       '<div class="slotpicker-cal-grid"></div>' +
-      '<div class="slotpicker-times-wrap" style="display:none">' +
+      '<div class="slotpicker-times-wrap">' +
         '<div class="slotpicker-times-heading"></div>' +
         '<div class="slotpicker-times-instructions">Swipe up or down to browse available times, then tap one to select it.</div>' +
         '<div class="slotpicker-time-list"></div>' +
@@ -171,7 +171,11 @@ var AppointmentSlotPicker = (function () {
       timesListEl.appendChild(btn);
     });
 
-    timesWrap.style.display = '';
+    // Class, not inline style: on desktop this only flips visibility (the
+    // wrap already occupies its grid cell while hidden, so revealing it
+    // never changes the calendar's overall height); on mobile CSS maps the
+    // same class to display so the stacked layout still grows naturally.
+    timesWrap.classList.add('is-visible');
   }
 
   function selectSlot(btn, slot) {
