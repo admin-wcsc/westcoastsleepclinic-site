@@ -229,7 +229,7 @@ body{background:#f4f8fb}
 .slotpicker-cal-day.has-slots:hover{border-color:var(--mg);color:var(--mg)}
 .slotpicker-cal-day.selected,.slotpicker-cal-day.selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
 
-.slotpicker-times-wrap{grid-column:2;visibility:hidden}
+.slotpicker-times-wrap{grid-column:2;grid-row:1/3;visibility:hidden}
 .slotpicker-times-wrap.is-visible{visibility:visible}
 .slotpicker-times-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:6px}
 .slotpicker-times-instructions{font-size:12.5px;color:var(--tl);margin-bottom:12px}
@@ -243,7 +243,7 @@ body{background:#f4f8fb}
 #fstep5 .form-nav{justify-content:flex-end;gap:16px}
 @media(max-width:700px){
   #apptSlotDays{grid-template-columns:1fr}
-  .slotpicker-times-wrap{grid-column:1;margin-top:24px;display:none;visibility:visible}
+  .slotpicker-times-wrap{grid-column:1;grid-row:3;margin-top:24px;display:none;visibility:visible}
   .slotpicker-times-wrap.is-visible{display:block}
   .slotpicker-cal-grid{gap:4px}
   .slotpicker-cal-day{font-size:13px}
