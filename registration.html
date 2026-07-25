@@ -214,7 +214,7 @@ body{background:#f4f8fb}
 .slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
 .slotpicker-fallback{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 24px;font-size:14.5px;color:var(--tm);line-height:1.7}
 
-#apptSlotDays{display:grid;grid-template-columns:380px 1fr;column-gap:36px;align-items:start}
+#apptSlotDays{display:grid;grid-template-columns:380px 1fr;column-gap:36px;align-items:stretch}
 .slotpicker-cal-head{grid-column:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;max-width:420px}
 .slotpicker-cal-nav{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--dg);font-family:'Montserrat',sans-serif}
 .slotpicker-cal-nav:hover{background:var(--cream)}
@@ -229,11 +229,11 @@ body{background:#f4f8fb}
 .slotpicker-cal-day.has-slots:hover{border-color:var(--mg);color:var(--mg)}
 .slotpicker-cal-day.selected,.slotpicker-cal-day.selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
 
-.slotpicker-times-wrap{grid-column:2;grid-row:1/3;visibility:hidden}
+.slotpicker-times-wrap{grid-column:2;grid-row:1/3;visibility:hidden;display:flex;flex-direction:column}
 .slotpicker-times-wrap.is-visible{visibility:visible}
 .slotpicker-times-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:6px}
 .slotpicker-times-instructions{font-size:12.5px;color:var(--tl);margin-bottom:12px}
-.slotpicker-time-list{height:315px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--cream)}
+.slotpicker-time-list{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--cream)}
 .slotpicker-time-list::-webkit-scrollbar{width:6px}
 .slotpicker-time-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .slot-btn{display:block;width:100%;background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:12px 8px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif;margin-bottom:6px}
@@ -244,7 +244,8 @@ body{background:#f4f8fb}
 @media(max-width:700px){
   #apptSlotDays{grid-template-columns:1fr}
   .slotpicker-times-wrap{grid-column:1;grid-row:3;margin-top:24px;display:none;visibility:visible}
-  .slotpicker-times-wrap.is-visible{display:block}
+  .slotpicker-times-wrap.is-visible{display:flex}
+  .slotpicker-time-list{flex:none;height:300px}
   .slotpicker-cal-grid{gap:4px}
   .slotpicker-cal-day{font-size:13px}
 }
