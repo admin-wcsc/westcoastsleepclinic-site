@@ -214,12 +214,13 @@ body{background:#f4f8fb}
 .slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
 .slotpicker-fallback{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 24px;font-size:14.5px;color:var(--tm);line-height:1.7}
 
-.slotpicker-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;max-width:420px}
+#apptSlotDays{display:grid;grid-template-columns:380px 1fr;column-gap:36px;align-items:start}
+.slotpicker-cal-head{grid-column:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;max-width:420px}
 .slotpicker-cal-nav{background:none;border:1px solid var(--border);border-radius:6px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--dg);font-family:'Montserrat',sans-serif}
 .slotpicker-cal-nav:hover{background:var(--cream)}
 .slotpicker-cal-nav:disabled{opacity:.35;cursor:default;background:none}
 .slotpicker-cal-title{font-size:16px;font-weight:700;color:var(--dg)}
-.slotpicker-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:24px;max-width:420px}
+.slotpicker-cal-grid{grid-column:1;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:420px}
 .slotpicker-cal-dow{font-size:11px;text-transform:uppercase;color:var(--tl);text-align:center;padding-bottom:4px;letter-spacing:.05em}
 .slotpicker-cal-day{aspect-ratio:1;border:1px solid var(--border);border-radius:8px;background:var(--cream);
   display:flex;align-items:center;justify-content:center;font-size:14px;color:#c4c9cc;cursor:default;font-family:'Montserrat',sans-serif}
@@ -228,16 +229,23 @@ body{background:#f4f8fb}
 .slotpicker-cal-day.has-slots:hover{border-color:var(--mg);color:var(--mg)}
 .slotpicker-cal-day.selected,.slotpicker-cal-day.selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
 
-.slotpicker-times-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:6px;max-width:420px}
-.slotpicker-times-instructions{font-size:12.5px;color:var(--tl);margin-bottom:12px;max-width:420px}
-.slotpicker-time-list{max-width:420px;max-height:262px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--cream)}
+.slotpicker-times-wrap{grid-column:2}
+.slotpicker-times-heading{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--dg);margin-bottom:6px}
+.slotpicker-times-instructions{font-size:12.5px;color:var(--tl);margin-bottom:12px}
+.slotpicker-time-list{max-height:346px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--cream)}
 .slotpicker-time-list::-webkit-scrollbar{width:6px}
 .slotpicker-time-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .slot-btn{display:block;width:100%;background:#fff;border:1.5px solid var(--border);color:var(--tm);font-size:14px;font-weight:600;padding:12px 8px;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'Montserrat',sans-serif;margin-bottom:6px}
 .slot-btn:last-child{margin-bottom:0}
 .slot-btn:hover{border-color:var(--mg);color:var(--dg)}
 .slot-btn-selected,.slot-btn-selected:hover{background:var(--dg);border-color:var(--dg);color:#fff}
-@media(max-width:600px){.slotpicker-cal-grid{gap:4px}.slotpicker-cal-day{font-size:13px}}
+#fstep5 .form-nav{justify-content:flex-end;gap:16px}
+@media(max-width:700px){
+  #apptSlotDays{grid-template-columns:1fr}
+  .slotpicker-times-wrap{grid-column:1;margin-top:24px}
+  .slotpicker-cal-grid{gap:4px}
+  .slotpicker-cal-day{font-size:13px}
+}
 
 /* ── REVIEW & SUBMIT ── */
 .rv-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:24px 26px;margin-bottom:20px}
