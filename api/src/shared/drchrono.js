@@ -106,9 +106,12 @@ async function getDrChronoAccessToken(containerClient) {
 // avoids the read-modify-write race a normal block blob would have if two
 // requests logged at the same instant. Audit logging is best-effort and
 // never fails a real submission.
+// Lives under _audit/ rather than the container root so the review-automation
+// flow's Blob Storage trigger (which only sees root-level blobs, same reason
+// _drchrono/ and _schedule/ are subfolders) never fires a redundant run for it.
 async function appendAudit(containerClient, record) {
   try {
-    const appendBlobClient = containerClient.getAppendBlobClient('audit.log');
+    const appendBlobClient = containerClient.getAppendBlobClient('_audit/audit.log');
     await appendBlobClient.createIfNotExists();
     const line = JSON.stringify(record) + '\n';
     await appendBlobClient.appendBlock(line, Buffer.byteLength(line));
