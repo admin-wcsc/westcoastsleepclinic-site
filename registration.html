@@ -273,9 +273,14 @@ body{background:#f4f8fb}
 
 footer{background:var(--cream)}
 .foot-bot{margin-top:32px}
+
+/* ── DEV-ONLY: test data fill button, see DEV_FILL_ENABLED near the bottom script ── */
+.dev-fill-btn{display:none;position:fixed;bottom:20px;right:20px;z-index:500;background:#c0392b;color:#fff;border:none;padding:12px 18px;font-size:13px;font-weight:700;letter-spacing:.03em;border-radius:8px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.3);font-family:'Montserrat',sans-serif}
+.dev-fill-btn:hover{background:#a93226}
 </style>
 </head>
 <body>
+<button type="button" class="dev-fill-btn" id="devFillBtn" onclick="fillTestData()">Fill Test Data</button>
 
 
 <!-- SHARED:HEADER:START (kept in sync from partials/header.html by scripts/sync-partials.js — edit the partial, not this block) -->
@@ -1935,6 +1940,102 @@ document.querySelector('.step-row').addEventListener('click', function(e) {
 <script src="upload-widget.js"></script>
 <script src="slot-picker.js"></script>
 <script>
+
+// ---------------- DEV-ONLY: FILL TEST DATA ----------------
+// Flip to false (and re-push) to hide the button without deleting this
+// block. Only fills Step 1 (Questionnaire) and Step 2 (Demographics) --
+// deliberately leaves consents/signatures, scheduling, and document upload
+// alone since those need a real interaction (signature pad, slot picker).
+var DEV_FILL_ENABLED = true;
+var devFillBtnEl = document.getElementById('devFillBtn');
+if (devFillBtnEl) devFillBtnEl.style.display = DEV_FILL_ENABLED ? 'block' : 'none';
+
+function fillTestData() {
+  function setVal(name, value) {
+    var el = document.querySelector('[name="' + name + '"]');
+    if (!el) return;
+    el.value = value;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function setCheck(name, checked) {
+    var el = document.querySelector('[name="' + name + '"]');
+    if (!el) return;
+    el.checked = checked;
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function setRadio(name, value) {
+    var el = document.querySelector('[name="' + name + '"][value="' + value + '"]');
+    if (!el) return;
+    el.checked = true;
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function setDpk(dpkName, iso) {
+    var wrapper = document.querySelector('[data-dpk="' + dpkName + '"]');
+    if (!wrapper) return;
+    var hidden = wrapper.querySelector('input[type="hidden"]');
+    var visible = wrapper.querySelector('.dpk-input');
+    var parts = iso.split('-');
+    hidden.value = iso;
+    visible.value = parts[1] + '/' + parts[2] + '/' + parts[0];
+    hidden.dispatchEvent(new Event('input', { bubbles: true }));
+    hidden.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // Ensures the full questionnaire (hidden until a type is picked) is on screen.
+  if (typeof selectTreatmentType === 'function') selectTreatmentType('sleep_study');
+
+  // STEP 1: Questionnaire
+  setVal('chief_complaint', 'Loud snoring and daytime fatigue -- test submission.');
+  setVal('sleep_hrs', '6.5');
+  setVal('concern_duration', '6 months');
+  setVal('bedtime', '22:30');
+  setVal('waketime', '06:30');
+  ['sym_snore', 'sym_daytime', 'sym_not_refreshed'].forEach(function (n) { setCheck(n, true); });
+  setRadio('prev_study', 'No');
+  setRadio('cpap_use', 'No');
+  ['ess1', 'ess2', 'ess3', 'ess4', 'ess5', 'ess6', 'ess7', 'ess8'].forEach(function (n) { setRadio(n, '1'); });
+  setVal('medications', 'None');
+  setVal('allergies', 'NKDA');
+  setVal('height', '5\'10"');
+  setVal('weight', '180 lbs');
+  setVal('comments', 'Test submission -- please disregard.');
+
+  // STEP 2: Demographics -- Patient Details
+  setVal('first_name', 'Test');
+  setVal('last_name', 'Patient');
+  setVal('mi', 'Q');
+  setDpk('dob', '1985-06-15');
+  setRadio('sex', 'Male');
+  setVal('dl', 'T123456789');
+  setVal('address', '123 Test Street');
+  setVal('city', 'Largo');
+  setVal('state', 'FL');
+  setVal('zip', '33770');
+  setVal('home_phone', '(727) 555-0100');
+  setVal('cell_phone', '(727) 555-0101');
+  setVal('email', 'test.patient@example.com');
+  setRadio('marital', 'Single');
+  setVal('employer', 'Test Employer');
+  setVal('occupation', 'Tester');
+
+  // STEP 2: Demographics -- Emergency Contact
+  setVal('ec_name', 'Emergency Contact');
+  setVal('ec_rel', 'Spouse');
+  setVal('ec_phone', '(727) 555-0102');
+
+  // STEP 2: Demographics -- Insurance
+  setVal('ins1', 'Self-Pay / Uninsured');
+  setVal('ph_name', 'Test Patient');
+  setDpk('ph_dob', '1985-06-15');
+  setVal('ph_rel', 'Self');
+  setVal('member_id', 'TESTID12345');
+
+  // STEP 2: Demographics -- Preferred Pharmacy
+  setVal('pharm_name', 'Test Pharmacy');
+  setVal('pharm_addr', '456 Pharmacy Ave, Largo, FL');
+  setVal('pharm_phone', '(727) 555-0103');
+}
 
 // A single shared Escape handler: an open calendar popup takes priority
 // over an open Step 1 modal, so the two features' keyboard handling never
