@@ -51,6 +51,20 @@ async function writeRecordBlob(containerClient, blobName, value) {
   });
 }
 
+// Power Automate's Blob Storage trigger can't see blobs added inside a
+// subfolder (registration/{id}/record.json is two levels deep) — confirmed
+// against Microsoft's own connector docs and a live test. This flat marker
+// blob (no folder prefix) is what the review-automation flow's trigger
+// actually watches; it holds only the id (no patient data), so the flow
+// does a second, deliberate fetch of the real record rather than a second
+// copy of PII sitting in the container root.
+async function writeRegistrationReviewMarker(containerClient, id) {
+  const content = JSON.stringify({ id, type: 'registration' });
+  await containerClient.getBlockBlobClient(`registration-review-${id}.json`).upload(content, Buffer.byteLength(content), {
+    blobHTTPHeaders: { blobContentType: 'application/json' }
+  });
+}
+
 // Blob names are flat keys with no real "folders" — listBlobsByHierarchy
 // with a '/' delimiter gives us the virtual subfolder names (submission
 // IDs) the same way fs.readdirSync did for the local disk version.
@@ -262,6 +276,7 @@ async function mergeRegistrationIntoRecord(containerClient, match, data, files) 
   matchedRecord.type = 'registration';
   matchedRecord.data = data || {};
   await writeRecordBlob(containerClient, targetPrefix + 'record.json', matchedRecord);
+  await writeRegistrationReviewMarker(containerClient, match.id);
 
   await appendAudit(containerClient, { kind: 'event', ts: Date.now(), type: 'registration_merged', details: { mergedIntoType: match.type, mergedIntoId: match.id, fileCount: files.length } });
   return { status: 200, jsonBody: { ok: true, id: match.id, merged: true, mergedIntoType: match.type } };
@@ -273,6 +288,9 @@ async function createNewSubmission(containerClient, type, data, files) {
 
   const record = { id, type, submittedAt: Date.now(), data: data || {} };
   await writeRecordBlob(containerClient, prefix + 'record.json', record);
+  if (type === 'registration') {
+    await writeRegistrationReviewMarker(containerClient, id);
+  }
 
   const filesPrefix = prefix + 'files/';
   for (const f of files) {
