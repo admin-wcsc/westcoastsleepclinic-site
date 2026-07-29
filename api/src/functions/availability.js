@@ -20,13 +20,13 @@ const AVAILABILITY_BLOB = '_schedule/doctor-availability.json';
 const BUSY_BLOB = '_drchrono/busy-calendar.json';
 const MIN_LEAD_DAYS = 3; // doctors need at least 3 days' notice -- no same-day/next-day/2-day-out bookings
 
-// Fixed daily hours, same for every treatment type: 9:30am-4:30pm, a slot
+// Fixed daily hours, same for every treatment type: 9:00am-4:30pm, a slot
 // every 15 minutes. Each slot only blocks its own 15 minutes when booked --
 // no implicit hour-long hold. `treatment_type` is still a required query
 // param (kept for API contract stability with existing callers) but no
 // longer changes which slots come back -- both profiles use this same
 // daily pattern for now.
-const DAY_START_MINUTES = 9 * 60 + 30; // 9:30am
+const DAY_START_MINUTES = 9 * 60; // 9:00am
 const DAY_END_MINUTES = 16 * 60 + 45; // 4:45pm -- a slot must fit entirely before this, so 4:30pm is the last offered start time
 const SLOT_DURATION_MINUTES = 15;
 
