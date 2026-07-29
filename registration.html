@@ -265,10 +265,6 @@ body{background:#f4f8fb}
 .rv-empty{color:var(--tl);font-style:italic;font-size:13px}
 .rv-list{font-size:14px;color:var(--td);line-height:1.7}
 
-/* ── REFERENCE NUMBER (shown on the confirmation page after submit) ── */
-.ref-box{display:none;flex-direction:column;align-items:center;gap:4px;background:rgba(29,86,110,.06);border:1.5px solid rgba(29,86,110,.18);border-radius:8px;padding:16px 28px;margin:24px auto 0;max-width:340px}
-.ref-box-lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tl)}
-.ref-box-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--dg);letter-spacing:.03em}
 .done-icon.notice{background:linear-gradient(135deg,var(--gold),var(--gold2))}
 
 footer{background:var(--cream)}
@@ -1038,10 +1034,6 @@ footer{background:var(--cream)}
 <div id="donePg" class="done-wrap">
   <div class="done-icon" id="doneIcon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
   <h2 id="doneHeading">Registration Complete!</h2>
-  <div class="ref-box" id="refNumberBox">
-    <span class="ref-box-lbl">Your Reference Number</span>
-    <span class="ref-box-val" id="refNumberVal"></span>
-  </div>
   <div id="normalDoneMsg">
     <p>Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
     <p>We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
@@ -1599,12 +1591,11 @@ function showSubmitError(msg) {
   if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration ✓'; }
 }
 
-function showDonePage(refNum, alreadyRegistered) {
+function showDonePage(alreadyRegistered) {
   document.getElementById('regFormArea').style.display = 'none';
   document.querySelector('.stepper').style.display = 'none';
   document.getElementById('submitError').style.display = 'none';
 
-  var refBox = document.getElementById('refNumberBox');
   var heading = document.getElementById('doneHeading');
   var icon = document.getElementById('doneIcon');
   var normalMsg = document.getElementById('normalDoneMsg');
@@ -1616,33 +1607,16 @@ function showDonePage(refNum, alreadyRegistered) {
     icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
     normalMsg.style.display = 'none';
     alreadyMsg.style.display = 'block';
-    if (refBox) refBox.style.display = 'none';
   } else {
     heading.textContent = 'Registration Complete!';
     icon.classList.remove('notice');
     icon.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
     normalMsg.style.display = '';
     alreadyMsg.style.display = 'none';
-    if (refBox && refNum) {
-      document.getElementById('refNumberVal').textContent = refNum;
-      refBox.style.display = 'flex';
-    }
   }
 
   document.getElementById('donePg').classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-// Client-generated confirmation number — not a server-issued sequence, just
-// a friendly identifier the patient can reference. Stored in the payload
-// (alongside their email) so the eventual Power Automate flow can quote it
-// back in the confirmation email once that side is built.
-function generateReferenceNumber() {
-  var now = new Date();
-  var mm = pad2(now.getMonth() + 1);
-  var yy = String(now.getFullYear()).slice(-2);
-  var rand = Math.random().toString(36).slice(2, 5).toUpperCase();
-  return 'WCSC-' + rand + mm + yy;
 }
 
 function blobToFile(blob, filename) {
@@ -1791,7 +1765,6 @@ function submitForms() {
   var btn = document.querySelector('.btn-sub');
   if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
 
-  var refNum = generateReferenceNumber();
   var essTotal = 0;
   if (val('treatment_type') !== 'weight_loss') {
     for (var i = 1; i <= EPWORTH_ITEMS; i++) {
@@ -1801,7 +1774,6 @@ function submitForms() {
   }
 
   var payload = {
-    reference_number:        refNum,
     treatment_type:          val('treatment_type'),
     first_name:              val('first_name'),
     last_name:               val('last_name'),
@@ -1920,7 +1892,7 @@ function submitForms() {
       // mergedIntoType === 'referral', which just means a referring office
       // had already sent documents for a genuinely new patient.
       var alreadyRegistered = !!(result && result.merged && result.mergedIntoType === 'registration');
-      showDonePage(refNum, alreadyRegistered);
+      showDonePage(alreadyRegistered);
     })
     .catch(function (err) {
       showSubmitError('Unable to submit. Please call us at 727-472-9112 or try again. (' + err.message + ')');
