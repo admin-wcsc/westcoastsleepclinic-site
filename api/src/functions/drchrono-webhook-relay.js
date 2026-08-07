@@ -3,11 +3,22 @@
 // truncates to 200 characters (confirmed live, 2026-08-06) -- Power
 // Automate's HTTP-trigger invoke URLs run ~296 chars because of the
 // required `sig=` SAS token that authenticates the call, so DrChrono can
-// never be pointed at the flow's URL directly. This short function is the
-// URL DrChrono actually talks to; it does the minimum possible and hands
-// everything else to the "DrChrono Webhook Receiver" Power Automate flow,
-// which owns all real business logic (event handling, re-fetching the
-// appointment, writing the busy-calendar blob).
+// never be pointed at a flow's HTTP-trigger URL directly. This short
+// function is the URL DrChrono actually talks to.
+//
+// Originally this forwarded real deliveries on to a Power Automate flow's
+// HTTP-trigger URL, but Azure Static Web Apps' managed-Functions layer
+// rejected every such POST with a platform-level "401 MISE unauthorized"
+// before this code even ran (GET requests on the same anonymous route were
+// unaffected -- confirmed live, 2026-08-06/07, cause not identified despite
+// isolating headers/payload/method). Rather than fight an undocumented
+// platform block, this now uses the same blob-marker pattern already
+// proven elsewhere in this solution (see the Patient Registration flow's
+// `registration-review-{id}.json` markers): write a small marker blob at
+// the `submissions` container root, and a Power Automate flow with a Blob
+// Storage trigger (polling that root every minute, same as the
+// registration flow) picks it up from there. No outbound call to Power
+// Automate at all, so the MISE block never comes into play.
 //
 // Two jobs only:
 //   GET  ?msg=<value>  -- DrChrono's one-time verification handshake (sent
@@ -15,20 +26,23 @@
 //                          Power Automate's expression language has no HMAC
 //                          function, so this function answers it directly:
 //                          { secret_token: HMAC-SHA256(secret, msg) }.
-//   POST (real delivery) -- forwarded through verbatim (method, headers,
-//                          body) to the flow's trigger URL; the flow does
-//                          its own X-drchrono-signature check against the
-//                          same secret. This function does not verify
-//                          anything on POST -- it's a dumb pipe, not a
-//                          second place for auth logic to drift out of
-//                          sync with the flow's.
+//   POST (real delivery) -- verified against DrChronoAppointmentSyncSecret
+//                          (X-drchrono-signature is a direct match against
+//                          the secret, not an HMAC -- same as the retired
+//                          drchrono-webhook.js), then written verbatim to
+//                          `appointment-event-{deliveryId}.json` at the
+//                          container root for the flow to pick up.
 const { app } = require('@azure/functions');
 const crypto = require('crypto');
-const { fetchWithTimeout, DRCHRONO_TIMEOUT_MS } = require('../shared/drchrono');
+const { getContainerClient } = require('../shared/drchrono');
 
-const FLOW_TRIGGER_URL = 'https://default8c8d9562fb1749a092dabfc1691fab.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/05/workflows/1469ba1a99334de186aec8837411c0d5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=D_ZBprIFdyqTJVgXcknOoIzJdheirlEmp1F1WNzghuI';
-
-const SKIP_FORWARD_HEADERS = new Set(['host', 'content-length', 'connection', 'transfer-encoding']);
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 app.http('drchronoWebhookRelay', {
   methods: ['GET', 'POST'],
@@ -50,33 +64,21 @@ app.http('drchronoWebhookRelay', {
       return { status: 200, jsonBody: { secret_token: secretToken } };
     }
 
-    const bodyText = await request.text();
-    const forwardHeaders = {};
-    for (const [key, value] of request.headers) {
-      if (!SKIP_FORWARD_HEADERS.has(key.toLowerCase())) {
-        forwardHeaders[key] = value;
-      }
+    const signature = request.headers.get('x-drchrono-signature');
+    if (!safeEqual(signature, secret)) {
+      context.warn('drchrono-webhook-relay: signature mismatch, rejecting');
+      return { status: 401, jsonBody: { error: 'Invalid signature' } };
     }
 
-    try {
-      const res = await fetchWithTimeout(FLOW_TRIGGER_URL, {
-        method: 'POST',
-        headers: forwardHeaders,
-        body: bodyText
-      }, DRCHRONO_TIMEOUT_MS);
-      const resBodyText = await res.text();
-      return {
-        status: res.status,
-        headers: { 'Content-Type': res.headers.get('content-type') || 'application/json' },
-        body: resBodyText
-      };
-    } catch (err) {
-      context.error('drchrono-webhook-relay: forward to flow failed:', err.message);
-      // Still 200: matches drchrono-webhook.js's reasoning -- DrChrono treats
-      // non-2xx as delivery failure and retries at +1h/+3h, but a missed
-      // delivery here self-heals via the flow's own recurrence-triggered
-      // resync well before then.
-      return { status: 200, jsonBody: { ok: false } };
-    }
+    const bodyText = await request.text();
+    const deliveryId = request.headers.get('x-drchrono-delivery') || crypto.randomUUID();
+    const containerClient = getContainerClient();
+    await containerClient.getBlockBlobClient(`appointment-event-${deliveryId}.json`).upload(
+      bodyText,
+      Buffer.byteLength(bodyText),
+      { blobHTTPHeaders: { blobContentType: 'application/json' } }
+    );
+
+    return { status: 200, jsonBody: { ok: true } };
   }
 });
