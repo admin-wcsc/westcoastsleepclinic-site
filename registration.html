@@ -254,7 +254,10 @@ body{background:#f4f8fb}
 /* ── REVIEW & SUBMIT ── */
 .rv-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:24px 26px;margin-bottom:20px}
 .rv-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.rv-card-ttl{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--dg)}
+.rv-card-compact .rv-card-hd{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.rv-card-ttl{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--dg);display:flex;align-items:center;gap:10px}
+.rv-check{width:22px;height:22px;border-radius:50%;background:#27ae60;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rv-check svg{width:13px;height:13px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .rv-edit{background:none;border:1.5px solid var(--border);color:var(--tm);font-size:12px;font-weight:600;padding:6px 14px;border-radius:14px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif}
 .rv-edit:hover{border-color:var(--mg);color:var(--dg)}
 .rv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
@@ -1017,28 +1020,24 @@ footer{background:var(--cream)}
       <p class="fstep-sub">Please review your information below before submitting. Click Edit on any section to make changes.</p>
 
       <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Reason for Appointment</div><button class="rv-edit" type="button" onclick="goStep(1)">Edit</button></div>
-        <div id="rvQuestionnaire"></div>
-      </div>
-
-      <div class="rv-card">
         <div class="rv-card-hd"><div class="rv-card-ttl">Patient Demographics</div><button class="rv-edit" type="button" onclick="goStep(2)">Edit</button></div>
         <div id="rvDemographics"></div>
       </div>
 
-      <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Consents &amp; Signatures</div><button class="rv-edit" type="button" onclick="goStep(3)">Edit</button></div>
-        <div id="rvConsents"></div>
+      <div class="rv-card rv-card-compact">
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Reason for Appointment</div><button class="rv-edit" type="button" onclick="goStep(1)">Edit</button></div>
       </div>
 
-      <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Authorization to Release</div><button class="rv-edit" type="button" onclick="goStep(4)">Edit</button></div>
-        <div id="rvRelease"></div>
+      <div class="rv-card rv-card-compact">
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Consents &amp; Signatures</div><button class="rv-edit" type="button" onclick="goStep(3)">Edit</button></div>
       </div>
 
-      <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Scheduled Appointment</div><button class="rv-edit" type="button" onclick="goStep(5)">Edit</button></div>
-        <div id="rvAppointment"></div>
+      <div class="rv-card rv-card-compact">
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Authorization to Release</div><button class="rv-edit" type="button" onclick="goStep(4)">Edit</button></div>
+      </div>
+
+      <div class="rv-card rv-card-compact">
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Scheduled Appointment</div><button class="rv-edit" type="button" onclick="goStep(5)">Edit</button></div>
       </div>
 
       <div class="rv-card">
@@ -1148,17 +1147,15 @@ footer{background:var(--cream)}
 <script>
 var EPWORTH_ITEMS = 8;
 
-// Shared label data for the sleep questionnaire -- single source of truth
-// for both the Review & Submit card (renderReviewCards) and the generated
-// questionnaire PDF (buildQuestionnairePdf), so the two can never drift out
-// of sync with each other.
+// Shared label data for the sleep questionnaire -- kept as named constants
+// rather than inlined into buildQuestionnairePdf() so the generated PDF's
+// question wording lives in one readable place.
 var ESS_LABELS = ['Sitting and reading', 'Watching TV', 'Sitting inactive in a public place', 'As a passenger in a car for an hour', 'Lying down in the afternoon when possible', 'Sitting and talking to someone', 'Sitting quietly after lunch (no alcohol)', 'In a car stopped for a few minutes in traffic'];
 var SYMPTOM_FIELDS = [['sym_sleep_onset', 'Difficulty falling asleep'], ['sym_wake_night', 'Waking up frequently during the night'], ['sym_early_wake', 'Waking up too early and unable to return to sleep'], ['sym_snore', 'Snoring'], ['sym_witnessed', 'Witnessed pauses in breathing or gasping'], ['sym_not_refreshed', 'Not feeling refreshed after sleep'], ['sym_daytime', 'Excessive daytime sleepiness'], ['sym_rls', 'Restless legs or uncomfortable leg sensations'], ['sym_grind', 'Teeth grinding or jaw clenching'], ['sym_walk', 'Sleepwalking or talking in sleep']];
 var CONDITION_FIELDS = [['hx_htn', 'High Blood Pressure'], ['hx_dm', 'Diabetes'], ['hx_heart', 'Heart Disease'], ['hx_afib', 'Atrial Fibrillation'], ['hx_stroke', 'Stroke or TIA'], ['hx_asthma', 'Asthma'], ['hx_copd', 'COPD / Emphysema'], ['hx_anxiety', 'Anxiety / Panic Disorder'], ['hx_depression', 'Depression'], ['hx_thyroid', 'Thyroid Disorder'], ['hx_obesity', 'Obesity'], ['hx_reflux', 'GERD / Acid Reflux'], ['hx_cancer', 'Cancer'], ['hx_kidney', 'Kidney Disease'], ['hx_liver', 'Liver Disease']];
 
-// Same single-source-of-truth reasoning for the Authorization to Release
-// step: renderReviewCards() and buildReleasePdf() both read these instead
-// of keeping their own copies of the checkbox wording.
+// Same reasoning for the Authorization to Release step: buildReleasePdf()
+// reads these instead of keeping an inline copy of the checkbox wording.
 var RELEASE_RECORD_FIELDS = [['release_rec_complete', 'Complete Medical Record'], ['release_rec_office_visit', 'Office Visit Notes'], ['release_rec_sleep_study', 'Sleep Study Reports'], ['release_rec_consultation', 'Consultation Notes'], ['release_rec_medication_list', 'Medication List'], ['release_rec_labs', 'Labs'], ['release_rec_imaging', 'Imaging']];
 var RELEASE_PURPOSE_FIELDS = [['release_purpose_continuity', 'Continuity of Care'], ['release_purpose_treatment', 'Treatment'], ['release_purpose_patient_request', 'Patient Request']];
 
@@ -1847,10 +1844,9 @@ function writePdfSignatureBlock(pdf, sigName, dateName, extraLabel, extraValue) 
 // Builds one PDF of the full sleep questionnaire -- every question the
 // patient was asked, paired with what they actually answered -- so
 // DrChrono gets the same document a paper intake packet would have
-// produced. Question wording comes from the same ESS_LABELS/SYMPTOM_FIELDS/
-// CONDITION_FIELDS arrays renderReviewCards() uses, not a second copy.
-// Returns null for Weight Loss (qVal/qCheck/qRadio already blank that path
-// out; there's nothing to render), same gating renderReviewCards() applies.
+// produced. Question wording comes from the shared ESS_LABELS/SYMPTOM_FIELDS/
+// CONDITION_FIELDS arrays. Returns null for Weight Loss (qVal/qCheck/qRadio
+// already blank that path out; there's nothing to render).
 function buildQuestionnairePdf() {
   if (val('treatment_type') === 'weight_loss') return null;
 
@@ -1917,8 +1913,8 @@ function buildQuestionnairePdfFile() {
 // like the other four, so it's built section-by-section through the same
 // writePdf* helpers buildQuestionnairePdf() uses instead of
 // buildConsentPdf's disclosure-block template. Field wording (records/
-// purpose checkboxes) comes from the same RELEASE_RECORD_FIELDS/
-// RELEASE_PURPOSE_FIELDS arrays renderReviewCards() uses.
+// purpose checkboxes) comes from the shared RELEASE_RECORD_FIELDS/
+// RELEASE_PURPOSE_FIELDS arrays.
 function buildReleasePdf() {
   var pdf = startPdfDoc('Authorization to Release and Request Medical Records');
   writePdfQaRow(pdf, 'Phone', val('cell_phone'));
@@ -2443,46 +2439,10 @@ function dpkDisplayVal(name) {
   return input ? input.value : '';
 }
 
+// Only Patient Demographics still gets a field-by-field review card --
+// every other step now shows as a compact "already completed" card
+// (see #fstep6) instead of repeating everything the patient just entered.
 function renderReviewCards() {
-  if (val('treatment_type') === 'weight_loss') {
-    document.getElementById('rvQuestionnaire').innerHTML =
-      '<p>Weight Loss program selected \u2014 no questionnaire required.</p>';
-  } else {
-  var essTotal = 0, essAny = false, essHtml = '';
-  for (var i = 1; i <= EPWORTH_ITEMS; i++) {
-    var raw = getRadioValue('ess' + i);
-    var n = parseInt(raw, 10);
-    if (!isNaN(n)) { essTotal += n; essAny = true; }
-    essHtml += rvRow(ESS_LABELS[i - 1], raw);
-  }
-  var symChecked = SYMPTOM_FIELDS.filter(function (s) { return getCheckbox(s[0]); }).map(function (s) { return s[1]; });
-  var hxChecked = CONDITION_FIELDS.filter(function (c) { return getCheckbox(c[0]); }).map(function (c) { return c[1]; });
-
-  document.getElementById('rvQuestionnaire').innerHTML =
-    '<div class="rv-grid">' +
-      rvRow('Chief Complaint', val('chief_complaint')) +
-      rvRow('Hours of Sleep', val('sleep_hrs')) +
-      rvRow('Duration of Concern', val('concern_duration')) +
-      rvRow('Bedtime', val('bedtime')) +
-      rvRow('Wake Time', val('waketime')) +
-      rvRow('Previous Sleep Study', getRadioValue('prev_study')) +
-      rvRow('Current CPAP/BiPAP Use', getRadioValue('cpap_use')) +
-    '</div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Sleep Symptoms</div>' +
-    '<div class="rv-list">' + (symChecked.length ? symChecked.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + '</div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Epworth Sleepiness Scale</div>' +
-    '<div class="rv-list">' + essHtml + '<strong>Total Score: ' + (essAny ? essTotal : '\u2014') + '</strong></div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Medical History</div>' +
-    '<div class="rv-list">' + (hxChecked.length ? hxChecked.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + (val('hx_other') ? '<br>Other: ' + escHtml(val('hx_other')) : '') + '</div>' +
-    '<div class="rv-grid" style="margin-top:14px">' +
-      rvRow('Medications', val('medications')) +
-      rvRow('Allergies', val('allergies')) +
-      rvRow('Height', val('height')) +
-      rvRow('Weight', val('weight')) +
-      rvRow('Additional Comments', val('comments')) +
-    '</div>';
-  }
-
   document.getElementById('rvDemographics').innerHTML =
     '<div class="rv-grid">' +
       rvRow('Name', [val('first_name'), val('mi'), val('last_name')].filter(Boolean).join(' ')) +
@@ -2516,59 +2476,6 @@ function renderReviewCards() {
       rvRow('Pharmacy Address', val('pharm_addr')) +
       rvRow('Pharmacy Phone', val('pharm_phone')) +
     '</div>';
-
-  document.getElementById('rvConsents').innerHTML =
-    '<div class="rv-list">' +
-      'Consent to Treat: ' + (getCheckbox('consent_treat') ? 'Signed on ' + escHtml(dpkDisplayVal('date2')) : 'Not signed') + '<br>' +
-      'Financial Agreement: ' + (getCheckbox('consent_financial') ? 'Signed on ' + escHtml(dpkDisplayVal('date3')) : 'Not signed') + '<br>' +
-      'HIPAA Acknowledgment: ' + (getCheckbox('consent_hipaa') ? 'Signed on ' + escHtml(dpkDisplayVal('date4')) : 'Not signed') + (val('hipaa_rep') ? ' &mdash; Representative: ' + escHtml(val('hipaa_rep')) : '') + '<br>' +
-      'Text Message Consent: ' + (getCheckbox('consent_text') ? 'Yes (' + escHtml(val('text_phone')) + ')' : 'Declined') + '<br>' +
-      'Telehealth Consent: ' + (getCheckbox('consent_telehealth') ? 'Signed on ' + escHtml(dpkDisplayVal('date5')) : 'Declined') +
-    '</div>';
-
-  var releaseRecords = RELEASE_RECORD_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
-  if (getCheckbox('release_rec_other') && val('release_rec_other_text')) releaseRecords.push('Other: ' + val('release_rec_other_text'));
-  var releasePurposes = RELEASE_PURPOSE_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
-  if (getCheckbox('release_purpose_other') && val('release_purpose_other_text')) releasePurposes.push('Other: ' + val('release_purpose_other_text'));
-  var releaseDateRange = getCheckbox('release_daterange_all')
-    ? 'All Records'
-    : [dpkDisplayVal('release_daterange_from'), dpkDisplayVal('release_daterange_to')].filter(Boolean).join(' – ');
-
-  document.getElementById('rvRelease').innerHTML =
-    '<div class="rv-grid">' +
-      rvRow('Provider Facility', val('release_from_facility')) +
-      rvRow('Provider Address', val('release_from_address')) +
-      rvRow('Provider Phone', val('release_from_phone')) +
-      rvRow('Provider Fax', val('release_from_fax')) +
-    '</div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Records Requested</div>' +
-    '<div class="rv-list">' + (releaseRecords.length ? releaseRecords.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + '</div>' +
-    '<div class="rv-row-lbl" style="margin-top:14px">Purpose</div>' +
-    '<div class="rv-list">' + (releasePurposes.length ? releasePurposes.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + '</div>' +
-    '<div class="rv-grid" style="margin-top:14px">' +
-      rvRow('Date Range', releaseDateRange) +
-      rvRow('Relationship', val('release_relationship')) +
-      rvRow('Authorization Signature', val('sig6') ? ('Signed on ' + dpkDisplayVal('date6')) : '') +
-    '</div>';
-
-  document.getElementById('rvAppointment').innerHTML = val('appointment_date')
-    ? '<div class="rv-grid">' + rvRow('Appointment', formatReviewAppointment(val('appointment_date'), val('appointment_time'))) + '</div>'
-    : '<p class="rv-empty">Our office will contact you to schedule.</p>';
-}
-
-// Small local formatter for the review card only -- appointment_date/time
-// are plain ISO values (not a .dpk widget like every other date on this
-// page), so dpkDisplayVal() doesn't apply here.
-function formatReviewAppointment(dateIso, timeHhmm) {
-  if (!dateIso) return '';
-  var d = new Date(dateIso + 'T00:00:00');
-  var dateStr = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  if (!timeHhmm) return dateStr;
-  var parts = timeHhmm.split(':');
-  var h = parseInt(parts[0], 10);
-  var ampm = h >= 12 ? 'PM' : 'AM';
-  var h12 = h % 12 || 12;
-  return dateStr + ' at ' + h12 + ':' + parts[1] + ' ' + ampm;
 }
 
 // ---------------- STEP 5: DOCUMENT UPLOAD ----------------
