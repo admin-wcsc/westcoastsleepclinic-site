@@ -1097,6 +1097,14 @@ footer{background:var(--cream)}
 <script>
 var EPWORTH_ITEMS = 8;
 
+// Shared label data for the sleep questionnaire -- single source of truth
+// for both the Review & Submit card (renderReviewCards) and the generated
+// questionnaire PDF (buildQuestionnairePdf), so the two can never drift out
+// of sync with each other.
+var ESS_LABELS = ['Sitting and reading', 'Watching TV', 'Sitting inactive in a public place', 'As a passenger in a car for an hour', 'Lying down in the afternoon when possible', 'Sitting and talking to someone', 'Sitting quietly after lunch (no alcohol)', 'In a car stopped for a few minutes in traffic'];
+var SYMPTOM_FIELDS = [['sym_sleep_onset', 'Difficulty falling asleep'], ['sym_wake_night', 'Waking up frequently during the night'], ['sym_early_wake', 'Waking up too early and unable to return to sleep'], ['sym_snore', 'Snoring'], ['sym_witnessed', 'Witnessed pauses in breathing or gasping'], ['sym_not_refreshed', 'Not feeling refreshed after sleep'], ['sym_daytime', 'Excessive daytime sleepiness'], ['sym_rls', 'Restless legs or uncomfortable leg sensations'], ['sym_grind', 'Teeth grinding or jaw clenching'], ['sym_walk', 'Sleepwalking or talking in sleep']];
+var CONDITION_FIELDS = [['hx_htn', 'High Blood Pressure'], ['hx_dm', 'Diabetes'], ['hx_heart', 'Heart Disease'], ['hx_afib', 'Atrial Fibrillation'], ['hx_stroke', 'Stroke or TIA'], ['hx_asthma', 'Asthma'], ['hx_copd', 'COPD / Emphysema'], ['hx_anxiety', 'Anxiety / Panic Disorder'], ['hx_depression', 'Depression'], ['hx_thyroid', 'Thyroid Disorder'], ['hx_obesity', 'Obesity'], ['hx_reflux', 'GERD / Acid Reflux'], ['hx_cancer', 'Cancer'], ['hx_kidney', 'Kidney Disease'], ['hx_liver', 'Liver Disease']];
+
 var curStep = 1;
 var maxStep = 1;
 var totalSteps = 6;
@@ -1660,59 +1668,166 @@ function extractDisclosureBlocks(container) {
   return blocks;
 }
 
-function buildConsentPdf(opts) {
+// Shared PDF page setup: creates the document and writes the title +
+// patient info header every generated PDF opens with (consent forms and
+// the questionnaire alike). Returns a small mutable context object rather
+// than a fixed tuple -- doc/margin/maxWidth/pageWidth/pageHeight/y -- so
+// callers can thread it through helper functions by reference and have
+// `y` (and page breaks) stay correct across calls.
+function startPdfDoc(title) {
   var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
-  var pageWidth = doc.internal.pageSize.getWidth();
-  var pageHeight = doc.internal.pageSize.getHeight();
-  var margin = 54;
-  var maxWidth = pageWidth - margin * 2;
-  var y = margin;
+  var pdf = {
+    doc: doc,
+    pageWidth: doc.internal.pageSize.getWidth(),
+    pageHeight: doc.internal.pageSize.getHeight(),
+    margin: 54,
+    y: 54
+  };
+  pdf.maxWidth = pdf.pageWidth - pdf.margin * 2;
 
   doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
-  doc.text(opts.title, margin, y); y += 26;
+  doc.text(title, pdf.margin, pdf.y); pdf.y += 26;
 
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
   var patientName = [val('first_name'), val('mi'), val('last_name')].filter(Boolean).join(' ');
-  doc.text('Patient: ' + patientName + '    DOB: ' + dpkDisplayVal('dob'), margin, y);
-  y += 22;
+  doc.text('Patient: ' + patientName + '    DOB: ' + dpkDisplayVal('dob'), pdf.margin, pdf.y);
+  pdf.y += 22;
+
+  return pdf;
+}
+
+function buildConsentPdf(opts) {
+  var pdf = startPdfDoc(opts.title);
+  var doc = pdf.doc;
 
   opts.disclosureEls.forEach(function (el) {
     if (!el) return;
     extractDisclosureBlocks(el).forEach(function (block) {
       doc.setFont('helvetica', block.bold ? 'bold' : 'normal');
       doc.setFontSize(block.bold ? 12 : 10.5);
-      var lines = doc.splitTextToSize(block.text, maxWidth);
+      var lines = doc.splitTextToSize(block.text, pdf.maxWidth);
       lines.forEach(function (line) {
-        if (y > pageHeight - margin) { doc.addPage(); y = margin; }
-        doc.text(line, margin, y);
-        y += block.bold ? 15 : 14;
+        if (pdf.y > pdf.pageHeight - pdf.margin) { doc.addPage(); pdf.y = pdf.margin; }
+        doc.text(line, pdf.margin, pdf.y);
+        pdf.y += block.bold ? 15 : 14;
       });
-      y += block.bold ? 4 : 8;
+      pdf.y += block.bold ? 4 : 8;
     });
-    y += 8;
+    pdf.y += 8;
   });
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
 
   (opts.extraLines || []).forEach(function (line) {
-    if (y > pageHeight - margin) { doc.addPage(); y = margin; }
-    doc.text(line, margin, y); y += 14;
+    if (pdf.y > pdf.pageHeight - pdf.margin) { doc.addPage(); pdf.y = pdf.margin; }
+    doc.text(line, pdf.margin, pdf.y); pdf.y += 14;
   });
 
   var sigBlockHeight = 120;
-  if (y > pageHeight - margin - sigBlockHeight) { doc.addPage(); y = margin; }
-  y += 26;
+  if (pdf.y > pdf.pageHeight - pdf.margin - sigBlockHeight) { doc.addPage(); pdf.y = pdf.margin; }
+  pdf.y += 26;
   doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-  doc.text('Signature', margin, y); y += 8;
+  doc.text('Signature', pdf.margin, pdf.y); pdf.y += 8;
 
   var pad = SignaturePads[opts.sigName];
   if (pad && pad.isSigned()) {
-    doc.addImage(pad.toDataURL(), 'PNG', margin, y, 200, 65);
+    doc.addImage(pad.toDataURL(), 'PNG', pdf.margin, pdf.y, 200, 65);
   }
-  y += 75;
+  pdf.y += 75;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text('Date Signed: ' + (dpkDisplayVal(opts.dateName) || '—'), margin, y);
+  doc.text('Date Signed: ' + (dpkDisplayVal(opts.dateName) || '—'), pdf.margin, pdf.y);
 
   return doc.output('blob');
+}
+
+// Writes one wrapped line of text at the current y, advancing it and
+// adding a page when it runs off the bottom -- same page-break handling
+// buildConsentPdf's disclosure-block loop uses, factored out so the
+// questionnaire's line-by-line Q&A rows don't have to repeat it.
+function writePdfLine(pdf, text, bold) {
+  pdf.doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  pdf.doc.setFontSize(bold ? 12 : 10.5);
+  pdf.doc.splitTextToSize(text, pdf.maxWidth).forEach(function (line) {
+    if (pdf.y > pdf.pageHeight - pdf.margin) { pdf.doc.addPage(); pdf.y = pdf.margin; }
+    pdf.doc.text(line, pdf.margin, pdf.y);
+    pdf.y += bold ? 15 : 14;
+  });
+}
+
+function writePdfSectionHeading(pdf, heading) {
+  pdf.y += 10;
+  writePdfLine(pdf, heading, true);
+  pdf.y += 2;
+}
+
+function writePdfQaRow(pdf, label, value) {
+  writePdfLine(pdf, label + ': ' + (value || '—'), false);
+}
+
+// Builds one PDF of the full sleep questionnaire -- every question the
+// patient was asked, paired with what they actually answered -- so
+// DrChrono gets the same document a paper intake packet would have
+// produced. Question wording comes from the same ESS_LABELS/SYMPTOM_FIELDS/
+// CONDITION_FIELDS arrays renderReviewCards() uses, not a second copy.
+// Returns null for Weight Loss (qVal/qCheck/qRadio already blank that path
+// out; there's nothing to render), same gating renderReviewCards() applies.
+function buildQuestionnairePdf() {
+  if (val('treatment_type') === 'weight_loss') return null;
+
+  var pdf = startPdfDoc('Sleep Questionnaire');
+
+  writePdfQaRow(pdf, 'Chief Complaint', val('chief_complaint'));
+  writePdfQaRow(pdf, 'Hours of Sleep', val('sleep_hrs'));
+  writePdfQaRow(pdf, 'Duration of Concern', val('concern_duration'));
+  writePdfQaRow(pdf, 'Bedtime', val('bedtime'));
+  writePdfQaRow(pdf, 'Wake Time', val('waketime'));
+  writePdfQaRow(pdf, 'Previous Sleep Study', getRadioValue('prev_study'));
+  writePdfQaRow(pdf, 'Current CPAP/BiPAP Use', getRadioValue('cpap_use'));
+
+  writePdfSectionHeading(pdf, 'Sleep Symptoms');
+  var symChecked = SYMPTOM_FIELDS.filter(function (s) { return getCheckbox(s[0]); }).map(function (s) { return s[1]; });
+  if (symChecked.length) {
+    symChecked.forEach(function (label) { writePdfLine(pdf, '• ' + label, false); });
+  } else {
+    writePdfLine(pdf, 'None selected', false);
+  }
+
+  writePdfSectionHeading(pdf, 'Epworth Sleepiness Scale');
+  var essTotal = 0, essAny = false;
+  for (var i = 1; i <= EPWORTH_ITEMS; i++) {
+    var raw = getRadioValue('ess' + i);
+    var n = parseInt(raw, 10);
+    if (!isNaN(n)) { essTotal += n; essAny = true; }
+    writePdfQaRow(pdf, ESS_LABELS[i - 1], raw);
+  }
+  writePdfLine(pdf, 'Total Score: ' + (essAny ? essTotal : '—'), true);
+
+  writePdfSectionHeading(pdf, 'Medical History');
+  var hxChecked = CONDITION_FIELDS.filter(function (c) { return getCheckbox(c[0]); }).map(function (c) { return c[1]; });
+  if (hxChecked.length) {
+    hxChecked.forEach(function (label) { writePdfLine(pdf, '• ' + label, false); });
+  } else {
+    writePdfLine(pdf, 'None selected', false);
+  }
+  if (val('hx_other')) writePdfQaRow(pdf, 'Other', val('hx_other'));
+
+  writePdfSectionHeading(pdf, 'Additional Information');
+  writePdfQaRow(pdf, 'Medications', val('medications'));
+  writePdfQaRow(pdf, 'Allergies', val('allergies'));
+  writePdfQaRow(pdf, 'Height', val('height'));
+  writePdfQaRow(pdf, 'Weight', val('weight'));
+  writePdfQaRow(pdf, 'Additional Comments', val('comments'));
+
+  return pdf.doc.output('blob');
+}
+
+// Skipped entirely if the jsPDF CDN failed to load or the questionnaire
+// doesn't apply (Weight Loss) -- same reliability posture as
+// buildAllConsentPdfFiles(): a flaky third-party CDN must never block
+// registration.
+function buildQuestionnairePdfFile() {
+  if (!window.jspdf) return [];
+  var blob = buildQuestionnairePdf();
+  return blob ? [blobToFile(blob, 'sleep-questionnaire.pdf')] : [];
 }
 
 // Builds a PDF for each consent the patient actually signed — skipped
@@ -1885,7 +2000,7 @@ function submitForms() {
     submitted_at:            new Date().toISOString()
   };
 
-  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()))
+  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()).concat(buildQuestionnairePdfFile()))
     .then(function (result) {
       // mergedIntoType === 'registration' means this name + DOB already had
       // a registration on file before this submission — as opposed to
@@ -2174,18 +2289,15 @@ function renderReviewCards() {
     document.getElementById('rvQuestionnaire').innerHTML =
       '<p>Weight Loss program selected \u2014 no questionnaire required.</p>';
   } else {
-  var essLabels = ['Sitting and reading', 'Watching TV', 'Sitting inactive in a public place', 'As a passenger in a car for an hour', 'Lying down in the afternoon when possible', 'Sitting and talking to someone', 'Sitting quietly after lunch (no alcohol)', 'In a car stopped for a few minutes in traffic'];
   var essTotal = 0, essAny = false, essHtml = '';
   for (var i = 1; i <= EPWORTH_ITEMS; i++) {
     var raw = getRadioValue('ess' + i);
     var n = parseInt(raw, 10);
     if (!isNaN(n)) { essTotal += n; essAny = true; }
-    essHtml += rvRow(essLabels[i - 1], raw);
+    essHtml += rvRow(ESS_LABELS[i - 1], raw);
   }
-  var symptoms = [['sym_sleep_onset', 'Difficulty falling asleep'], ['sym_wake_night', 'Waking up frequently during the night'], ['sym_early_wake', 'Waking up too early and unable to return to sleep'], ['sym_snore', 'Snoring'], ['sym_witnessed', 'Witnessed pauses in breathing or gasping'], ['sym_not_refreshed', 'Not feeling refreshed after sleep'], ['sym_daytime', 'Excessive daytime sleepiness'], ['sym_rls', 'Restless legs or uncomfortable leg sensations'], ['sym_grind', 'Teeth grinding or jaw clenching'], ['sym_walk', 'Sleepwalking or talking in sleep']];
-  var symChecked = symptoms.filter(function (s) { return getCheckbox(s[0]); }).map(function (s) { return s[1]; });
-  var conditions = [['hx_htn', 'High Blood Pressure'], ['hx_dm', 'Diabetes'], ['hx_heart', 'Heart Disease'], ['hx_afib', 'Atrial Fibrillation'], ['hx_stroke', 'Stroke or TIA'], ['hx_asthma', 'Asthma'], ['hx_copd', 'COPD / Emphysema'], ['hx_anxiety', 'Anxiety / Panic Disorder'], ['hx_depression', 'Depression'], ['hx_thyroid', 'Thyroid Disorder'], ['hx_obesity', 'Obesity'], ['hx_reflux', 'GERD / Acid Reflux'], ['hx_cancer', 'Cancer'], ['hx_kidney', 'Kidney Disease'], ['hx_liver', 'Liver Disease']];
-  var hxChecked = conditions.filter(function (c) { return getCheckbox(c[0]); }).map(function (c) { return c[1]; });
+  var symChecked = SYMPTOM_FIELDS.filter(function (s) { return getCheckbox(s[0]); }).map(function (s) { return s[1]; });
+  var hxChecked = CONDITION_FIELDS.filter(function (c) { return getCheckbox(c[0]); }).map(function (c) { return c[1]; });
 
   document.getElementById('rvQuestionnaire').innerHTML =
     '<div class="rv-grid">' +
