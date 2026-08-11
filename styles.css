@@ -18,9 +18,9 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:400;line-hei
 
 /* ── NAV ── */
 .site-header{position:sticky;top:0;z-index:100;background:#fff;box-shadow:0 2px 12px rgba(29,86,110,.08)}
-.nav-wrap{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:center;height:var(--nav-height);gap:12px}
+.nav-wrap{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:flex-start;height:var(--nav-height);gap:12px}
 .main-nav{display:flex;align-items:center;gap:4px;list-style:none}
-.main-nav a{display:block;padding:8px 12px;font-size:13px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap;cursor:pointer}
+.main-nav a{display:block;padding:8px 12px;font-size:16px;font-weight:500;letter-spacing:.03em;color:#2C7DA0;text-decoration:none;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap;cursor:pointer}
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
