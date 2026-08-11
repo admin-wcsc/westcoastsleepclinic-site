@@ -909,21 +909,72 @@ footer{background:var(--cream)}
 
     <!-- STEP 4: Authorization to Release -->
     <div class="fstep" id="fstep4">
-      <h2 class="fstep-ttl">Authorization to Release Medical Information</h2>
-      <p class="fstep-sub">Complete this form to authorize release of your medical records.</p>
-      <div class="ibox">This authorization allows West Coast Sleep Clinic to release your medical records. You may leave optional fields blank if not applicable. You have the right to revoke this authorization at any time by notifying us in writing.</div>
+      <h2 class="fstep-ttl">Authorization to Release and Request Medical Records</h2>
+      <p class="fstep-sub">Complete this form to authorize an outside provider to release your prior medical records to West Coast Sleep Clinic.</p>
+
       <div class="fsec">
-        <div class="fsec-ttl">Expiration</div>
+        <div class="fsec-ttl">Healthcare Provider Releasing Records</div>
         <div class="fg fg2">
-          <div class="fld"><label>Authorization Expiration Date</label><div class="dpk" data-dpk="rel_exp"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="rel_exp"><div class="dpk-pop" data-dpk-pop="rel_exp"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
-          <div class="fld" style="align-self:center;padding-top:22px"><label class="clbl" style="font-size:14px"><input type="checkbox" name="rel_no_exp"> <span>No Expiration (one-year default)</span></label></div>
+          <div class="fld"><label>Facility/Provider</label><input type="text" name="release_from_facility"></div>
+          <div class="fld"><label>Address</label><input type="text" name="release_from_address"></div>
+        </div>
+        <div class="fg fg2 mt-16">
+          <div class="fld"><label>Phone</label><input type="text" name="release_from_phone"></div>
+          <div class="fld"><label>Fax</label><input type="text" name="release_from_fax"></div>
         </div>
       </div>
-      <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_release" required> <span>I authorize the release of the medical information described above. I understand I may revoke this authorization at any time in writing. I understand that a photocopy or electronic copy of this authorization is as valid as the original.</span></label>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Records Requested</div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="release_rec_complete"> <span>Complete Medical Record</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_office_visit"> <span>Office Visit Notes</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_sleep_study"> <span>Sleep Study Reports</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_consultation"> <span>Consultation Notes</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_medication_list"> <span>Medication List</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_labs"> <span>Labs</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_imaging"> <span>Imaging</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_other" onchange="toggleReleaseOther('releaseRecOtherWrap', this.checked)"> <span>Other</span></label>
+        </div>
+        <div class="fld mt-16" id="releaseRecOtherWrap" style="display:none"><label>Please specify</label><input type="text" name="release_rec_other_text"></div>
       </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Purpose</div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="release_purpose_continuity"> <span>Continuity of Care</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_treatment"> <span>Treatment</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_patient_request"> <span>Patient Request</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_other" onchange="toggleReleaseOther('releasePurposeOtherWrap', this.checked)"> <span>Other</span></label>
+        </div>
+        <div class="fld mt-16" id="releasePurposeOtherWrap" style="display:none"><label>Please specify</label><input type="text" name="release_purpose_other_text"></div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-ttl">Date Range</div>
+        <div class="chk-col">
+          <label class="clbl"><input type="checkbox" name="release_daterange_all" onchange="toggleReleaseDateRange(this.checked)"> <span>All Records</span></label>
+        </div>
+        <div class="fg fg2 mt-16" id="releaseDateRangeWrap">
+          <div class="fld"><label>From</label><div class="dpk" data-dpk="release_daterange_from"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_from"><div class="dpk-pop" data-dpk-pop="release_daterange_from"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+          <div class="fld"><label>To</label><div class="dpk" data-dpk="release_daterange_to"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_to"><div class="dpk-pop" data-dpk-pop="release_daterange_to"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+        </div>
+      </div>
+
+      <div class="policy-box">
+        <h4>Authorization</h4>
+        <p>I authorize the healthcare provider listed above to release my protected health information to West Coast Sleep Clinic. I understand this authorization may be revoked in writing at any time except where action has already been taken. This authorization expires one year from the date signed unless otherwise specified.</p>
+      </div>
+      <div class="chk-col">
+        <label class="clbl"><input type="checkbox" name="consent_release" required> <span>I authorize the release of the medical information described above.</span><span class="req">*</span></label>
+      </div>
+
+      <div class="fg fg2 mt-16">
+        <div class="fld"><label>Relationship (if applicable)</label><input type="text" name="release_relationship"></div>
+      </div>
+
       <div class="sig-row">
-        <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label>
+        <div class="fld"><label>Patient/Legal Representative Signature <span class="req">*</span></label>
           <div class="sigpad" data-sigpad="sig6">
             <canvas class="sigpad-canvas"></canvas>
             <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
@@ -1104,6 +1155,12 @@ var EPWORTH_ITEMS = 8;
 var ESS_LABELS = ['Sitting and reading', 'Watching TV', 'Sitting inactive in a public place', 'As a passenger in a car for an hour', 'Lying down in the afternoon when possible', 'Sitting and talking to someone', 'Sitting quietly after lunch (no alcohol)', 'In a car stopped for a few minutes in traffic'];
 var SYMPTOM_FIELDS = [['sym_sleep_onset', 'Difficulty falling asleep'], ['sym_wake_night', 'Waking up frequently during the night'], ['sym_early_wake', 'Waking up too early and unable to return to sleep'], ['sym_snore', 'Snoring'], ['sym_witnessed', 'Witnessed pauses in breathing or gasping'], ['sym_not_refreshed', 'Not feeling refreshed after sleep'], ['sym_daytime', 'Excessive daytime sleepiness'], ['sym_rls', 'Restless legs or uncomfortable leg sensations'], ['sym_grind', 'Teeth grinding or jaw clenching'], ['sym_walk', 'Sleepwalking or talking in sleep']];
 var CONDITION_FIELDS = [['hx_htn', 'High Blood Pressure'], ['hx_dm', 'Diabetes'], ['hx_heart', 'Heart Disease'], ['hx_afib', 'Atrial Fibrillation'], ['hx_stroke', 'Stroke or TIA'], ['hx_asthma', 'Asthma'], ['hx_copd', 'COPD / Emphysema'], ['hx_anxiety', 'Anxiety / Panic Disorder'], ['hx_depression', 'Depression'], ['hx_thyroid', 'Thyroid Disorder'], ['hx_obesity', 'Obesity'], ['hx_reflux', 'GERD / Acid Reflux'], ['hx_cancer', 'Cancer'], ['hx_kidney', 'Kidney Disease'], ['hx_liver', 'Liver Disease']];
+
+// Same single-source-of-truth reasoning for the Authorization to Release
+// step: renderReviewCards() and buildReleasePdf() both read these instead
+// of keeping their own copies of the checkbox wording.
+var RELEASE_RECORD_FIELDS = [['release_rec_complete', 'Complete Medical Record'], ['release_rec_office_visit', 'Office Visit Notes'], ['release_rec_sleep_study', 'Sleep Study Reports'], ['release_rec_consultation', 'Consultation Notes'], ['release_rec_medication_list', 'Medication List'], ['release_rec_labs', 'Labs'], ['release_rec_imaging', 'Imaging']];
+var RELEASE_PURPOSE_FIELDS = [['release_purpose_continuity', 'Continuity of Care'], ['release_purpose_treatment', 'Treatment'], ['release_purpose_patient_request', 'Patient Request']];
 
 var curStep = 1;
 var maxStep = 1;
@@ -1362,6 +1419,20 @@ function toggleInsOther(val) {
   var show = (val === 'Other');
   if (wrap) wrap.style.display = show ? '' : 'none';
   if (other) other.required = show;
+}
+
+// Reveals the free-text "Please specify" field only when its own "Other"
+// checkbox is checked -- same show/hide pattern toggleInsOther() uses.
+function toggleReleaseOther(wrapId, checked) {
+  var wrap = document.getElementById(wrapId);
+  if (wrap) wrap.style.display = checked ? '' : 'none';
+}
+
+// Hides the From/To date range once "All Records" is checked -- a specific
+// range is meaningless once "everything" is requested.
+function toggleReleaseDateRange(allChecked) {
+  var wrap = document.getElementById('releaseDateRangeWrap');
+  if (wrap) wrap.style.display = allChecked ? 'none' : '';
 }
 
 // Self-pay patients have no insurance card and no policy holder to record —
@@ -1722,20 +1793,7 @@ function buildConsentPdf(opts) {
     doc.text(line, pdf.margin, pdf.y); pdf.y += 14;
   });
 
-  var sigBlockHeight = 120;
-  if (pdf.y > pdf.pageHeight - pdf.margin - sigBlockHeight) { doc.addPage(); pdf.y = pdf.margin; }
-  pdf.y += 26;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-  doc.text('Signature', pdf.margin, pdf.y); pdf.y += 8;
-
-  var pad = SignaturePads[opts.sigName];
-  if (pad && pad.isSigned()) {
-    doc.addImage(pad.toDataURL(), 'PNG', pdf.margin, pdf.y, 200, 65);
-  }
-  pdf.y += 75;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text('Date Signed: ' + (dpkDisplayVal(opts.dateName) || '—'), pdf.margin, pdf.y);
-
+  writePdfSignatureBlock(pdf, opts.sigName, opts.dateName);
   return doc.output('blob');
 }
 
@@ -1761,6 +1819,29 @@ function writePdfSectionHeading(pdf, heading) {
 
 function writePdfQaRow(pdf, label, value) {
   writePdfLine(pdf, label + ': ' + (value || '—'), false);
+}
+
+// Shared signature block -- heading, signature image (if signed), and date
+// signed -- used by every generated PDF that ends in a signature.
+// `extraLabel`/`extraValue`, when given, print one more Q&A row above the
+// signature (the release form's "Relationship" field).
+function writePdfSignatureBlock(pdf, sigName, dateName, extraLabel, extraValue) {
+  var doc = pdf.doc;
+  if (extraLabel) writePdfQaRow(pdf, extraLabel, extraValue);
+
+  var sigBlockHeight = 120;
+  if (pdf.y > pdf.pageHeight - pdf.margin - sigBlockHeight) { doc.addPage(); pdf.y = pdf.margin; }
+  pdf.y += 26;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+  doc.text('Signature', pdf.margin, pdf.y); pdf.y += 8;
+
+  var pad = SignaturePads[sigName];
+  if (pad && pad.isSigned()) {
+    doc.addImage(pad.toDataURL(), 'PNG', pdf.margin, pdf.y, 200, 65);
+  }
+  pdf.y += 75;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text('Date Signed: ' + (dpkDisplayVal(dateName) || '—'), pdf.margin, pdf.y);
 }
 
 // Builds one PDF of the full sleep questionnaire -- every question the
@@ -1830,6 +1911,60 @@ function buildQuestionnairePdfFile() {
   return blob ? [blobToFile(blob, 'sleep-questionnaire.pdf')] : [];
 }
 
+// Builds the "Authorization to Release and Request Medical Records" PDF --
+// a structured records-request form (who's releasing, what's requested,
+// why, and what date range) rather than a disclosure-then-sign document
+// like the other four, so it's built section-by-section through the same
+// writePdf* helpers buildQuestionnairePdf() uses instead of
+// buildConsentPdf's disclosure-block template. Field wording (records/
+// purpose checkboxes) comes from the same RELEASE_RECORD_FIELDS/
+// RELEASE_PURPOSE_FIELDS arrays renderReviewCards() uses.
+function buildReleasePdf() {
+  var pdf = startPdfDoc('Authorization to Release and Request Medical Records');
+  writePdfQaRow(pdf, 'Phone', val('cell_phone'));
+
+  writePdfSectionHeading(pdf, 'Healthcare Provider Releasing Records');
+  writePdfQaRow(pdf, 'Facility/Provider', val('release_from_facility'));
+  writePdfQaRow(pdf, 'Address', val('release_from_address'));
+  writePdfQaRow(pdf, 'Phone', val('release_from_phone'));
+  writePdfQaRow(pdf, 'Fax', val('release_from_fax'));
+
+  writePdfSectionHeading(pdf, 'Records Requested');
+  var recordsRequested = RELEASE_RECORD_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
+  if (getCheckbox('release_rec_other') && val('release_rec_other_text')) recordsRequested.push('Other: ' + val('release_rec_other_text'));
+  writePdfLine(pdf, recordsRequested.length ? recordsRequested.join(', ') : 'None selected', false);
+
+  writePdfSectionHeading(pdf, 'Purpose');
+  var purposes = RELEASE_PURPOSE_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
+  if (getCheckbox('release_purpose_other') && val('release_purpose_other_text')) purposes.push('Other: ' + val('release_purpose_other_text'));
+  writePdfLine(pdf, purposes.length ? purposes.join(', ') : 'None selected', false);
+
+  writePdfSectionHeading(pdf, 'Date Range');
+  if (getCheckbox('release_daterange_all')) {
+    writePdfLine(pdf, 'All Records', false);
+  } else {
+    writePdfQaRow(pdf, 'From', dpkDisplayVal('release_daterange_from'));
+    writePdfQaRow(pdf, 'To', dpkDisplayVal('release_daterange_to'));
+  }
+
+  writePdfSectionHeading(pdf, 'Authorization');
+  writePdfLine(pdf, 'I authorize the healthcare provider listed above to release my protected health information to West Coast Sleep Clinic. I understand this authorization may be revoked in writing at any time except where action has already been taken. This authorization expires one year from the date signed unless otherwise specified.', false);
+
+  writePdfSignatureBlock(pdf, 'sig6', 'date6', val('release_relationship') ? 'Relationship' : null, val('release_relationship'));
+
+  return pdf.doc.output('blob');
+}
+
+// Skipped entirely if the jsPDF CDN failed to load or the patient never
+// signed this section -- same reliability posture as
+// buildAllConsentPdfFiles(): a flaky third-party CDN must never block
+// registration, and there's no signature to put on an unsigned form.
+function buildReleasePdfFile() {
+  if (!window.jspdf) return [];
+  if (!(getCheckbox('consent_release') && SignaturePads.sig6 && SignaturePads.sig6.isSigned())) return [];
+  return [blobToFile(buildReleasePdf(), 'authorization-to-release.pdf')];
+}
+
 // Builds a PDF for each consent the patient actually signed — skipped
 // entirely if the jsPDF CDN failed to load, since a flaky third-party CDN
 // must never block registration.
@@ -1865,13 +2000,6 @@ function buildAllConsentPdfFiles() {
       disclosureEls: Array.prototype.slice.call(document.querySelectorAll('#s2secTextTele .policy-box')),
       sigName: 'sig5', dateName: 'date5'
     }), 'text-telehealth-consent.pdf'));
-  }
-  if (getCheckbox('consent_release') && SignaturePads.sig6 && SignaturePads.sig6.isSigned()) {
-    files.push(blobToFile(buildConsentPdf({
-      title: 'Authorization to Release Medical Information',
-      disclosureEls: [document.querySelector('#fstep4 .ibox'), document.querySelector('#fstep4 .chk-col span')],
-      sigName: 'sig6', dateName: 'date6'
-    }), 'authorization-to-release.pdf'));
   }
   return files;
 }
@@ -1941,8 +2069,28 @@ function submitForms() {
     consent_telehealth:      getCheckbox('consent_telehealth'),
     sig_tele:                val('sig5'),
     date_tele:               val('date5'),
-    release_expiration:      val('rel_exp'),
-    release_no_expiration:   getCheckbox('rel_no_exp'),
+    release_from_facility:   val('release_from_facility'),
+    release_from_address:    val('release_from_address'),
+    release_from_phone:      val('release_from_phone'),
+    release_from_fax:        val('release_from_fax'),
+    release_rec_complete:        getCheckbox('release_rec_complete'),
+    release_rec_office_visit:    getCheckbox('release_rec_office_visit'),
+    release_rec_sleep_study:     getCheckbox('release_rec_sleep_study'),
+    release_rec_consultation:    getCheckbox('release_rec_consultation'),
+    release_rec_medication_list: getCheckbox('release_rec_medication_list'),
+    release_rec_labs:            getCheckbox('release_rec_labs'),
+    release_rec_imaging:         getCheckbox('release_rec_imaging'),
+    release_rec_other:           getCheckbox('release_rec_other'),
+    release_rec_other_text:      val('release_rec_other_text'),
+    release_purpose_continuity:      getCheckbox('release_purpose_continuity'),
+    release_purpose_treatment:       getCheckbox('release_purpose_treatment'),
+    release_purpose_patient_request: getCheckbox('release_purpose_patient_request'),
+    release_purpose_other:           getCheckbox('release_purpose_other'),
+    release_purpose_other_text:      val('release_purpose_other_text'),
+    release_daterange_all:  getCheckbox('release_daterange_all'),
+    release_daterange_from: val('release_daterange_from'),
+    release_daterange_to:   val('release_daterange_to'),
+    release_relationship:   val('release_relationship'),
     consent_release:         getCheckbox('consent_release'),
     sig_release:             val('sig6'),
     date_release:            val('date6'),
@@ -2000,7 +2148,7 @@ function submitForms() {
     submitted_at:            new Date().toISOString()
   };
 
-  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()).concat(buildQuestionnairePdfFile()))
+  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()).concat(buildQuestionnairePdfFile()).concat(buildReleasePdfFile()))
     .then(function (result) {
       // mergedIntoType === 'registration' means this name + DOB already had
       // a registration on file before this submission — as opposed to
@@ -2122,6 +2270,17 @@ function fillTestData() {
   setVal('pharm_name', 'Test Pharmacy');
   setVal('pharm_addr', '456 Pharmacy Ave, Largo, FL');
   setVal('pharm_phone', '(727) 555-0103');
+
+  // STEP 4: Authorization to Release -- text/checkbox fields only; consent_release
+  // and its signature still need manual interaction, same as the other consents.
+  setVal('release_from_facility', 'Test Prior Provider Clinic');
+  setVal('release_from_address', '789 Prior Provider Rd, Largo, FL');
+  setVal('release_from_phone', '(727) 555-0104');
+  setVal('release_from_fax', '(727) 555-0105');
+  setCheck('release_rec_sleep_study', true);
+  setCheck('release_rec_consultation', true);
+  setCheck('release_purpose_continuity', true);
+  setCheck('release_daterange_all', true);
 }
 
 // A single shared Escape handler: an open calendar popup takes priority
@@ -2367,9 +2526,28 @@ function renderReviewCards() {
       'Telehealth Consent: ' + (getCheckbox('consent_telehealth') ? 'Signed on ' + escHtml(dpkDisplayVal('date5')) : 'Declined') +
     '</div>';
 
+  var releaseRecords = RELEASE_RECORD_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
+  if (getCheckbox('release_rec_other') && val('release_rec_other_text')) releaseRecords.push('Other: ' + val('release_rec_other_text'));
+  var releasePurposes = RELEASE_PURPOSE_FIELDS.filter(function (f) { return getCheckbox(f[0]); }).map(function (f) { return f[1]; });
+  if (getCheckbox('release_purpose_other') && val('release_purpose_other_text')) releasePurposes.push('Other: ' + val('release_purpose_other_text'));
+  var releaseDateRange = getCheckbox('release_daterange_all')
+    ? 'All Records'
+    : [dpkDisplayVal('release_daterange_from'), dpkDisplayVal('release_daterange_to')].filter(Boolean).join(' – ');
+
   document.getElementById('rvRelease').innerHTML =
     '<div class="rv-grid">' +
-      rvRow('Expiration Date', getCheckbox('rel_no_exp') ? 'No Expiration' : dpkDisplayVal('rel_exp')) +
+      rvRow('Provider Facility', val('release_from_facility')) +
+      rvRow('Provider Address', val('release_from_address')) +
+      rvRow('Provider Phone', val('release_from_phone')) +
+      rvRow('Provider Fax', val('release_from_fax')) +
+    '</div>' +
+    '<div class="rv-row-lbl" style="margin-top:14px">Records Requested</div>' +
+    '<div class="rv-list">' + (releaseRecords.length ? releaseRecords.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + '</div>' +
+    '<div class="rv-row-lbl" style="margin-top:14px">Purpose</div>' +
+    '<div class="rv-list">' + (releasePurposes.length ? releasePurposes.map(escHtml).join('<br>') : '<span class="rv-empty">None selected</span>') + '</div>' +
+    '<div class="rv-grid" style="margin-top:14px">' +
+      rvRow('Date Range', releaseDateRange) +
+      rvRow('Relationship', val('release_relationship')) +
       rvRow('Authorization Signature', val('sig6') ? ('Signed on ' + dpkDisplayVal('date6')) : '') +
     '</div>';
 
