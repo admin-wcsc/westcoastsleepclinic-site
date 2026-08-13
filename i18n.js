@@ -329,6 +329,7 @@ var I18N_DICT = {
   "reg.s2_address": { en: "Street Address", es: "Dirección" },
   "reg.s2_city": { en: "City", es: "Ciudad" },
   "reg.s2_state": { en: "State", es: "Estado" },
+  "reg.s2_state_select": { en: "-- Select state --", es: "-- Seleccione un estado --" },
   "reg.s2_zip": { en: "Zip Code", es: "Código Postal" },
   "reg.s2_home_phone": { en: "Home Phone", es: "Teléfono de Casa" },
   "reg.s2_cell_phone": { en: "Cell Phone", es: "Teléfono Celular" },

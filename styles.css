@@ -236,3 +236,9 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 .fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
 .fld input::placeholder{color:rgba(107,127,116,.5)}
 .mt-16{margin-top:16px}
+
+/* Within a 2/3-column field row, a label that wraps to fewer lines than its
+   row-mate otherwise leaves its input sitting higher than the neighbor's --
+   reserving two lines' worth of label height keeps every input in the row
+   starting at the same vertical position regardless of how each label wraps. */
+.fg2 .fld label,.fg3 .fld label{display:block;min-height:39px}
