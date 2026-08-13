@@ -2309,7 +2309,7 @@ document.querySelector('.step-row').addEventListener('click', function(e) {
 // block. Only fills Step 1 (Questionnaire) and Step 2 (Demographics) --
 // deliberately leaves consents/signatures, scheduling, and document upload
 // alone since those need a real interaction (signature pad, slot picker).
-var DEV_FILL_ENABLED = true;
+var DEV_FILL_ENABLED = false;
 var devFillBtnEl = document.getElementById('devFillBtn');
 if (devFillBtnEl) devFillBtnEl.style.display = DEV_FILL_ENABLED ? 'block' : 'none';
 
