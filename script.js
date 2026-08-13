@@ -5,11 +5,25 @@ function switchTab(btn, tabId) {
   document.getElementById('tab-' + tabId).classList.add('active');
 }
 
-function toggleMobNav() {
+// Split out so it can run both once (on open) and repeatedly (while open) --
+// .site-header is position:sticky, so its viewport position shifts as the
+// page scrolls, and .mob-nav's own top has to keep tracking it or the menu
+// drifts away from the header instead of staying docked right below it.
+function positionMobNav() {
   var nav = document.getElementById('mobNav');
   var header = document.querySelector('.site-header');
   nav.style.top = header.getBoundingClientRect().bottom + 'px';
-  nav.classList.toggle('open');
+}
+
+function toggleMobNav() {
+  var nav = document.getElementById('mobNav');
+  var isOpen = nav.classList.toggle('open');
+  if (isOpen) {
+    positionMobNav();
+    window.addEventListener('scroll', positionMobNav);
+  } else {
+    window.removeEventListener('scroll', positionMobNav);
+  }
 }
 
 function toggleCallFab() {
