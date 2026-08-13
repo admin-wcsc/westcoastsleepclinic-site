@@ -34,15 +34,7 @@
 //                          container root for the flow to pick up.
 const { app } = require('@azure/functions');
 const crypto = require('crypto');
-const { getContainerClient } = require('../shared/drchrono');
-
-function safeEqual(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
-}
+const { getContainerClient, safeEqual } = require('../shared/drchrono');
 
 app.http('drchronoWebhookRelay', {
   methods: ['GET', 'POST'],

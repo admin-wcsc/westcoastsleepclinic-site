@@ -37,73 +37,26 @@ body{background:#f4f8fb}
 .btn-upload-open:hover{background:var(--mg);transform:translateY(-1px)}
 .btn-upload-open svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* ── MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(10,30,50,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
-.modal-bg.open{display:flex}
-.modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
-.modal-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-head h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg)}
-.modal-close{background:none;border:none;cursor:pointer;color:var(--tl);line-height:1;padding:4px;border-radius:4px;transition:color .2s,background .2s}
-.modal-close:hover{color:var(--td);background:rgba(0,0,0,.07)}
-.modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.modal-body{padding:28px}
-
-/* ── PATIENT INFO FIELDS (ported from registration.html's .fld/.fg system) ── */
+/* ── PATIENT INFO FIELDS (ported from registration.html's .fld/.fg system;
+   the shared .fg, .fld, .mt-16, .modal- shell, .drop-zone, .dz- icons/text,
+   .file- list items, and .upload-err rules now live in styles.css --
+   registration.html uses byte-identical CSS for all of those, so keeping
+   one copy there instead of two here) ── */
 .modal-sec-lbl{font-size:10.5px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
 .modal-sec-divider{height:1px;background:var(--border);margin:26px 0 22px}
-.fg{display:grid;gap:16px}
 .fg2{grid-template-columns:1fr 1fr}
 @media(max-width:480px){.fg2{grid-template-columns:1fr}}
-.fld{display:flex;flex-direction:column;gap:5px}
-.fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
-.fld label .req{color:#c0392b;margin-left:3px;font-weight:600}
-.fld input:not([type="checkbox"]):not([type="radio"]){width:100%;padding:13px 14px;font-size:16px;font-family:'Montserrat',sans-serif;color:var(--td);background:#fff;border:1.5px solid var(--border);border-radius:6px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
-.fld input:not([type="checkbox"]):not([type="radio"]):focus{border-color:var(--mg);box-shadow:0 0 0 3px rgba(44,125,160,.1)}
-.fld input::placeholder{color:rgba(107,127,116,.5)}
-.mt-16{margin-top:16px}
 
-/* ── DROP ZONE ── */
-.drop-zone{border:2px dashed var(--lg);border-radius:8px;padding:44px 24px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s;position:relative;background:#fbfcfe}
-.drop-zone.drag-over{background:rgba(44,125,160,.08);border-color:var(--dg)}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.dz-icon{margin-bottom:14px;color:var(--lg)}
-.dz-icon svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.dz-primary{font-size:15px;font-weight:600;color:var(--tm);margin-bottom:6px}
-.dz-types{font-size:11.5px;color:var(--tl);margin-top:8px;opacity:.8}
-.dz-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--tl);font-size:13px}
-.dz-or::before,.dz-or::after{content:'';flex:1;height:1px;background:var(--border)}
-
-.btn-browse{display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--tm);border:1.5px solid var(--border);padding:12px 26px;font-size:14px;font-weight:500;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif;position:relative;overflow:hidden}
-.btn-browse:hover{border-color:var(--mg);color:var(--dg)}
-.btn-browse input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.btn-browse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* ── FILE LIST ── */
-.file-list{margin-top:22px;display:flex;flex-direction:column;gap:8px}
-.file-item{display:flex;align-items:center;gap:12px;background:rgba(44,125,160,.05);border:1px solid rgba(44,125,160,.14);border-radius:6px;padding:10px 14px}
-.file-icon{flex-shrink:0;color:var(--dg)}
-.file-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.file-info{flex:1;min-width:0}
-.file-name{font-size:13px;font-weight:500;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-size{font-size:11px;color:var(--tl)}
-.file-remove{background:none;border:none;cursor:pointer;color:var(--tl);padding:2px;border-radius:3px;flex-shrink:0;line-height:1;transition:color .2s}
-.file-remove:hover{color:#c0392b}
-.file-remove svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.file-count-note{font-size:12.5px;color:var(--tl);margin-top:10px;text-align:center}
-
-/* ── MODAL FOOTER ── */
-.modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+/* ── MODAL FOOTER (page-specific buttons; shared .modal-foot is in styles.css) ── */
 .btn-cancel{background:var(--cream);color:var(--tm);border:1.5px solid var(--border);padding:13px 24px;font-size:14px;font-weight:500;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif}
 .btn-cancel:hover{border-color:var(--tm);color:var(--td)}
 .btn-submit-files{background:var(--gold);color:#fff;border:none;padding:14px 32px;font-size:15px;font-weight:600;border-radius:6px;cursor:pointer;transition:background .2s;font-family:'Montserrat',sans-serif;display:inline-flex;align-items:center;gap:8px}
 .btn-submit-files:hover:not(:disabled){background:var(--gold2)}
 .btn-submit-files:disabled{opacity:.5;cursor:not-allowed}
 .btn-submit-files svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.upload-err{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:4px;padding:10px 14px;margin-top:14px}
 
 footer{background:var(--cream)}
 .foot-bot{margin-top:32px}
-@media(max-width:600px){.drop-zone{display:none}.dz-or{display:none}.btn-browse{width:100%;justify-content:center;padding:16px 24px;font-size:15px}}
 </style>
 </head>
 <body>
@@ -115,27 +68,30 @@ footer{background:var(--cream)}
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/" data-i18n="common.nav_home">Home</a></li>
+        <li><a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a></li>
       </ul>
     </nav>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
+    <button class="lang-toggle" onclick="toggleLang()" data-i18n-aria="common.lang_toggle_aria" aria-label="Switch language">
+      <span class="lang-opt" data-lang-opt="en">EN</span><span class="lang-opt" data-lang-opt="es">ES</span>
+    </button>
+    <button class="hamburger" aria-label="Menu" data-i18n-aria="common.hamburger_aria" onclick="toggleMobNav()">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/">Home</a>
-  <a href="/about">Meet Dr. Scuteri</a>
-  <a href="/registration">New Patient Registration</a>
+  <a href="/" data-i18n="common.nav_home">Home</a>
+  <a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a>
+  <a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a>
 </div>
 <!-- SHARED:HEADER:END -->
 
 <!-- ══════ PAGE HEADER ══════ -->
 <div class="reg-hdr">
-  <h1>Provider Referral Intake</h1>
-  <p>Securely submit patient referral documents to West Coast Sleep Clinic</p>
+  <h1 data-i18n="referral.page_title">Provider Referral Intake</h1>
+  <p data-i18n="referral.page_desc">Securely submit patient referral documents to West Coast Sleep Clinic</p>
 </div>
 
 <!-- ══════ MAIN CONTENT ══════ -->
@@ -143,22 +99,22 @@ footer{background:var(--cream)}
   <div class="page-wrap">
 
     <div class="disclaimer-box">
-      <p>Thank you for referring your patient to West Coast Sleep Clinic. We appreciate your referral and look forward to providing excellent care.</p>
-      <p>To help us schedule your patient's appointment as quickly as possible, please upload the following:</p>
+      <p data-i18n="referral.disc_p1">Thank you for referring your patient to West Coast Sleep Clinic. We appreciate your referral and look forward to providing excellent care.</p>
+      <p data-i18n="referral.disc_p2">To help us schedule your patient's appointment as quickly as possible, please upload the following:</p>
       <ul>
-        <li>Patient demographics (including contact information and insurance)</li>
-        <li>Provider referral/order</li>
-        <li>Relevant medical records (if available)</li>
+        <li data-i18n="referral.disc_li1">Patient demographics (including contact information and insurance)</li>
+        <li data-i18n="referral.disc_li2">Provider referral/order</li>
+        <li data-i18n="referral.disc_li3">Relevant medical records (if available)</li>
       </ul>
-      <p>Please note: A provider referral is required for patients with HMO insurance plans and may also be required by other insurance plans before an appointment can be scheduled.</p>
-      <p>Once all required documents have been received, our scheduling team will contact the patient promptly to arrange their appointment.</p>
-      <p>Thank you for trusting West Coast Sleep Clinic with your patient's care.</p>
+      <p data-i18n="referral.disc_p3">Please note: A provider referral is required for patients with HMO insurance plans and may also be required by other insurance plans before an appointment can be scheduled.</p>
+      <p data-i18n="referral.disc_p4">Once all required documents have been received, our scheduling team will contact the patient promptly to arrange their appointment.</p>
+      <p data-i18n="referral.disc_p5">Thank you for trusting West Coast Sleep Clinic with your patient's care.</p>
     </div>
 
     <div class="upload-trigger-wrap">
       <button class="btn-upload-open" onclick="openModal()">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>Click Here to Upload Files</span>
+        <span data-i18n="referral.upload_btn">Click Here to Upload Files</span>
       </button>
     </div>
 
@@ -168,12 +124,12 @@ footer{background:var(--cream)}
 <!-- ══════ DONE STATE ══════ -->
 <div id="donePg" class="done-wrap">
   <div class="done-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-  <h2>Documents Received</h2>
-  <p>Thank you. Your referral documents have been successfully submitted to West Coast Sleep Clinic.</p>
-  <p>Our scheduling team will contact the patient promptly to arrange their appointment.</p>
-  <p style="margin-top:20px"><em>Thank you for trusting West Coast Sleep Clinic with your patient's care.</em></p>
+  <h2 data-i18n="referral.done_title">Documents Received</h2>
+  <p data-i18n="referral.done_p1">Thank you. Your referral documents have been successfully submitted to West Coast Sleep Clinic.</p>
+  <p data-i18n="referral.done_p2">Our scheduling team will contact the patient promptly to arrange their appointment.</p>
+  <p style="margin-top:20px"><em data-i18n="referral.disc_p5">Thank you for trusting West Coast Sleep Clinic with your patient's care.</em></p>
   <div style="margin-top:36px">
-    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block" data-i18n="referral.return_home">Return to Home</a>
   </div>
 </div>
 
@@ -181,7 +137,7 @@ footer{background:var(--cream)}
 <div class="modal-bg" id="uploadModal" onclick="handleBackdropClick(event)">
   <div class="modal-card">
     <div class="modal-head">
-      <h3>Upload Referral Documents</h3>
+      <h3 data-i18n="referral.modal_title">Upload Referral Documents</h3>
       <button class="modal-close" onclick="closeModal()" aria-label="Close">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -189,20 +145,20 @@ footer{background:var(--cream)}
 
     <div class="modal-body">
       <!-- Patient information -->
-      <div class="modal-sec-lbl">Patient Information</div>
+      <div class="modal-sec-lbl" data-i18n="referral.patient_info">Patient Information</div>
       <div class="fg fg2">
-        <div class="fld"><label>First Name <span class="req">*</span></label><input type="text" id="patFirstName" placeholder="Patient's first name"></div>
-        <div class="fld"><label>Last Name <span class="req">*</span></label><input type="text" id="patLastName" placeholder="Patient's last name"></div>
+        <div class="fld"><label><span data-i18n="referral.first_name">First Name</span> <span class="req">*</span></label><input type="text" id="patFirstName" placeholder="Patient's first name" data-i18n-placeholder="referral.first_name_ph"></div>
+        <div class="fld"><label><span data-i18n="referral.last_name">Last Name</span> <span class="req">*</span></label><input type="text" id="patLastName" placeholder="Patient's last name" data-i18n-placeholder="referral.last_name_ph"></div>
       </div>
       <div class="fg fg2 mt-16">
         <div class="fld">
-          <label>Date of Birth <span class="req">*</span></label>
+          <label><span data-i18n="referral.dob">Date of Birth</span> <span class="req">*</span></label>
           <div class="dpk" data-dpk="patient_dob">
             <input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off">
             <input type="hidden" name="patient_dob">
             <div class="dpk-pop" data-dpk-pop="patient_dob">
-              <div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div>
-              <div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+              <div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div>
+              <div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div>
               <div class="dpk-grid"></div>
             </div>
           </div>
@@ -210,7 +166,7 @@ footer{background:var(--cream)}
       </div>
 
       <div class="modal-sec-divider"></div>
-      <div class="modal-sec-lbl">Upload Documents</div>
+      <div class="modal-sec-lbl" data-i18n="referral.upload_docs_lbl">Upload Documents</div>
 
       <!-- Drag and drop zone -->
       <div class="drop-zone" id="dropZone">
@@ -219,16 +175,16 @@ footer{background:var(--cream)}
         <div class="dz-icon">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
-        <div class="dz-primary">Drag &amp; drop files here</div>
+        <div class="dz-primary" data-i18n="referral.dropzone_text">Drag &amp; drop files here</div>
         <div class="dz-types">Word &middot; PDF &middot; Excel &middot; PNG &middot; JPEG</div>
       </div>
 
-      <div class="dz-or">or</div>
+      <div class="dz-or" data-i18n="referral.or">or</div>
 
       <div style="text-align:center">
         <label class="btn-browse">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span>Browse from Device</span>
+          <span data-i18n="referral.browse_btn">Browse from Device</span>
           <input type="file" id="fileInputBrowse" multiple
             accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
         </label>
@@ -241,10 +197,10 @@ footer{background:var(--cream)}
     </div>
 
     <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closeModal()" data-i18n="referral.cancel_btn">Cancel</button>
       <button class="btn-submit-files" id="btnSubmitFiles" onclick="submitFiles()" disabled>
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>Submit Documents</span>
+        <span data-i18n="referral.submit_btn">Submit Documents</span>
       </button>
     </div>
   </div>
@@ -287,10 +243,10 @@ footer{background:var(--cream)}
 
 <div class="call-fab">
   <div class="call-fab-pop" id="callFabPop">
-    <div class="call-fab-pop-lbl">Call Us</div>
+    <div class="call-fab-pop-lbl" data-i18n="common.callfab_label">Call Us</div>
     <a href="tel:7274729112">727-472-9112</a>
   </div>
-  <button class="call-fab-btn" aria-label="Call Us" onclick="toggleCallFab()">
+  <button class="call-fab-btn" aria-label="Call Us" data-i18n-aria="common.callfab_aria" onclick="toggleCallFab()">
     <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
   </button>
 </div>
@@ -341,7 +297,7 @@ function submitFiles() {
 
   var btn = document.getElementById('btnSubmitFiles');
   btn.disabled = true;
-  btn.textContent = 'Uploading…';
+  btn.textContent = t('referral.uploading');
   document.getElementById('uploadErr').style.display = 'none';
 
   StorageClient.submitIntake('referral', {
@@ -357,7 +313,7 @@ function submitFiles() {
     showDonePage();
   })
   .catch(function (err) {
-    prUpload.showError('Unable to upload. Please call us at 727-472-9112 or try again. (' + err.message + ')');
+    prUpload.showError(t('referral.upload_err_prefix') + err.message + ')');
     resetSubmitBtn();
   });
 }
@@ -368,7 +324,7 @@ function resetSubmitBtn() {
   btn.innerHTML =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>' +
-    '</svg> <span>Submit Documents</span>';
+    '</svg> <span data-i18n="referral.submit_btn">' + t('referral.submit_btn') + '</span>';
 }
 
 function showDonePage() {
@@ -386,6 +342,7 @@ document.addEventListener('keydown', function (e) {
 
 </script>
 <script src="date-picker.js"></script>
+<script src="i18n.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

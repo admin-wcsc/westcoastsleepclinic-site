@@ -3,18 +3,21 @@
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/" data-i18n="common.nav_home">Home</a></li>
+        <li><a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a></li>
       </ul>
     </nav>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
+    <button class="lang-toggle" onclick="toggleLang()" data-i18n-aria="common.lang_toggle_aria" aria-label="Switch language">
+      <span class="lang-opt" data-lang-opt="en">EN</span><span class="lang-opt" data-lang-opt="es">ES</span>
+    </button>
+    <button class="hamburger" aria-label="Menu" data-i18n-aria="common.hamburger_aria" onclick="toggleMobNav()">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/">Home</a>
-  <a href="/about">Meet Dr. Scuteri</a>
-  <a href="/registration">New Patient Registration</a>
+  <a href="/" data-i18n="common.nav_home">Home</a>
+  <a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a>
+  <a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a>
 </div>

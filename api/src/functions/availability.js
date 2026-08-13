@@ -1,12 +1,19 @@
 // ---------------- PATIENT-FACING AVAILABILITY READ ----------------
 // GET /api/availability?treatment_type=sleep_study
 // Deliberately has NO DrChrono fetch anywhere in this file -- it only ever
-// reads two mirror blobs: doctor-availability.json (the office manager's
-// curated list of days Dr. Scuteri is actually in, maintained via
-// manager-availability.html/manager-availability.js) and busy-calendar.json
-// (kept fresh by drchrono-resync.js and drchrono-webhook.js). This is what
-// guarantees the scheduling step never depends on DrChrono's uptime at the
-// moment a patient reaches it.
+// reads two mirror blobs, neither of which this app writes itself:
+//   - doctor-availability.json: the office manager's curated list of days
+//     Dr. Scuteri is actually in. Maintained entirely in the sibling
+//     wcsc-app-sleephub Static Web App (its index.html + api/src/functions/
+//     manager-availability.js) -- a separate deployment that happens to
+//     share this same storage account, which is the whole integration
+//     between the two apps (no direct API-to-API call).
+//   - busy-calendar.json: kept fresh by the DrChrono Power Automate flow
+//     ("DrChrono Webook - Appointments", in the separate
+//     DrChronoWorkflowAutomation solution) via drchrono-webhook-relay.js's
+//     marker-blob handoff.
+// This is what guarantees the scheduling step never depends on DrChrono's
+// uptime at the moment a patient reaches it.
 //
 // Earlier version of this file derived slots from DrChrono's own
 // "Appointment Templates" -- confirmed empty for this doctor/office because

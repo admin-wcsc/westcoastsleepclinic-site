@@ -24,6 +24,10 @@ body{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:400;line-hei
 .main-nav a:hover{color:var(--gold);background:rgba(0,0,0,.07)}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold3);border-radius:2px}
+.lang-toggle{display:inline-flex;align-items:center;background:var(--cream);border:1.5px solid var(--border);border-radius:999px;padding:3px;cursor:pointer;font-family:'Montserrat',sans-serif;margin-left:auto;flex-shrink:0}
+.lang-toggle .lang-opt{padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--tl);transition:background .2s,color .2s}
+.lang-toggle .lang-opt.active{background:var(--dg);color:#fff}
+.lang-toggle:hover .lang-opt:not(.active){color:var(--dg)}
 .mob-nav{display:none;position:fixed;top:var(--nav-height);left:0;right:0;background:#fff;border-top:1px solid rgba(176,135,84,.35);z-index:99;padding:10px 0 16px}
 .mob-nav.open{display:block}
 .mob-nav a{display:block;padding:13px 24px;font-size:15px;font-weight:500;color:#2C7DA0;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
@@ -183,3 +187,52 @@ footer{background:#fff;color:rgba(29,54,78,.8);padding:52px 24px 24px;border-top
 .dpk-grid button.dpk-today{font-weight:700;color:var(--dg)}
 .dpk-grid button.dpk-sel{background:var(--dg);color:#fff}
 .dpk-grid button.dpk-other{color:var(--tl);opacity:.4}
+
+/* ── MODAL SHELL (registration.html + provider-referral.html) ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(10,30,50,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
+.modal-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg)}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--tl);line-height:1;padding:4px;border-radius:4px;transition:color .2s,background .2s}
+.modal-close:hover{color:var(--td);background:rgba(0,0,0,.07)}
+.modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.modal-body{padding:28px}
+.modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* ── UPLOAD WIDGET (registration.html + provider-referral.html; see upload-widget.js) ── */
+.drop-zone{border:2px dashed var(--lg);border-radius:8px;padding:44px 24px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s;position:relative;background:#fbfcfe}
+.drop-zone.drag-over{background:rgba(44,125,160,.08);border-color:var(--dg)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{margin-bottom:14px;color:var(--lg)}
+.dz-icon svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.dz-primary{font-size:15px;font-weight:600;color:var(--tm);margin-bottom:6px}
+.dz-types{font-size:11.5px;color:var(--tl);margin-top:8px;opacity:.8}
+.dz-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--tl);font-size:13px}
+.dz-or::before,.dz-or::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-browse{display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--tm);border:1.5px solid var(--border);padding:12px 26px;font-size:14px;font-weight:500;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif;position:relative;overflow:hidden}
+.btn-browse:hover{border-color:var(--mg);color:var(--dg)}
+.btn-browse input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.btn-browse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.file-list{margin-top:22px;display:flex;flex-direction:column;gap:8px}
+.file-item{display:flex;align-items:center;gap:12px;background:rgba(44,125,160,.05);border:1px solid rgba(44,125,160,.14);border-radius:6px;padding:10px 14px}
+.file-icon{flex-shrink:0;color:var(--dg)}
+.file-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:13px;font-weight:500;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font-size:11px;color:var(--tl)}
+.file-remove{background:none;border:none;cursor:pointer;color:var(--tl);padding:2px;border-radius:3px;flex-shrink:0;line-height:1;transition:color .2s}
+.file-remove:hover{color:#c0392b}
+.file-remove svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.file-count-note{font-size:12.5px;color:var(--tl);margin-top:10px;text-align:center}
+.upload-err{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:4px;padding:10px 14px;margin-top:14px}
+@media(max-width:600px){.drop-zone{display:none}.dz-or{display:none}.btn-browse{width:100%;justify-content:center;padding:16px 24px;font-size:15px}}
+
+/* ── SHARED FORM FIELD BASICS (registration.html + provider-referral.html;
+   each page also layers its own extensions on top -- e.g. registration.html
+   adds .fg3, textarea/select support, and .fld.spotlight) ── */
+.fg{display:grid;gap:16px}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
+.fld input::placeholder{color:rgba(107,127,116,.5)}
+.mt-16{margin-top:16px}

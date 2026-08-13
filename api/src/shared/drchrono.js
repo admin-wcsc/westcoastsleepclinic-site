@@ -5,6 +5,7 @@
 // N near-identical copies. Extracted from submissions.js — no behavior
 // change, same functions, same logic, just importable from one place.
 const { BlobServiceClient } = require('@azure/storage-blob');
+const crypto = require('crypto');
 
 const CONTAINER_NAME = 'submissions';
 
@@ -120,6 +121,18 @@ async function appendAudit(containerClient, record) {
   }
 }
 
+// Constant-time string comparison -- shared by the webhook relay and the
+// OAuth callback, both of which check an incoming value against a secret
+// Application Setting and can't use a plain === (its short-circuit-on-
+// first-mismatch timing would leak how many leading characters matched).
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 module.exports = {
   CONTAINER_NAME,
   getContainerClient,
@@ -128,5 +141,6 @@ module.exports = {
   streamToBuffer,
   fetchWithTimeout,
   getDrChronoAccessToken,
-  appendAudit
+  appendAudit,
+  safeEqual
 };

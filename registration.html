@@ -57,17 +57,18 @@ body{background:#f4f8fb}
 .fsec:last-of-type{border-bottom:none}
 .fsec-ttl{font-size:10.5px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:12px}
 .fsec-ttl::after{content:'';flex:1;height:1px;background:var(--border)}
-.fg{display:grid;gap:16px}
 .fg2{grid-template-columns:1fr 1fr}
 .fg3{grid-template-columns:1fr 1fr 1fr}
 @media(max-width:580px){.fg2,.fg3{grid-template-columns:1fr}}
-.fld{display:flex;flex-direction:column;gap:5px}
-.fld label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--tm)}
 .fld label .req,.clbl .req{color:#c0392b;margin-left:3px;font-weight:600}
 .fld input:not([type="checkbox"]):not([type="radio"]),.fld select,.fld textarea{width:100%;padding:13px 14px;font-size:16px;font-family:'Montserrat',sans-serif;color:var(--td);background:#fff;border:1.5px solid var(--border);border-radius:6px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
 .fld input:not([type="checkbox"]):not([type="radio"]):focus,.fld select:focus,.fld textarea:focus{border-color:var(--mg);box-shadow:0 0 0 3px rgba(44,125,160,.1)}
 .fld textarea{resize:vertical;min-height:90px}
-.fld input::placeholder{color:rgba(107,127,116,.5)}
+/* Spotlight: paired with the .req asterisk toggle in markEmptyRequired() --
+   an outline (not border/box-shadow, so it can't shift layout or grid gaps)
+   plus a couple of pulses to catch the eye the moment a field is flagged. */
+@keyframes spotlightPulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,.4)}70%{box-shadow:0 0 0 10px rgba(192,57,43,0)}100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}}
+.fld.spotlight{outline:2px solid #c0392b;outline-offset:6px;border-radius:8px;animation:spotlightPulse 1s ease-out 2}
 .radio-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
 .rlbl{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--td);cursor:pointer}
 .rlbl input{width:20px;height:20px;cursor:pointer;accent-color:var(--dg)}
@@ -110,12 +111,11 @@ body{background:#f4f8fb}
 .req-note{font-size:13px;color:var(--tl);margin-bottom:24px}
 .req-note span{color:#c0392b;font-weight:600}
 .ibox{background:rgba(44,125,160,.06);border:1px solid rgba(44,125,160,.14);border-left:3px solid var(--mg);border-radius:4px;padding:14px 18px;font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:18px}
-.mt-16{margin-top:16px}
 
-/* ── MODAL SHELL (adapted from provider-referral.html's upload modal — same
-   classes, ported here since this page needs 4 modals instead of 1) ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(10,30,50,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
-.modal-bg.open{display:flex}
+/* ── MODAL SHELL (base .modal-bg/.modal-card/.modal-head/.modal-close/
+   .modal-body/.modal-foot rules now live in styles.css -- identical to
+   provider-referral.html's; this page's own per-modal width overrides and
+   #modalTreatmentType positioning stay here since they're specific to it) ── */
 /* Treatment Type is the very first thing shown on page load -- unlike the
    later Step 2/3/4 modals (which intentionally block the whole page), the
    nav bar and floating call button should stay usable while it's up. Sits
@@ -127,13 +127,15 @@ body{background:#f4f8fb}
    real offset has to be measured from the header's rendered position, not
    assumed. */
 #modalTreatmentType{z-index:60;top:var(--nav-height)}
-.modal-card{background:#fff;border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22)}
-/* Insurance and Patient Details are the two longest Step 2 modals — widened
-   so their fg2/fg3 rows can lay out side by side instead of cramming into
-   the shared 580px. Emergency Contact and Pharmacy stay at the default
-   width; they're short enough that the single-column layout reads fine. */
+/* All four Step 2 modals use fg2/fg3 side-by-side rows, so they're all
+   widened the same way — at 580px (and even at 760px) the Spanish labels
+   (longer than their English counterparts, e.g. "Número de Identificación
+   de Miembro") still wrap or crowd out their input's placeholder text
+   inside each column. */
 #modalS1Ins .modal-card,
-#modalS1Details .modal-card{max-width:760px}
+#modalS1Details .modal-card,
+#modalS1Ec .modal-card,
+#modalS1Pharm .modal-card{max-width:860px}
 /* Consent modals (Step 3) -- widened for the same reason, and so the
    signature pad below has more room to be a real signature-length strip
    instead of squeezed to half the row next to the date field. */
@@ -141,13 +143,6 @@ body{background:#f4f8fb}
 #modalS2Financial .modal-card,
 #modalS2Hipaa .modal-card,
 #modalS2TextTele .modal-card{max-width:760px}
-.modal-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-head h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--dg)}
-.modal-close{background:none;border:none;cursor:pointer;color:var(--tl);line-height:1;padding:4px;border-radius:4px;transition:color .2s,background .2s}
-.modal-close:hover{color:var(--td);background:rgba(0,0,0,.07)}
-.modal-close svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.modal-body{padding:28px}
-.modal-foot{padding:20px 28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
 /* Floating callout anchored (via JS, see toggleSelfPayFields) just above the
    Insurance modal's bottom-left corner when Self-Pay is selected -- stays
    visible the whole time that's the case, not a hover tooltip. position:fixed
@@ -181,34 +176,10 @@ body{background:#f4f8fb}
 .s1-menu-status.s1-optional{background:rgba(176,135,84,.1);color:var(--gold)}
 .s1-menu-chev{width:18px;height:18px;fill:none;stroke:var(--tl);stroke-width:2;flex-shrink:0}
 
-/* ── UPLOAD WIDGET (ported from provider-referral.html's upload modal — same
-   classes/behavior, duplicated here for the Review step's document upload) ── */
-.drop-zone{border:2px dashed var(--lg);border-radius:8px;padding:44px 24px;text-align:center;cursor:pointer;transition:background .2s,border-color .2s;position:relative;background:#fbfcfe}
-.drop-zone.drag-over{background:rgba(44,125,160,.08);border-color:var(--dg)}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.dz-icon{margin-bottom:14px;color:var(--lg)}
-.dz-icon svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.dz-primary{font-size:15px;font-weight:600;color:var(--tm);margin-bottom:6px}
-.dz-types{font-size:11.5px;color:var(--tl);margin-top:8px;opacity:.8}
-.dz-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--tl);font-size:13px}
-.dz-or::before,.dz-or::after{content:'';flex:1;height:1px;background:var(--border)}
-.btn-browse{display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--tm);border:1.5px solid var(--border);padding:12px 26px;font-size:14px;font-weight:500;border-radius:6px;cursor:pointer;transition:border-color .2s,color .2s;font-family:'Montserrat',sans-serif;position:relative;overflow:hidden}
-.btn-browse:hover{border-color:var(--mg);color:var(--dg)}
-.btn-browse input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.btn-browse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.file-list{margin-top:22px;display:flex;flex-direction:column;gap:8px}
-.file-item{display:flex;align-items:center;gap:12px;background:rgba(44,125,160,.05);border:1px solid rgba(44,125,160,.14);border-radius:6px;padding:10px 14px}
-.file-icon{flex-shrink:0;color:var(--dg)}
-.file-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.file-info{flex:1;min-width:0}
-.file-name{font-size:13px;font-weight:500;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-size{font-size:11px;color:var(--tl)}
-.file-remove{background:none;border:none;cursor:pointer;color:var(--tl);padding:2px;border-radius:3px;flex-shrink:0;line-height:1;transition:color .2s}
-.file-remove:hover{color:#c0392b}
-.file-remove svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.file-count-note{font-size:12.5px;color:var(--tl);margin-top:10px;text-align:center}
-.upload-err{font-size:13px;color:#c0392b;background:#fdf0f0;border:1px solid #f5c6c6;border-radius:4px;padding:10px 14px;margin-top:14px}
-@media(max-width:600px){.drop-zone{display:none}.dz-or{display:none}.btn-browse{width:100%;justify-content:center;padding:16px 24px;font-size:15px}}
+/* ── UPLOAD WIDGET: shared .drop-zone, .dz- icons/text, .btn-browse,
+   .file- list items, and .upload-err rules (used by this page's
+   Review-step document upload) now live in styles.css, identical to
+   provider-referral.html's copy ── */
 
 /* ── SCHEDULE APPOINTMENT ── */
 .slotpicker-loading{color:var(--tl);font-size:14px;padding:24px 0}
@@ -265,8 +236,6 @@ body{background:#f4f8fb}
 .rv-row{font-size:14px;display:flex;flex-direction:column;gap:2px}
 .rv-row-lbl{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--tl)}
 .rv-row-val{color:var(--td);word-break:break-word}
-.rv-empty{color:var(--tl);font-style:italic;font-size:13px}
-.rv-list{font-size:14px;color:var(--td);line-height:1.7}
 
 .done-icon.notice{background:linear-gradient(135deg,var(--gold),var(--gold2))}
 
@@ -288,45 +257,48 @@ footer{background:var(--cream)}
   <div class="nav-wrap">
     <nav>
       <ul class="main-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">Meet Dr. Scuteri</a></li>
-        <li><a href="/registration">New Patient Registration</a></li>
+        <li><a href="/" data-i18n="common.nav_home">Home</a></li>
+        <li><a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a></li>
+        <li><a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a></li>
       </ul>
     </nav>
-    <button class="hamburger" aria-label="Menu" onclick="toggleMobNav()" style="margin-left:auto">
+    <button class="lang-toggle" onclick="toggleLang()" data-i18n-aria="common.lang_toggle_aria" aria-label="Switch language">
+      <span class="lang-opt" data-lang-opt="en">EN</span><span class="lang-opt" data-lang-opt="es">ES</span>
+    </button>
+    <button class="hamburger" aria-label="Menu" data-i18n-aria="common.hamburger_aria" onclick="toggleMobNav()">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 <div class="mob-nav" id="mobNav">
-  <a href="/">Home</a>
-  <a href="/about">Meet Dr. Scuteri</a>
-  <a href="/registration">New Patient Registration</a>
+  <a href="/" data-i18n="common.nav_home">Home</a>
+  <a href="/about" data-i18n="common.nav_about">Meet Dr. Scuteri</a>
+  <a href="/registration" data-i18n="common.nav_registration">New Patient Registration</a>
 </div>
 <!-- SHARED:HEADER:END -->
 
 <!-- ══════ REG HEADER ══════ -->
 <div class="reg-hdr">
-  <h1>New Patient Registration</h1>
-  <p class="reg-welcome">Welcome to West Coast Sleep Clinic!</p>
-  <p>Please complete all forms below. Use the Next button to proceed through each step.</p>
+  <h1 data-i18n="reg.header_title">New Patient Registration</h1>
+  <p class="reg-welcome" data-i18n="reg.header_welcome">Welcome to West Coast Sleep Clinic!</p>
+  <p data-i18n="reg.header_instructions">Please complete all forms below. Use the Next button to proceed through each step.</p>
 </div>
 
 <!-- ══════ STEPPER ══════ -->
 <div class="stepper">
   <div class="stepper-in">
     <div class="step-row">
-      <div class="step-item" data-step="1"><div class="step-circ active" id="stepCircle1">1</div><div class="step-lbl active" id="stepLabel1">Reason for Appointment</div></div>
+      <div class="step-item" data-step="1"><div class="step-circ active" id="stepCircle1">1</div><div class="step-lbl active" id="stepLabel1" data-i18n="reg.step1">Reason for Appointment</div></div>
       <div class="step-conn" id="stepConnector1"></div>
-      <div class="step-item" data-step="2"><div class="step-circ" id="stepCircle2">2</div><div class="step-lbl" id="stepLabel2">Patient Demographics</div></div>
+      <div class="step-item" data-step="2"><div class="step-circ" id="stepCircle2">2</div><div class="step-lbl" id="stepLabel2" data-i18n="reg.step2">Patient Demographics</div></div>
       <div class="step-conn" id="stepConnector2"></div>
-      <div class="step-item" data-step="3"><div class="step-circ" id="stepCircle3">3</div><div class="step-lbl" id="stepLabel3">Consents &amp; Signatures</div></div>
+      <div class="step-item" data-step="3"><div class="step-circ" id="stepCircle3">3</div><div class="step-lbl" id="stepLabel3" data-i18n="reg.step3">Consents &amp; Signatures</div></div>
       <div class="step-conn" id="stepConnector3"></div>
-      <div class="step-item" data-step="4"><div class="step-circ" id="stepCircle4">4</div><div class="step-lbl" id="stepLabel4">Authorization to Release</div></div>
+      <div class="step-item" data-step="4"><div class="step-circ" id="stepCircle4">4</div><div class="step-lbl" id="stepLabel4" data-i18n="reg.step4">Medical Record Request</div></div>
       <div class="step-conn" id="stepConnector4"></div>
-      <div class="step-item" data-step="5"><div class="step-circ" id="stepCircle5">5</div><div class="step-lbl" id="stepLabel5">Schedule Appointment</div></div>
+      <div class="step-item" data-step="5"><div class="step-circ" id="stepCircle5">5</div><div class="step-lbl" id="stepLabel5" data-i18n="reg.step5">Schedule Appointment</div></div>
       <div class="step-conn" id="stepConnector5"></div>
-      <div class="step-item" data-step="6"><div class="step-circ" id="stepCircle6">6</div><div class="step-lbl" id="stepLabel6">Review &amp; Submit</div></div>
+      <div class="step-item" data-step="6"><div class="step-circ" id="stepCircle6">6</div><div class="step-lbl" id="stepLabel6" data-i18n="reg.step6">Review &amp; Submit</div></div>
     </div>
   </div>
 </div>
@@ -340,17 +312,17 @@ footer{background:var(--cream)}
   <div class="modal-bg" id="modalTreatmentType">
     <div class="modal-card">
       <div class="modal-head">
-        <h3>What kind of treatment are you interested in?</h3>
+        <h3 data-i18n="reg.tt_modal_title">What kind of treatment are you interested in?</h3>
       </div>
       <div class="modal-body">
         <div class="tt-options">
           <div class="tt-card" data-type="sleep_study" onclick="selectTreatmentType('sleep_study')">
-            <div class="tt-card-ttl">Sleep Medicine</div>
-            <div class="tt-card-sub">Evaluation for snoring, insomnia, or other sleep concerns</div>
+            <div class="tt-card-ttl" data-i18n="reg.tt_sleep_title">Sleep Medicine</div>
+            <div class="tt-card-sub" data-i18n="reg.tt_sleep_sub">Evaluation for snoring, insomnia, or other sleep concerns</div>
           </div>
           <div class="tt-card" data-type="weight_loss" onclick="selectTreatmentType('weight_loss')">
-            <div class="tt-card-ttl">Weight Loss</div>
-            <div class="tt-card-sub">Medical weight management program</div>
+            <div class="tt-card-ttl" data-i18n="reg.tt_weight_title">Weight Loss</div>
+            <div class="tt-card-sub" data-i18n="reg.tt_weight_sub">Medical weight management program</div>
           </div>
         </div>
       </div>
@@ -362,149 +334,149 @@ footer{background:var(--cream)}
     <!-- STEP 1: Questionnaire -->
     <div class="fstep active" id="fstep1">
       <div class="fsec">
-        <div class="fsec-ttl">Treatment Type</div>
+        <div class="fsec-ttl" data-i18n="reg.s1_treatment_type_ttl">Treatment Type</div>
         <div class="tt-summary-row">
-          <span>Selected:</span>
-          <strong id="s7TreatmentSummaryVal">None selected</strong>
-          <button type="button" class="tt-change-btn" onclick="openFormModal('modalTreatmentType')">Change</button>
+          <span data-i18n="reg.selected_lbl">Selected:</span>
+          <strong id="s7TreatmentSummaryVal" data-i18n="reg.none_selected">None selected</strong>
+          <button type="button" class="tt-change-btn" onclick="openFormModal('modalTreatmentType')" data-i18n="reg.change_btn">Change</button>
         </div>
         <input type="hidden" name="treatment_type" required>
-        <p class="ibox mt-16" id="s7WeightLossNote" style="display:none">No additional questionnaire is required for the Weight Loss program. Click Next to continue with your registration.</p>
+        <p class="ibox mt-16" id="s7WeightLossNote" style="display:none" data-i18n="reg.weight_loss_note">No additional questionnaire is required for the Weight Loss program. Click Next to continue with your registration.</p>
       </div>
 
       <div id="s7QuestionnaireBody">
       <div class="fsec">
-        <div class="fsec-ttl">Chief Complaint &amp; Sleep History</div>
-        <div class="fld"><label>What is your main reason for visiting today?</label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required></textarea></div>
+        <div class="fsec-ttl" data-i18n="reg.s1_chief_ttl">Chief Complaint &amp; Sleep History</div>
+        <div class="fld"><label data-i18n="reg.s1_chief_q">What is your main reason for visiting today?</label><textarea name="chief_complaint" placeholder="Describe your main concern or reason for your visit..." required data-i18n-placeholder="reg.s1_chief_ph"></textarea></div>
         <div class="fg fg2 mt-16">
-          <div class="fld"><label>How many hours of sleep do you get per night?</label><input type="number" name="sleep_hrs" min="0" max="24" step=".5" placeholder="e.g. 6.5"></div>
-          <div class="fld"><label>How long have you had this concern?</label><input type="text" name="concern_duration" placeholder="e.g. 6 months, 2 years"></div>
+          <div class="fld"><label data-i18n="reg.s1_sleep_hrs_q">How many hours of sleep do you get per night?</label><input type="number" name="sleep_hrs" min="0" max="24" step=".5" placeholder="e.g. 6.5"></div>
+          <div class="fld"><label data-i18n="reg.s1_duration_q">How long have you had this concern?</label><input type="text" name="concern_duration" placeholder="e.g. 6 months, 2 years" data-i18n-placeholder="reg.s1_duration_ph"></div>
         </div>
         <div class="fg fg2 mt-16">
-          <div class="fld"><label>Usual bedtime</label><input type="time" name="bedtime"></div>
-          <div class="fld"><label>Usual wake time</label><input type="time" name="waketime"></div>
+          <div class="fld"><label data-i18n="reg.s1_bedtime_lbl">Usual bedtime</label><input type="time" name="bedtime"></div>
+          <div class="fld"><label data-i18n="reg.s1_waketime_lbl">Usual wake time</label><input type="time" name="waketime"></div>
         </div>
         <div class="fld mt-16">
-          <label>Sleep Symptoms (check all that apply)</label>
+          <label data-i18n="reg.s1_symptoms_lbl">Sleep Symptoms (check all that apply)</label>
           <div class="chk-col" style="margin-top:8px">
-            <label class="clbl"><input type="checkbox" name="sym_sleep_onset"> <span>Difficulty falling asleep</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_wake_night"> <span>Waking up frequently during the night</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_early_wake"> <span>Waking up too early and unable to return to sleep</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_snore"> <span>Snoring</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_witnessed"> <span>Witnessed pauses in breathing or gasping</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_not_refreshed"> <span>Not feeling refreshed after sleep</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_daytime"> <span>Excessive daytime sleepiness</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_rls"> <span>Restless legs or uncomfortable leg sensations at night</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_grind"> <span>Teeth grinding or jaw clenching during sleep</span></label>
-            <label class="clbl"><input type="checkbox" name="sym_walk"> <span>Sleepwalking or talking in sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_sleep_onset"> <span data-i18n="reg.s1_sym1">Difficulty falling asleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_wake_night"> <span data-i18n="reg.s1_sym2">Waking up frequently during the night</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_early_wake"> <span data-i18n="reg.s1_sym3">Waking up too early and unable to return to sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_snore"> <span data-i18n="reg.s1_sym4">Snoring</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_witnessed"> <span data-i18n="reg.s1_sym5">Witnessed pauses in breathing or gasping</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_not_refreshed"> <span data-i18n="reg.s1_sym6">Not feeling refreshed after sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_daytime"> <span data-i18n="reg.s1_sym7">Excessive daytime sleepiness</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_rls"> <span data-i18n="reg.s1_sym8">Restless legs or uncomfortable leg sensations at night</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_grind"> <span data-i18n="reg.s1_sym9">Teeth grinding or jaw clenching during sleep</span></label>
+            <label class="clbl"><input type="checkbox" name="sym_walk"> <span data-i18n="reg.s1_sym10">Sleepwalking or talking in sleep</span></label>
           </div>
         </div>
         <div class="fg fg2 mt-16">
-          <div class="fld"><label>Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> <span>Yes</span></label><label class="rlbl"><input type="radio" name="prev_study" value="No"> <span>No</span></label></div></div>
-          <div class="fld"><label>Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> <span>Yes</span></label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> <span>No</span></label></div></div>
+          <div class="fld"><label data-i18n="reg.s1_prev_study_q">Have you had a sleep study before?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="prev_study" value="Yes"> <span data-i18n="reg.yes">Yes</span></label><label class="rlbl"><input type="radio" name="prev_study" value="No"> <span data-i18n="reg.no">No</span></label></div></div>
+          <div class="fld"><label data-i18n="reg.s1_cpap_q">Do you currently use CPAP or BiPAP?</label><div class="radio-row"><label class="rlbl"><input type="radio" name="cpap_use" value="Yes"> <span data-i18n="reg.yes">Yes</span></label><label class="rlbl"><input type="radio" name="cpap_use" value="No"> <span data-i18n="reg.no">No</span></label></div></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Epworth Sleepiness Scale</div>
-        <p style="font-size:14px;color:var(--tl);margin-bottom:14px">How likely are you to doze off or fall asleep in the following situations?<br><strong>0</strong> = Would never doze &nbsp; <strong>1</strong> = Slight chance &nbsp; <strong>2</strong> = Moderate chance &nbsp; <strong>3</strong> = High chance</p>
+        <div class="fsec-ttl" data-i18n="reg.s1_ess_ttl">Epworth Sleepiness Scale</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:14px" data-i18n="reg.s1_ess_instructions">How likely are you to doze off or fall asleep in the following situations?<br><strong>0</strong> = Would never doze &nbsp; <strong>1</strong> = Slight chance &nbsp; <strong>2</strong> = Moderate chance &nbsp; <strong>3</strong> = High chance</p>
         <div style="overflow-x:auto">
           <table class="ess-table">
-            <thead><tr><th>Situation</th><th style="text-align:center">0</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th style="text-align:center">3</th></tr></thead>
+            <thead><tr><th data-i18n="reg.s1_ess_situation_th">Situation</th><th style="text-align:center">0</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th style="text-align:center">3</th></tr></thead>
             <tbody>
-              <tr><td>Sitting and reading</td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="3"></label></div></td></tr>
-              <tr><td>Watching TV</td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="3"></label></div></td></tr>
-              <tr><td>Sitting inactive in a public place</td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="3"></label></div></td></tr>
-              <tr><td>As a passenger in a car for an hour</td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="3"></label></div></td></tr>
-              <tr><td>Lying down in the afternoon when possible</td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="3"></label></div></td></tr>
-              <tr><td>Sitting and talking to someone</td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="3"></label></div></td></tr>
-              <tr><td>Sitting quietly after lunch (no alcohol)</td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="3"></label></div></td></tr>
-              <tr><td>In a car stopped for a few minutes in traffic</td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row1">Sitting and reading</td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess1" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row2">Watching TV</td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess2" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row3">Sitting inactive in a public place</td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess3" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row4">As a passenger in a car for an hour</td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess4" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row5">Lying down in the afternoon when possible</td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess5" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row6">Sitting and talking to someone</td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess6" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row7">Sitting quietly after lunch (no alcohol)</td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess7" value="3"></label></div></td></tr>
+              <tr><td data-i18n="reg.s1_ess_row8">In a car stopped for a few minutes in traffic</td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="0"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="1"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="2"></label></div></td><td><div class="ess-radios"><label><input type="radio" name="ess8" value="3"></label></div></td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Medical History</div>
-        <p style="font-size:14px;color:var(--tl);margin-bottom:12px">Check all conditions that apply to you:</p>
+        <div class="fsec-ttl" data-i18n="reg.s1_medhx_ttl">Medical History</div>
+        <p style="font-size:14px;color:var(--tl);margin-bottom:12px" data-i18n="reg.s1_medhx_instructions">Check all conditions that apply to you:</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
-          <label class="clbl"><input type="checkbox" name="hx_htn"> <span>High Blood Pressure (Hypertension)</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_dm"> <span>Diabetes (Type 1 or Type 2)</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_heart"> <span>Heart Disease / Cardiac Condition</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_afib"> <span>Atrial Fibrillation (AFib)</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_stroke"> <span>Stroke or TIA</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_asthma"> <span>Asthma</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_copd"> <span>COPD / Emphysema</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_anxiety"> <span>Anxiety / Panic Disorder</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_depression"> <span>Depression</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_thyroid"> <span>Thyroid Disorder</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_obesity"> <span>Obesity</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_reflux"> <span>GERD / Acid Reflux</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_cancer"> <span>Cancer (current or past)</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_kidney"> <span>Kidney Disease</span></label>
-          <label class="clbl"><input type="checkbox" name="hx_liver"> <span>Liver Disease</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_htn"> <span data-i18n="reg.s1_hx1">High Blood Pressure (Hypertension)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_dm"> <span data-i18n="reg.s1_hx2">Diabetes (Type 1 or Type 2)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_heart"> <span data-i18n="reg.s1_hx3">Heart Disease / Cardiac Condition</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_afib"> <span data-i18n="reg.s1_hx4">Atrial Fibrillation (AFib)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_stroke"> <span data-i18n="reg.s1_hx5">Stroke or TIA</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_asthma"> <span data-i18n="reg.s1_hx6">Asthma</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_copd"> <span data-i18n="reg.s1_hx7">COPD / Emphysema</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_anxiety"> <span data-i18n="reg.s1_hx8">Anxiety / Panic Disorder</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_depression"> <span data-i18n="reg.s1_hx9">Depression</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_thyroid"> <span data-i18n="reg.s1_hx10">Thyroid Disorder</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_obesity"> <span data-i18n="reg.s1_hx11">Obesity</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_reflux"> <span data-i18n="reg.s1_hx12">GERD / Acid Reflux</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_cancer"> <span data-i18n="reg.s1_hx13">Cancer (current or past)</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_kidney"> <span data-i18n="reg.s1_hx14">Kidney Disease</span></label>
+          <label class="clbl"><input type="checkbox" name="hx_liver"> <span data-i18n="reg.s1_hx15">Liver Disease</span></label>
         </div>
-        <div class="fld mt-16"><label>Other Medical Conditions</label><input type="text" name="hx_other" placeholder="List any other conditions not listed above"></div>
+        <div class="fld mt-16"><label data-i18n="reg.s1_hx_other_lbl">Other Medical Conditions</label><input type="text" name="hx_other" placeholder="List any other conditions not listed above" data-i18n-placeholder="reg.s1_hx_other_ph"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Medications &amp; Allergies</div>
-        <div class="fld"><label>Current Medications (include dosages if known)</label><textarea name="medications" placeholder="List all current medications, vitamins, and supplements..."></textarea></div>
-        <div class="fld mt-16"><label>Known Drug Allergies</label><input type="text" name="allergies" placeholder="List any drug allergies or NKDA (No Known Drug Allergies)"></div>
+        <div class="fsec-ttl" data-i18n="reg.s1_meds_ttl">Medications &amp; Allergies</div>
+        <div class="fld"><label data-i18n="reg.s1_meds_lbl">Current Medications (include dosages if known)</label><textarea name="medications" placeholder="List all current medications, vitamins, and supplements..." data-i18n-placeholder="reg.s1_meds_ph"></textarea></div>
+        <div class="fld mt-16"><label data-i18n="reg.s1_allergies_lbl">Known Drug Allergies</label><input type="text" name="allergies" placeholder="List any drug allergies or NKDA (No Known Drug Allergies)" data-i18n-placeholder="reg.s1_allergies_ph"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Additional Information</div>
+        <div class="fsec-ttl" data-i18n="reg.s1_additional_ttl">Additional Information</div>
         <div class="fg fg2">
-          <div class="fld"><label>Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;" inputmode="numeric"></div>
-          <div class="fld"><label>Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
+          <div class="fld"><label data-i18n="reg.s1_height_lbl">Height</label><input type="text" name="height" placeholder="e.g. 5'10&quot;" inputmode="numeric"></div>
+          <div class="fld"><label data-i18n="reg.s1_weight_lbl">Weight</label><input type="text" name="weight" placeholder="e.g. 180 lbs"></div>
         </div>
-        <div class="fld mt-16"><label>Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..."></textarea></div>
+        <div class="fld mt-16"><label data-i18n="reg.s1_comments_lbl">Additional Comments or Concerns</label><textarea name="comments" placeholder="Anything else you would like your provider to know..." data-i18n-placeholder="reg.s1_comments_ph"></textarea></div>
       </div>
       </div>
 
       <div class="form-nav">
         <span></span>
-        <button class="btn-nxt" onclick="goStep(2)">Next: Patient Demographics &rarr;</button>
+        <button class="btn-nxt" onclick="goStep(2)" data-i18n="reg.s1_next_btn">Next: Patient Demographics &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 2: New Patient Registration -->
     <div class="fstep" id="fstep2">
-      <h2 class="fstep-ttl">New Patient Registration</h2>
-      <p class="fstep-sub">Please fill in your personal and insurance information completely.</p>
-      <p class="req-note"><span>*</span> Indicates a required field</p>
+      <h2 class="fstep-ttl" data-i18n="reg.header_title">New Patient Registration</h2>
+      <p class="fstep-sub" data-i18n="reg.s2_sub">Please fill in your personal and insurance information completely.</p>
+      <p class="req-note" data-i18n="reg.req_note"><span>*</span> Indicates a required field</p>
 
       <div class="s1-menu">
         <div class="s1-menu-item" onclick="openS1Modal('modalS1Details')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Patient Details</div>
-            <div class="s1-menu-sub">Name, date of birth, contact info, address, employer</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s2_menu_details_ttl">Patient Details</div>
+            <div class="s1-menu-sub" data-i18n="reg.s2_menu_details_sub">Name, date of birth, contact info, address, employer</div>
           </div>
           <span class="s1-menu-status" data-s1-status="s1secDetails">Incomplete</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS1Modal('modalS1Ec')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Emergency Contact</div>
-            <div class="s1-menu-sub">Name, relationship, phone</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s2_menu_ec_ttl">Emergency Contact</div>
+            <div class="s1-menu-sub" data-i18n="reg.s2_menu_ec_sub">Name, relationship, phone</div>
           </div>
           <span class="s1-menu-status" data-s1-status="s1secEc">Optional</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS1Modal('modalS1Ins')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Insurance Information</div>
-            <div class="s1-menu-sub">Primary &amp; secondary insurance, PCP, referring provider</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s2_menu_ins_ttl">Insurance Information</div>
+            <div class="s1-menu-sub" data-i18n="reg.s2_menu_ins_sub">Primary &amp; secondary insurance, PCP, referring provider</div>
           </div>
           <span class="s1-menu-status" data-s1-status="s1secIns">Optional</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS1Modal('modalS1Pharm')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Preferred Pharmacy</div>
-            <div class="s1-menu-sub">Pharmacy name, address, phone</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s2_menu_pharm_ttl">Preferred Pharmacy</div>
+            <div class="s1-menu-sub" data-i18n="reg.s2_menu_pharm_sub">Pharmacy name, address, phone</div>
           </div>
           <span class="s1-menu-status" data-s1-status="s1secPharm">Optional</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
@@ -514,58 +486,58 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS1Details" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Details')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Patient Details</h3>
+            <h3 data-i18n="reg.s2_menu_details_ttl">Patient Details</h3>
             <button class="modal-close" onclick="closeS1Modal('modalS1Details')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s1secDetails">
             <div class="fg fg3">
-              <div class="fld"><label>First Name <span class="req" style="display:none">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
-              <div class="fld"><label>Last Name <span class="req" style="display:none">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
-              <div class="fld"><label>Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_first_name">First Name</span> <span class="req" style="display:none">*</span></label><input type="text" name="first_name" placeholder="First name" required></div>
+              <div class="fld"><label><span data-i18n="reg.s2_last_name">Last Name</span> <span class="req" style="display:none">*</span></label><input type="text" name="last_name" placeholder="Last name" required></div>
+              <div class="fld"><label data-i18n="reg.s2_mi">Middle Initial</label><input type="text" name="mi" placeholder="M" maxlength="1"></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label>Date of Birth <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="dob" required><div class="dpk-pop" data-dpk-pop="dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
-              <div class="fld"><label>Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_dob">Date of Birth</span> <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="dob" required><div class="dpk-pop" data-dpk-pop="dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="reg.s2_age">Age</label><input type="number" name="age" min="0" max="130" placeholder="Age"></div>
             </div>
             <div class="fld mt-16">
-              <label>Sex <span class="req" style="display:none">*</span></label>
+              <label><span data-i18n="reg.s2_sex">Sex</span> <span class="req" style="display:none">*</span></label>
               <div class="radio-row">
-                <label class="rlbl"><input type="radio" name="sex" value="Male" required> <span>Male</span></label>
-                <label class="rlbl"><input type="radio" name="sex" value="Female"> <span>Female</span></label>
+                <label class="rlbl"><input type="radio" name="sex" value="Male" required> <span data-i18n="reg.s2_male">Male</span></label>
+                <label class="rlbl"><input type="radio" name="sex" value="Female"> <span data-i18n="reg.s2_female">Female</span></label>
               </div>
             </div>
-            <div class="fld mt-16"><label>Driver's License/ID #</label><input type="text" name="dl" placeholder="License number"></div>
-            <div class="fld mt-16"><label>Street Address <span class="req" style="display:none">*</span></label><input type="text" name="address" placeholder="Street address" required></div>
+            <div class="fld mt-16"><label data-i18n="reg.s2_dl">Driver's License/ID #</label><input type="text" name="dl" placeholder="License number"></div>
+            <div class="fld mt-16"><label><span data-i18n="reg.s2_address">Street Address</span> <span class="req" style="display:none">*</span></label><input type="text" name="address" placeholder="Street address" required></div>
             <div class="fg fg3 mt-16">
-              <div class="fld"><label>City <span class="req" style="display:none">*</span></label><input type="text" name="city" placeholder="City" required></div>
-              <div class="fld"><label>State <span class="req" style="display:none">*</span></label><input type="text" name="state" placeholder="FL" maxlength="2" required></div>
-              <div class="fld"><label>Zip Code <span class="req" style="display:none">*</span></label><input type="text" name="zip" placeholder="00000" maxlength="10" required></div>
+              <div class="fld"><label><span data-i18n="reg.s2_city">City</span> <span class="req" style="display:none">*</span></label><input type="text" name="city" placeholder="City" required></div>
+              <div class="fld"><label><span data-i18n="reg.s2_state">State</span> <span class="req" style="display:none">*</span></label><input type="text" name="state" placeholder="FL" maxlength="2" required></div>
+              <div class="fld"><label><span data-i18n="reg.s2_zip">Zip Code</span> <span class="req" style="display:none">*</span></label><input type="text" name="zip" placeholder="00000" maxlength="10" required></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label>Home Phone <span class="req" style="display:none">*</span></label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
-              <div class="fld"><label>Cell Phone <span class="req" style="display:none">*</span></label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_home_phone">Home Phone</span> <span class="req" style="display:none">*</span></label><input type="tel" name="home_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_cell_phone">Cell Phone</span> <span class="req" style="display:none">*</span></label><input type="tel" name="cell_phone" placeholder="(000) 000-0000"></div>
             </div>
-            <p class="req-note" style="margin:6px 0 0">At least one phone number is required.</p>
-            <div class="fld mt-16"><label>Email Address <span class="req" style="display:none">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
+            <p class="req-note" style="margin:6px 0 0" data-i18n="reg.s2_phone_note">At least one phone number is required.</p>
+            <div class="fld mt-16"><label><span data-i18n="reg.s2_email">Email Address</span> <span class="req" style="display:none">*</span></label><input type="email" name="email" placeholder="you@example.com" required></div>
             <div class="fld mt-16">
-              <label>Marital Status</label>
+              <label data-i18n="reg.s2_marital">Marital Status</label>
               <div class="radio-row">
-                <label class="rlbl"><input type="radio" name="marital" value="Single"> <span>Single</span></label>
-                <label class="rlbl"><input type="radio" name="marital" value="Married"> <span>Married</span></label>
-                <label class="rlbl"><input type="radio" name="marital" value="Divorced"> <span>Divorced</span></label>
-                <label class="rlbl"><input type="radio" name="marital" value="Widowed"> <span>Widowed</span></label>
+                <label class="rlbl"><input type="radio" name="marital" value="Single"> <span data-i18n="reg.s2_single">Single</span></label>
+                <label class="rlbl"><input type="radio" name="marital" value="Married"> <span data-i18n="reg.s2_married">Married</span></label>
+                <label class="rlbl"><input type="radio" name="marital" value="Divorced"> <span data-i18n="reg.s2_divorced">Divorced</span></label>
+                <label class="rlbl"><input type="radio" name="marital" value="Widowed"> <span data-i18n="reg.s2_widowed">Widowed</span></label>
               </div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label>Employer</label><input type="text" name="employer" placeholder="Employer name"></div>
-              <div class="fld"><label>Occupation</label><input type="text" name="occupation" placeholder="Your occupation"></div>
+              <div class="fld"><label data-i18n="reg.s2_employer">Employer</label><input type="text" name="employer" placeholder="Employer name" data-i18n-placeholder="reg.s2_employer_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_occupation">Occupation</label><input type="text" name="occupation" placeholder="Your occupation" data-i18n-placeholder="reg.s2_occupation_ph"></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="s1ModalNext(0)">Next</button>
+            <button class="btn-nxt" onclick="s1ModalNext(0)" data-i18n="reg.next_btn">Next</button>
           </div>
         </div>
       </div>
@@ -573,28 +545,28 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS1Ec" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Ec')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Emergency Contact</h3>
+            <h3 data-i18n="reg.s2_menu_ec_ttl">Emergency Contact</h3>
             <button class="modal-close" onclick="closeS1Modal('modalS1Ec')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s1secEc">
-            <div class="fsec-ttl" style="margin-bottom:14px">Emergency Contact 1</div>
+            <div class="fsec-ttl" style="margin-bottom:14px" data-i18n="reg.s2_ec1_ttl">Emergency Contact 1</div>
             <div class="fg fg3">
-              <div class="fld"><label>Contact Name <span class="req" style="display:none">*</span></label><input type="text" name="ec_name" placeholder="Full name" required></div>
-              <div class="fld"><label>Relationship <span class="req" style="display:none">*</span></label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc." required></div>
-              <div class="fld"><label>Contact Phone <span class="req" style="display:none">*</span></label><input type="tel" name="ec_phone" placeholder="(000) 000-0000" required></div>
+              <div class="fld"><label><span data-i18n="reg.s2_ec_name">Contact Name</span> <span class="req" style="display:none">*</span></label><input type="text" name="ec_name" placeholder="Full name" required data-i18n-placeholder="reg.s2_ec_name_ph"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_ec_rel">Relationship</span> <span class="req" style="display:none">*</span></label><input type="text" name="ec_rel" placeholder="Spouse, Child, etc." required data-i18n-placeholder="reg.s2_ec_rel_ph"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_ec_phone">Contact Phone</span> <span class="req" style="display:none">*</span></label><input type="tel" name="ec_phone" placeholder="(000) 000-0000" required></div>
             </div>
-            <div class="fsec-ttl" style="margin:24px 0 14px">Emergency Contact 2 (Optional)</div>
+            <div class="fsec-ttl" style="margin:24px 0 14px" data-i18n="reg.s2_ec2_ttl">Emergency Contact 2 (Optional)</div>
             <div class="fg fg3">
-              <div class="fld"><label>Contact Name</label><input type="text" name="ec2_name" placeholder="Full name"></div>
-              <div class="fld"><label>Relationship</label><input type="text" name="ec2_rel" placeholder="Spouse, Child, etc."></div>
-              <div class="fld"><label>Contact Phone</label><input type="tel" name="ec2_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label data-i18n="reg.s2_ec_name">Contact Name</label><input type="text" name="ec2_name" placeholder="Full name" data-i18n-placeholder="reg.s2_ec_name_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_ec_rel">Relationship</label><input type="text" name="ec2_rel" placeholder="Spouse, Child, etc." data-i18n-placeholder="reg.s2_ec_rel_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_ec_phone">Contact Phone</label><input type="tel" name="ec2_phone" placeholder="(000) 000-0000"></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="s1ModalNext(1)">Next</button>
+            <button class="btn-nxt" onclick="s1ModalNext(1)" data-i18n="reg.next_btn">Next</button>
           </div>
         </div>
       </div>
@@ -602,16 +574,16 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS1Ins" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Ins')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Insurance Information</h3>
+            <h3 data-i18n="reg.s2_menu_ins_ttl">Insurance Information</h3>
             <button class="modal-close" onclick="closeS1Modal('modalS1Ins')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s1secIns">
             <div class="fg fg2">
-              <div class="fld"><label>Primary Insurance Company <span class="req" style="display:none">*</span></label><select name="ins1" required onchange="toggleInsOther(this.value); toggleSelfPayFields(this.value)">
-                <option value="">-- Select insurance --</option>
-                <option value="Self-Pay / Uninsured">Self-Pay / Uninsured</option>
+              <div class="fld"><label><span data-i18n="reg.s2_ins1">Primary Insurance Company</span> <span class="req" style="display:none">*</span></label><select name="ins1" required onchange="toggleInsOther(this.value); toggleSelfPayFields(this.value)">
+                <option value="" data-i18n="reg.s2_ins_select">-- Select insurance --</option>
+                <option value="Self-Pay / Uninsured" data-i18n="reg.s2_ins_selfpay">Self-Pay / Uninsured</option>
                 <option value="Medicare">Medicare</option>
                 <option value="Florida Medicaid">Florida Medicaid</option>
                 <option value="Florida Blue (BCBS)">Florida Blue (BCBS)</option>
@@ -629,100 +601,100 @@ footer{background:var(--cream)}
                 <option value="AvMed">AvMed</option>
                 <option value="Coventry Health Care">Coventry Health Care</option>
                 <option value="MultiPlan / PHCS">MultiPlan / PHCS</option>
-                <option value="Other">Other</option>
+                <option value="Other" data-i18n="reg.s2_ins_other">Other</option>
               </select></div>
               <div class="fld">
-                <label>Policy Holder/Payee Name <span class="req" style="display:none">*</span></label>
-                <input type="text" name="ph_name" placeholder="Policy holder full name" required>
-                <label class="clbl mt-16"><input type="checkbox" id="samePatientChk" onchange="toggleSameAsPatient(this.checked)"> <span>Same as Patient</span></label>
+                <label><span data-i18n="reg.s2_ph_name">Policy Holder/Payee Name</span> <span class="req" style="display:none">*</span></label>
+                <input type="text" name="ph_name" placeholder="Policy holder full name" required data-i18n-placeholder="reg.s2_ph_name_ph">
               </div>
             </div>
-            <div class="fld mt-16" id="ins1OtherWrap" style="display:none"><label>Please specify your insurance <span class="req" style="display:none">*</span></label><input type="text" name="ins1_other" placeholder="Insurance company name"></div>
-            <div class="fld mt-16"><label>Policy Holder Date of Birth <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="ph_dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="ph_dob" required><div class="dpk-pop" data-dpk-pop="ph_dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+            <label class="clbl mt-16"><input type="checkbox" onchange="toggleSameAsPatient(this.checked)"> <span data-i18n="reg.s2_same_as_patient">Check if Name and Date of Birth is same as Patient</span></label>
+            <div class="fld mt-16" id="ins1OtherWrap" style="display:none"><label><span data-i18n="reg.s2_ins_other_specify">Please specify your insurance</span> <span class="req" style="display:none">*</span></label><input type="text" name="ins1_other" placeholder="Insurance company name" data-i18n-placeholder="reg.s2_ins_other_ph"></div>
+            <div class="fld mt-16"><label><span data-i18n="reg.s2_ph_dob">Policy Holder Date of Birth</span> <span class="req" style="display:none">*</span></label><div class="dpk" data-dpk="ph_dob"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="ph_dob" required><div class="dpk-pop" data-dpk-pop="ph_dob"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
             <div class="fg fg3 mt-16">
-              <div class="fld"><label>Relation to Patient <span class="req" style="display:none">*</span></label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc." required></div>
-              <div class="fld"><label>Member ID # <span class="req" style="display:none">*</span></label><input type="text" name="member_id" placeholder="Member ID" required></div>
-              <div class="fld"><label>Group #</label><input type="text" name="group_num" placeholder="Group number"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_ph_rel">Relation to Patient</span> <span class="req" style="display:none">*</span></label><input type="text" name="ph_rel" placeholder="Self, Spouse, etc." required data-i18n-placeholder="reg.s2_ph_rel_ph"></div>
+              <div class="fld"><label><span data-i18n="reg.s2_member_id">Member ID #</span> <span class="req" style="display:none">*</span></label><input type="text" name="member_id" placeholder="Member ID" required data-i18n-placeholder="reg.s2_member_id_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_group_num">Group #</label><input type="text" name="group_num" placeholder="Group number" data-i18n-placeholder="reg.s2_group_num_ph"></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label>Secondary Insurance (if any)</label><input type="text" name="ins2" placeholder="Secondary insurance"></div>
-              <div class="fld"><label>Secondary Member ID #</label><input type="text" name="member_id2" placeholder="Secondary member ID"></div>
+              <div class="fld"><label data-i18n="reg.s2_ins2">Secondary Insurance (if any)</label><input type="text" name="ins2" placeholder="Secondary insurance" data-i18n-placeholder="reg.s2_ins2_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_member_id2">Secondary Member ID #</label><input type="text" name="member_id2" placeholder="Secondary member ID" data-i18n-placeholder="reg.s2_member_id2_ph"></div>
             </div>
             <div class="fg fg2 mt-16">
-              <div class="fld"><label>Primary Care Provider (PCP)</label><input type="text" name="pcp" placeholder="PCP name"></div>
-              <div class="fld"><label>Referring Provider</label><input type="text" name="ref_prov" placeholder="Referring provider name"></div>
+              <div class="fld"><label data-i18n="reg.s2_pcp">Primary Care Provider (PCP)</label><input type="text" name="pcp" placeholder="PCP name" data-i18n-placeholder="reg.s2_pcp_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_ref_prov">Referring Provider</label><input type="text" name="ref_prov" placeholder="Referring provider name" data-i18n-placeholder="reg.s2_ref_prov_ph"></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" id="insNextBtn" onclick="s1ModalNext(2)">Next</button>
+            <button class="btn-nxt" id="insNextBtn" onclick="s1ModalNext(2)" data-i18n="reg.next_btn">Next</button>
           </div>
         </div>
       </div>
-      <div class="ins-selfpay-pop" id="insSelfPayPop">Self-Pay/Uninsured selected, no further details needed</div>
+      <div class="ins-selfpay-pop" id="insSelfPayPop" data-i18n="reg.s2_selfpay_pop">Self-Pay/Uninsured selected, no further details needed</div>
 
       <div class="modal-bg" id="modalS1Pharm" onmousedown="modalBackdropMouseDown(event)" onclick="s1Backdrop(event,'modalS1Pharm')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Preferred Pharmacy</h3>
+            <h3 data-i18n="reg.s2_menu_pharm_ttl">Preferred Pharmacy</h3>
             <button class="modal-close" onclick="closeS1Modal('modalS1Pharm')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s1secPharm">
             <div class="fg fg3">
-              <div class="fld"><label>Pharmacy Name</label><input type="text" name="pharm_name" placeholder="Pharmacy name"></div>
-              <div class="fld"><label>Pharmacy Address</label><input type="text" name="pharm_addr" placeholder="Pharmacy address"></div>
-              <div class="fld"><label>Pharmacy Phone</label><input type="tel" name="pharm_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld"><label data-i18n="reg.s2_pharm_name">Pharmacy Name</label><input type="text" name="pharm_name" placeholder="Pharmacy name" data-i18n-placeholder="reg.s2_pharm_name_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_pharm_addr">Pharmacy Address</label><input type="text" name="pharm_addr" placeholder="Pharmacy address" data-i18n-placeholder="reg.s2_pharm_addr_ph"></div>
+              <div class="fld"><label data-i18n="reg.s2_pharm_phone">Pharmacy Phone</label><input type="tel" name="pharm_phone" placeholder="(000) 000-0000"></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" onclick="s1ModalNext(3)">Next</button>
+            <button class="btn-nxt" onclick="s1ModalNext(3)" data-i18n="reg.next_btn">Next</button>
           </div>
         </div>
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(1)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goToConsentsStep()">Next: Consent to Treat &rarr;</button>
+        <button class="btn-back" onclick="goStep(1)" data-i18n="reg.back_btn">&larr; Back</button>
+        <button class="btn-nxt" onclick="goToConsentsStep()" data-i18n="reg.s2_next_btn">Next: Consent to Treat &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 3: Consent to Treat -->
     <div class="fstep" id="fstep3">
-      <h2 class="fstep-ttl">Consents &amp; Signatures</h2>
-      <p class="fstep-sub">Please review and sign each of the following consents.</p>
+      <h2 class="fstep-ttl" data-i18n="reg.step3">Consents &amp; Signatures</h2>
+      <p class="fstep-sub" data-i18n="reg.s3_sub">Please review and sign each of the following consents.</p>
 
       <div class="s1-menu">
         <div class="s1-menu-item" onclick="openS2Modal('modalS2Treat')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Consent to Treat</div>
-            <div class="s1-menu-sub">Consent to treatment, evaluation, and diagnosis</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s3_menu_treat_ttl">Consent to Treat</div>
+            <div class="s1-menu-sub" data-i18n="reg.s3_menu_treat_sub">Consent to treatment, evaluation, and diagnosis</div>
           </div>
           <span class="s1-menu-status" data-s2-status="s2secTreat">Incomplete</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS2Modal('modalS2Financial')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Financial Policy</div>
-            <div class="s1-menu-sub">Co-pays, billing, and cancellation policy</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s3_menu_financial_ttl">Financial Policy</div>
+            <div class="s1-menu-sub" data-i18n="reg.s3_menu_financial_sub">Co-pays, billing, and cancellation policy</div>
           </div>
           <span class="s1-menu-status" data-s2-status="s2secFinancial">Incomplete</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS2Modal('modalS2Hipaa')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">HIPAA Notice of Privacy Practices</div>
-            <div class="s1-menu-sub">Acknowledge our Notice of Privacy Practices</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s3_menu_hipaa_ttl">HIPAA Notice of Privacy Practices</div>
+            <div class="s1-menu-sub" data-i18n="reg.s3_menu_hipaa_sub">Acknowledge our Notice of Privacy Practices</div>
           </div>
           <span class="s1-menu-status" data-s2-status="s2secHipaa">Incomplete</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
         </div>
         <div class="s1-menu-item" onclick="openS2Modal('modalS2TextTele')">
           <div class="s1-menu-txt">
-            <div class="s1-menu-ttl">Text &amp; Telehealth Consent</div>
-            <div class="s1-menu-sub">Optional — text message and telehealth consent</div>
+            <div class="s1-menu-ttl" data-i18n="reg.s3_menu_texttele_ttl">Text &amp; Telehealth Consent</div>
+            <div class="s1-menu-sub" data-i18n="reg.s3_menu_texttele_sub">Optional — text message and telehealth consent</div>
           </div>
           <span class="s1-menu-status" data-s2-status="s2secTextTele">Optional</span>
           <svg class="s1-menu-chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
@@ -732,37 +704,37 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS2Treat" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Treat')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Consent to Treat</h3>
+            <h3 data-i18n="reg.s3_menu_treat_ttl">Consent to Treat</h3>
             <button class="modal-close" onclick="closeS2Modal('modalS2Treat')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s2secTreat">
             <div class="policy-box">
-              <h4>Consent to Treatment</h4>
-              <p>I hereby consent to and authorize West Coast Sleep Clinic and its physicians, nurses, and medical staff to provide medical evaluation, diagnosis, and treatment that they deem appropriate for my care. I understand that the practice of medicine is not an exact science, and that no guarantees or assurances have been made regarding the outcome of any treatment or procedure.</p>
-              <p>I consent to physical examinations, diagnostic tests (including blood draws, sleep studies, imaging, and other procedures), medical treatments, and the administration of medications as deemed necessary by the treating physician.</p>
-              <p>I understand that I may refuse any treatment or procedure at any time, and that I have the right to ask questions about any recommended treatment before consenting to it. I have the right to be informed about my diagnosis, the nature and purpose of any proposed treatment, the risks and benefits, and any alternative treatments available.</p>
-              <p>I acknowledge that I have received and reviewed the Notice of Privacy Practices describing how my protected health information may be used and disclosed. I authorize West Coast Sleep Clinic to use my health information as described in that notice.</p>
-              <p>I authorize West Coast Sleep Clinic to bill my insurance company or other third-party payer on my behalf for services rendered. I understand that I am ultimately responsible for any charges not covered by my insurance.</p>
+              <h4 data-i18n="reg.s3_treat_h4">Consent to Treatment</h4>
+              <p data-i18n="reg.s3_treat_p1">I hereby consent to and authorize West Coast Sleep Clinic and its physicians, nurses, and medical staff to provide medical evaluation, diagnosis, and treatment that they deem appropriate for my care. I understand that the practice of medicine is not an exact science, and that no guarantees or assurances have been made regarding the outcome of any treatment or procedure.</p>
+              <p data-i18n="reg.s3_treat_p2">I consent to physical examinations, diagnostic tests (including blood draws, sleep studies, imaging, and other procedures), medical treatments, and the administration of medications as deemed necessary by the treating physician.</p>
+              <p data-i18n="reg.s3_treat_p3">I understand that I may refuse any treatment or procedure at any time, and that I have the right to ask questions about any recommended treatment before consenting to it. I have the right to be informed about my diagnosis, the nature and purpose of any proposed treatment, the risks and benefits, and any alternative treatments available.</p>
+              <p data-i18n="reg.s3_treat_p4">I acknowledge that I have received and reviewed the Notice of Privacy Practices describing how my protected health information may be used and disclosed. I authorize West Coast Sleep Clinic to use my health information as described in that notice.</p>
+              <p data-i18n="reg.s3_treat_p5">I authorize West Coast Sleep Clinic to bill my insurance company or other third-party payer on my behalf for services rendered. I understand that I am ultimately responsible for any charges not covered by my insurance.</p>
             </div>
             <div class="chk-col">
-              <label class="clbl"><input type="checkbox" name="consent_treat" required> <span>I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span><span class="req">*</span></label>
+              <label class="clbl"><input type="checkbox" name="consent_treat" required> <span data-i18n="reg.s3_treat_checkbox">I have read and understand the Consent to Treatment above, and I consent to the treatment and authorization described.</span><span class="req">*</span></label>
             </div>
             <div class="sig-row">
-              <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label>
+              <div class="fld"><label><span data-i18n="reg.s3_patient_sig">Patient (or Guardian) Signature</span> <span class="req">*</span></label>
                 <div class="sigpad" data-sigpad="sig2">
                   <canvas class="sigpad-canvas"></canvas>
-                  <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="reg.s3_clear_sig">Clear Signature</button></div>
                   <input type="hidden" name="sig2" required>
                 </div>
               </div>
-              <div class="fld"><label>Date</label><div class="dpk" data-dpk="date2"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date2" required><div class="dpk-pop" data-dpk-pop="date2"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="reg.s3_date">Date</label><div class="dpk" data-dpk="date2"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date2" required><div class="dpk-pop" data-dpk-pop="date2"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" data-s2-nextbtn="0" onclick="s2ModalNext(0)" disabled>Next: Financial Policy &rarr;</button>
+            <button class="btn-nxt" data-s2-nextbtn="0" onclick="s2ModalNext(0)" disabled data-i18n="reg.s3_treat_next_btn">Next: Financial Policy &rarr;</button>
           </div>
         </div>
       </div>
@@ -770,39 +742,39 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS2Financial" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Financial')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Financial Policy</h3>
+            <h3 data-i18n="reg.s3_menu_financial_ttl">Financial Policy</h3>
             <button class="modal-close" onclick="closeS2Modal('modalS2Financial')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s2secFinancial">
             <div class="policy-box">
-              <h4>Patient Financial Policy</h4>
-              <p><strong>Co-pays, Deductibles &amp; Co-insurance:</strong> All co-pays, deductibles, and co-insurance amounts are due at the time of service. We accept cash, check, and major credit/debit cards.</p>
-              <p><strong>Insurance Billing:</strong> We will bill your insurance company as a courtesy. You are responsible for ensuring that we have current and accurate insurance information. If your insurance does not pay within 60 days, the balance will become your responsibility.</p>
-              <p><strong>Non-Covered Services:</strong> Some services may not be covered by your insurance plan. You will be financially responsible for these services.</p>
-              <p><strong>Referrals &amp; Prior Authorizations:</strong> If your insurance requires a referral or prior authorization, it is your responsibility to obtain this before your visit. Failure to do so may result in non-payment by your insurance, and you will be responsible for the full balance.</p>
-              <p><strong>Self-Pay Patients:</strong> Payment is due in full at the time of service. Please contact our billing office to discuss payment arrangements if needed.</p>
-              <p><strong>Returned Checks:</strong> A fee of $35.00 will be charged for any returned checks.</p>
-              <p><strong>Cancellations:</strong> We require 24 hours notice for appointment cancellations. Repeated late cancellations or no-shows may result in a fee.</p>
+              <h4 data-i18n="reg.s3_financial_h4">Patient Financial Policy</h4>
+              <p data-i18n="reg.s3_fin_p1"><strong>Co-pays, Deductibles &amp; Co-insurance:</strong> All co-pays, deductibles, and co-insurance amounts are due at the time of service. We accept cash, check, and major credit/debit cards.</p>
+              <p data-i18n="reg.s3_fin_p2"><strong>Insurance Billing:</strong> We will bill your insurance company as a courtesy. You are responsible for ensuring that we have current and accurate insurance information. If your insurance does not pay within 60 days, the balance will become your responsibility.</p>
+              <p data-i18n="reg.s3_fin_p3"><strong>Non-Covered Services:</strong> Some services may not be covered by your insurance plan. You will be financially responsible for these services.</p>
+              <p data-i18n="reg.s3_fin_p4"><strong>Referrals &amp; Prior Authorizations:</strong> If your insurance requires a referral or prior authorization, it is your responsibility to obtain this before your visit. Failure to do so may result in non-payment by your insurance, and you will be responsible for the full balance.</p>
+              <p data-i18n="reg.s3_fin_p5"><strong>Self-Pay Patients:</strong> Payment is due in full at the time of service. Please contact our billing office to discuss payment arrangements if needed.</p>
+              <p data-i18n="reg.s3_fin_p6"><strong>Returned Checks:</strong> A fee of $35.00 will be charged for any returned checks.</p>
+              <p data-i18n="reg.s3_fin_p7"><strong>Cancellations:</strong> We require 24 hours notice for appointment cancellations. Repeated late cancellations or no-shows may result in a fee.</p>
             </div>
             <div class="chk-col">
-              <label class="clbl"><input type="checkbox" name="consent_financial" required> <span>I have read and understand the Financial Policy above, and I agree to abide by its terms.</span><span class="req">*</span></label>
+              <label class="clbl"><input type="checkbox" name="consent_financial" required> <span data-i18n="reg.s3_fin_checkbox">I have read and understand the Financial Policy above, and I agree to abide by its terms.</span><span class="req">*</span></label>
             </div>
             <div class="sig-row">
-              <div class="fld"><label>Patient (or Guardian) Signature <span class="req">*</span></label>
+              <div class="fld"><label><span data-i18n="reg.s3_patient_sig">Patient (or Guardian) Signature</span> <span class="req">*</span></label>
                 <div class="sigpad" data-sigpad="sig3">
                   <canvas class="sigpad-canvas"></canvas>
-                  <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="reg.s3_clear_sig">Clear Signature</button></div>
                   <input type="hidden" name="sig3" required>
                 </div>
               </div>
-              <div class="fld"><label>Date</label><div class="dpk" data-dpk="date3"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date3" required><div class="dpk-pop" data-dpk-pop="date3"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="reg.s3_date">Date</label><div class="dpk" data-dpk="date3"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date3" required><div class="dpk-pop" data-dpk-pop="date3"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" data-s2-nextbtn="1" onclick="s2ModalNext(1)" disabled>Next: HIPAA Notice &rarr;</button>
+            <button class="btn-nxt" data-s2-nextbtn="1" onclick="s2ModalNext(1)" disabled data-i18n="reg.s3_fin_next_btn">Next: HIPAA Notice &rarr;</button>
           </div>
         </div>
       </div>
@@ -810,41 +782,41 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS2Hipaa" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2Hipaa')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>HIPAA Notice of Privacy Practices</h3>
+            <h3 data-i18n="reg.s3_menu_hipaa_ttl">HIPAA Notice of Privacy Practices</h3>
             <button class="modal-close" onclick="closeS2Modal('modalS2Hipaa')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s2secHipaa">
             <div class="policy-box">
-              <h4>Notice of Privacy Practices — Acknowledgment</h4>
-              <p>This notice describes how medical information about you may be used and disclosed and how you can get access to this information. Please review it carefully.</p>
-              <p><strong>Our Commitment to Your Privacy:</strong> West Coast Sleep Clinic is dedicated to maintaining the privacy of your protected health information (PHI). We are required by law to maintain the privacy of your PHI and to provide you with this notice regarding our legal duties and privacy practices.</p>
-              <p><strong>How We May Use Your Information:</strong> We may use or disclose your PHI for treatment purposes (such as sharing information with other providers involved in your care), payment purposes (such as billing your insurance company), and healthcare operations (such as quality assessment and improvement activities).</p>
-              <p><strong>Your Rights:</strong> You have the right to:<ul><li>Request a restriction on uses and disclosures of your PHI</li><li>Request confidential communications</li><li>Inspect and copy your PHI</li><li>Request an amendment to your PHI</li><li>Receive an accounting of disclosures</li><li>Receive a copy of this notice</li></ul></p>
-              <p><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
+              <h4 data-i18n="reg.s3_hipaa_h4">Notice of Privacy Practices — Acknowledgment</h4>
+              <p data-i18n="reg.s3_hipaa_p1">This notice describes how medical information about you may be used and disclosed and how you can get access to this information. Please review it carefully.</p>
+              <p data-i18n="reg.s3_hipaa_p2"><strong>Our Commitment to Your Privacy:</strong> West Coast Sleep Clinic is dedicated to maintaining the privacy of your protected health information (PHI). We are required by law to maintain the privacy of your PHI and to provide you with this notice regarding our legal duties and privacy practices.</p>
+              <p data-i18n="reg.s3_hipaa_p3"><strong>How We May Use Your Information:</strong> We may use or disclose your PHI for treatment purposes (such as sharing information with other providers involved in your care), payment purposes (such as billing your insurance company), and healthcare operations (such as quality assessment and improvement activities).</p>
+              <p data-i18n="reg.s3_hipaa_p4"><strong>Your Rights:</strong> You have the right to:<ul><li>Request a restriction on uses and disclosures of your PHI</li><li>Request confidential communications</li><li>Inspect and copy your PHI</li><li>Request an amendment to your PHI</li><li>Receive an accounting of disclosures</li><li>Receive a copy of this notice</li></ul></p>
+              <p data-i18n="reg.s3_hipaa_p5"><strong>Complaints:</strong> If you believe your privacy rights have been violated, you may file a complaint with our Privacy Officer or with the U.S. Department of Health and Human Services. We will not retaliate against you for filing a complaint.</p>
             </div>
             <div class="chk-col">
-              <label class="clbl"><input type="checkbox" name="consent_hipaa" required> <span>I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</span><span class="req">*</span></label>
+              <label class="clbl"><input type="checkbox" name="consent_hipaa" required> <span data-i18n="reg.s3_hipaa_checkbox">I acknowledge that I have received and reviewed the Notice of Privacy Practices for West Coast Sleep Clinic.</span><span class="req">*</span></label>
             </div>
             <div class="fld" style="margin-top:18px">
-              <label>If you are signing on behalf of the patient, please explain your relationship:</label>
-              <input type="text" name="hipaa_rep" placeholder="Leave blank if signing for yourself">
+              <label data-i18n="reg.s3_hipaa_rep_lbl">If you are signing on behalf of the patient, please explain your relationship:</label>
+              <input type="text" name="hipaa_rep" placeholder="Leave blank if signing for yourself" data-i18n-placeholder="reg.s3_hipaa_rep_ph">
             </div>
             <div class="sig-row">
-              <div class="fld"><label>Patient (or Representative) Signature <span class="req">*</span></label>
+              <div class="fld"><label><span data-i18n="reg.s3_hipaa_sig_lbl">Patient (or Representative) Signature</span> <span class="req">*</span></label>
                 <div class="sigpad" data-sigpad="sig4">
                   <canvas class="sigpad-canvas"></canvas>
-                  <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="reg.s3_clear_sig">Clear Signature</button></div>
                   <input type="hidden" name="sig4" required>
                 </div>
               </div>
-              <div class="fld"><label>Date</label><div class="dpk" data-dpk="date4"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date4" required><div class="dpk-pop" data-dpk-pop="date4"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="reg.s3_date">Date</label><div class="dpk" data-dpk="date4"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date4" required><div class="dpk-pop" data-dpk-pop="date4"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" data-s2-nextbtn="2" onclick="s2ModalNext(2)" disabled>Next: Text &amp; Telehealth &rarr;</button>
+            <button class="btn-nxt" data-s2-nextbtn="2" onclick="s2ModalNext(2)" disabled data-i18n="reg.s3_hipaa_next_btn">Next: Text &amp; Telehealth &rarr;</button>
           </div>
         </div>
       </div>
@@ -852,153 +824,153 @@ footer{background:var(--cream)}
       <div class="modal-bg" id="modalS2TextTele" onmousedown="modalBackdropMouseDown(event)" onclick="s2Backdrop(event,'modalS2TextTele')">
         <div class="modal-card">
           <div class="modal-head">
-            <h3>Text &amp; Telehealth Consent</h3>
+            <h3 data-i18n="reg.s3_menu_texttele_ttl">Text &amp; Telehealth Consent</h3>
             <button class="modal-close" onclick="closeS2Modal('modalS2TextTele')" aria-label="Close">
               <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <div class="modal-body" id="s2secTextTele">
             <div class="fsec">
-              <div class="fsec-ttl">Text Message Consent</div>
+              <div class="fsec-ttl" data-i18n="reg.s3_text_sec_ttl">Text Message Consent</div>
               <div class="policy-box">
-                <h4>Consent to Receive Text Messages</h4>
-                <p>By signing below, you consent to receive text messages (SMS) from West Coast Sleep Clinic at the mobile phone number(s) you have provided. These messages may include appointment reminders, health information, billing notifications, and other practice communications.</p>
-                <p><strong>Message and data rates may apply.</strong> Message frequency varies. You may opt out at any time by replying STOP to any text message. Reply HELP for help. Carriers are not liable for delayed or undelivered messages.</p>
-                <p>Text messaging is not a secure form of communication. By consenting, you understand and accept the risk that text messages may be intercepted. Do not send sensitive medical information via text message.</p>
+                <h4 data-i18n="reg.s3_text_h4">Consent to Receive Text Messages</h4>
+                <p data-i18n="reg.s3_text_p1">By signing below, you consent to receive text messages (SMS) from West Coast Sleep Clinic at the mobile phone number(s) you have provided. These messages may include appointment reminders, health information, billing notifications, and other practice communications.</p>
+                <p data-i18n="reg.s3_text_p2"><strong>Message and data rates may apply.</strong> Message frequency varies. You may opt out at any time by replying STOP to any text message. Reply HELP for help. Carriers are not liable for delayed or undelivered messages.</p>
+                <p data-i18n="reg.s3_text_p3">Text messaging is not a secure form of communication. By consenting, you understand and accept the risk that text messages may be intercepted. Do not send sensitive medical information via text message.</p>
               </div>
               <div class="chk-col">
-                <label class="clbl"><input type="checkbox" name="consent_text" onchange="setStep5Conditional()"> <span>I consent to receive text messages from West Coast Sleep Clinic as described above.</span></label>
+                <label class="clbl"><input type="checkbox" name="consent_text" onchange="setStep5Conditional()"> <span data-i18n="reg.s3_text_checkbox">I consent to receive text messages from West Coast Sleep Clinic as described above.</span></label>
               </div>
-              <div class="fld" style="margin-top:14px"><label>Best Cell Phone for Texts<span class="req" id="req-text-phone" style="display:none">*</span></label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
+              <div class="fld" style="margin-top:14px"><label><span data-i18n="reg.s3_text_phone_lbl">Best Cell Phone for Texts</span><span class="req" id="req-text-phone" style="display:none">*</span></label><input type="tel" name="text_phone" placeholder="(000) 000-0000"></div>
             </div>
             <div class="fsec">
-              <div class="fsec-ttl">Telehealth Consent</div>
+              <div class="fsec-ttl" data-i18n="reg.s3_tele_sec_ttl">Telehealth Consent</div>
               <div class="policy-box">
-                <h4>Consent to Telehealth Services</h4>
-                <p>Telehealth involves the use of electronic communications to enable healthcare providers to provide clinical services to patients using interactive audio, video, or data communications. I understand that telehealth services involve the communication of my personal medical information, both orally and visually, to healthcare practitioners located in other areas.</p>
-                <p><strong>Risks &amp; Benefits:</strong> I understand there are potential risks with telehealth including interruptions, unauthorized access, and technical difficulties. I understand that my healthcare provider may determine that the transmitted information is of insufficient quality to make medical or health decisions, and that I may need an in-person visit.</p>
-                <p><strong>Confidentiality:</strong> I understand that the laws that protect the privacy and security of my health information apply to telehealth services. West Coast Sleep Clinic will take steps to ensure my information is secure.</p>
-                <p>I understand I may refuse telehealth services at any time without affecting my right to future care or treatment.</p>
+                <h4 data-i18n="reg.s3_tele_h4">Consent to Telehealth Services</h4>
+                <p data-i18n="reg.s3_tele_p1">Telehealth involves the use of electronic communications to enable healthcare providers to provide clinical services to patients using interactive audio, video, or data communications. I understand that telehealth services involve the communication of my personal medical information, both orally and visually, to healthcare practitioners located in other areas.</p>
+                <p data-i18n="reg.s3_tele_p2"><strong>Risks &amp; Benefits:</strong> I understand there are potential risks with telehealth including interruptions, unauthorized access, and technical difficulties. I understand that my healthcare provider may determine that the transmitted information is of insufficient quality to make medical or health decisions, and that I may need an in-person visit.</p>
+                <p data-i18n="reg.s3_tele_p3"><strong>Confidentiality:</strong> I understand that the laws that protect the privacy and security of my health information apply to telehealth services. West Coast Sleep Clinic will take steps to ensure my information is secure.</p>
+                <p data-i18n="reg.s3_tele_p4">I understand I may refuse telehealth services at any time without affecting my right to future care or treatment.</p>
               </div>
               <div class="chk-col">
-                <label class="clbl"><input type="checkbox" name="consent_telehealth" onchange="setStep5Conditional()"> <span>I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</span></label>
+                <label class="clbl"><input type="checkbox" name="consent_telehealth" onchange="setStep5Conditional()"> <span data-i18n="reg.s3_tele_checkbox">I consent to telehealth services as described above and understand the risks and benefits associated with receiving care via telehealth.</span></label>
               </div>
             </div>
             <div class="sig-row">
-              <div class="fld"><label>Patient (or Guardian) Signature <span class="req" id="req-sig5" style="display:none">*</span></label>
+              <div class="fld"><label><span data-i18n="reg.s3_patient_sig">Patient (or Guardian) Signature</span> <span class="req" id="req-sig5" style="display:none">*</span></label>
                 <div class="sigpad" data-sigpad="sig5">
                   <canvas class="sigpad-canvas"></canvas>
-                  <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
+                  <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="reg.s3_clear_sig">Clear Signature</button></div>
                   <input type="hidden" name="sig5">
                 </div>
               </div>
-              <div class="fld"><label>Date</label><div class="dpk" data-dpk="date5"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date5"><div class="dpk-pop" data-dpk-pop="date5"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+              <div class="fld"><label data-i18n="reg.s3_date">Date</label><div class="dpk" data-dpk="date5"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date5"><div class="dpk-pop" data-dpk-pop="date5"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
             </div>
           </div>
           <div class="modal-foot">
             <span></span>
-            <button class="btn-nxt" data-s2-nextbtn="3" onclick="s2ModalNext(3)">Done</button>
+            <button class="btn-nxt" data-s2-nextbtn="3" onclick="s2ModalNext(3)" data-i18n="reg.s3_done_btn">Done</button>
           </div>
         </div>
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(2)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(4)">Next: Authorization to Release &rarr;</button>
+        <button class="btn-back" onclick="goStep(2)" data-i18n="reg.back_btn">&larr; Back</button>
+        <button class="btn-nxt" onclick="goToAuthorizationStep()" data-i18n="reg.s3_next_btn">Next: Medical Record Request &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 4: Authorization to Release -->
     <div class="fstep" id="fstep4">
-      <h2 class="fstep-ttl">Authorization to Release and Request Medical Records</h2>
-      <p class="fstep-sub">Complete this form to authorize an outside provider to release your prior medical records to West Coast Sleep Clinic.</p>
+      <h2 class="fstep-ttl" data-i18n="reg.s4_ttl">Authorization to Request Medical Records</h2>
+      <p class="fstep-sub" data-i18n="reg.s4_sub">Complete this form to authorize an outside provider to release your prior medical records to West Coast Sleep Clinic.</p>
 
       <div class="fsec">
-        <div class="fsec-ttl">Healthcare Provider Releasing Records</div>
+        <div class="fsec-ttl" data-i18n="reg.s4_provider_ttl">Your Healthcare Provider to Release Records to West Coast Sleep Clinic</div>
         <div class="fg fg2">
-          <div class="fld"><label>Facility/Provider</label><input type="text" name="release_from_facility"></div>
-          <div class="fld"><label>Address</label><input type="text" name="release_from_address"></div>
+          <div class="fld"><label data-i18n="reg.s4_facility">Facility/Provider</label><input type="text" name="release_from_facility"></div>
+          <div class="fld"><label data-i18n="reg.s4_address">Address</label><input type="text" name="release_from_address"></div>
         </div>
         <div class="fg fg2 mt-16">
-          <div class="fld"><label>Phone</label><input type="text" name="release_from_phone"></div>
-          <div class="fld"><label>Fax</label><input type="text" name="release_from_fax"></div>
+          <div class="fld"><label data-i18n="reg.s4_phone">Phone</label><input type="text" name="release_from_phone"></div>
+          <div class="fld"><label data-i18n="reg.s4_fax">Fax</label><input type="text" name="release_from_fax"></div>
         </div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Records Requested</div>
+        <div class="fsec-ttl" data-i18n="reg.s4_records_ttl">Select type of Records West Coast Sleep Clinic can request from your provider</div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="release_rec_complete"> <span>Complete Medical Record</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_office_visit"> <span>Office Visit Notes</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_sleep_study"> <span>Sleep Study Reports</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_consultation"> <span>Consultation Notes</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_medication_list"> <span>Medication List</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_labs"> <span>Labs</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_imaging"> <span>Imaging</span></label>
-          <label class="clbl"><input type="checkbox" name="release_rec_other" onchange="toggleReleaseOther('releaseRecOtherWrap', this.checked)"> <span>Other</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_complete"> <span data-i18n="reg.s4_rec_complete">Complete Medical Record</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_office_visit"> <span data-i18n="reg.s4_rec_office_visit">Office Visit Notes</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_sleep_study"> <span data-i18n="reg.s4_rec_sleep_study">Sleep Study Reports</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_consultation"> <span data-i18n="reg.s4_rec_consultation">Consultation Notes</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_medication_list"> <span data-i18n="reg.s4_rec_medication_list">Medication List</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_labs"> <span data-i18n="reg.s4_rec_labs">Labs</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_imaging"> <span data-i18n="reg.s4_rec_imaging">Imaging</span></label>
+          <label class="clbl"><input type="checkbox" name="release_rec_other" onchange="toggleReleaseOther('releaseRecOtherWrap', this.checked)"> <span data-i18n="reg.s4_other">Other</span></label>
         </div>
-        <div class="fld mt-16" id="releaseRecOtherWrap" style="display:none"><label>Please specify</label><input type="text" name="release_rec_other_text"></div>
+        <div class="fld mt-16" id="releaseRecOtherWrap" style="display:none"><label data-i18n="reg.s4_specify">Please specify</label><input type="text" name="release_rec_other_text"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Purpose</div>
+        <div class="fsec-ttl" data-i18n="reg.s4_purpose_ttl">Purpose</div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="release_purpose_continuity"> <span>Continuity of Care</span></label>
-          <label class="clbl"><input type="checkbox" name="release_purpose_treatment"> <span>Treatment</span></label>
-          <label class="clbl"><input type="checkbox" name="release_purpose_patient_request"> <span>Patient Request</span></label>
-          <label class="clbl"><input type="checkbox" name="release_purpose_other" onchange="toggleReleaseOther('releasePurposeOtherWrap', this.checked)"> <span>Other</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_continuity"> <span data-i18n="reg.s4_purpose_continuity">Continuity of Care</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_treatment"> <span data-i18n="reg.s4_purpose_treatment">Treatment</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_patient_request"> <span data-i18n="reg.s4_purpose_patient_request">Patient Request</span></label>
+          <label class="clbl"><input type="checkbox" name="release_purpose_other" onchange="toggleReleaseOther('releasePurposeOtherWrap', this.checked)"> <span data-i18n="reg.s4_other">Other</span></label>
         </div>
-        <div class="fld mt-16" id="releasePurposeOtherWrap" style="display:none"><label>Please specify</label><input type="text" name="release_purpose_other_text"></div>
+        <div class="fld mt-16" id="releasePurposeOtherWrap" style="display:none"><label data-i18n="reg.s4_specify">Please specify</label><input type="text" name="release_purpose_other_text"></div>
       </div>
 
       <div class="fsec">
-        <div class="fsec-ttl">Date Range</div>
+        <div class="fsec-ttl" data-i18n="reg.s4_daterange_ttl">Date Range</div>
         <div class="chk-col">
-          <label class="clbl"><input type="checkbox" name="release_daterange_all" onchange="toggleReleaseDateRange(this.checked)"> <span>All Records</span></label>
+          <label class="clbl"><input type="checkbox" name="release_daterange_all" onchange="toggleReleaseDateRange(this.checked)"> <span data-i18n="reg.s4_all_records">All Records</span></label>
         </div>
         <div class="fg fg2 mt-16" id="releaseDateRangeWrap">
-          <div class="fld"><label>From</label><div class="dpk" data-dpk="release_daterange_from"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_from"><div class="dpk-pop" data-dpk-pop="release_daterange_from"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
-          <div class="fld"><label>To</label><div class="dpk" data-dpk="release_daterange_to"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_to"><div class="dpk-pop" data-dpk-pop="release_daterange_to"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+          <div class="fld"><label data-i18n="reg.s4_from">From</label><div class="dpk" data-dpk="release_daterange_from"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_from"><div class="dpk-pop" data-dpk-pop="release_daterange_from"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
+          <div class="fld"><label data-i18n="reg.s4_to">To</label><div class="dpk" data-dpk="release_daterange_to"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="release_daterange_to"><div class="dpk-pop" data-dpk-pop="release_daterange_to"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
         </div>
       </div>
 
       <div class="policy-box">
-        <h4>Authorization</h4>
-        <p>I authorize the healthcare provider listed above to release my protected health information to West Coast Sleep Clinic. I understand this authorization may be revoked in writing at any time except where action has already been taken. This authorization expires one year from the date signed unless otherwise specified.</p>
+        <h4 data-i18n="reg.s4_auth_h4">Authorization</h4>
+        <p data-i18n="reg.s4_auth_p">I authorize the healthcare provider listed above to release my protected health information to West Coast Sleep Clinic. I understand this authorization may be revoked in writing at any time except where action has already been taken. This authorization expires one year from the date signed unless otherwise specified.</p>
       </div>
       <div class="chk-col">
-        <label class="clbl"><input type="checkbox" name="consent_release" required> <span>I authorize the release of the medical information described above.</span><span class="req">*</span></label>
+        <label class="clbl"><input type="checkbox" name="consent_release" required> <span data-i18n="reg.s4_checkbox">I authorize the release of the medical information described above.</span><span class="req">*</span></label>
       </div>
 
       <div class="fg fg2 mt-16">
-        <div class="fld"><label>Relationship (if applicable)</label><input type="text" name="release_relationship"></div>
+        <div class="fld"><label data-i18n="reg.s4_relationship">Relationship (if applicable)</label><input type="text" name="release_relationship"></div>
       </div>
 
       <div class="sig-row">
-        <div class="fld"><label>Patient/Legal Representative Signature <span class="req">*</span></label>
+        <div class="fld"><label><span data-i18n="reg.s4_patient_sig">Patient/Legal Representative Signature</span> <span class="req">*</span></label>
           <div class="sigpad" data-sigpad="sig6">
             <canvas class="sigpad-canvas"></canvas>
-            <div class="sigpad-foot"><button type="button" class="sigpad-clear">Clear Signature</button></div>
+            <div class="sigpad-foot"><button type="button" class="sigpad-clear" data-i18n="reg.s3_clear_sig">Clear Signature</button></div>
             <input type="hidden" name="sig6" required>
           </div>
         </div>
-        <div class="fld"><label>Date</label><div class="dpk" data-dpk="date6"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date6" required><div class="dpk-pop" data-dpk-pop="date6"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month">&rsaquo;</button></div><div class="dpk-wk"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class="dpk-grid"></div></div></div></div>
+        <div class="fld"><label data-i18n="reg.s3_date">Date</label><div class="dpk" data-dpk="date6"><input type="text" class="dpk-input" placeholder="MM/DD/YYYY" inputmode="numeric" autocomplete="off"><input type="hidden" name="date6" required><div class="dpk-pop" data-dpk-pop="date6"><div class="dpk-hd"><button type="button" class="dpk-nav" data-dpk-prev aria-label="Previous month" data-i18n-aria="common.dpk_prev_month">&lsaquo;</button><span class="dpk-mtitle"></span><button type="button" class="dpk-nav" data-dpk-next aria-label="Next month" data-i18n-aria="common.dpk_next_month">&rsaquo;</button></div><div class="dpk-wk"><span data-i18n="common.dpk_su">Su</span><span data-i18n="common.dpk_mo">Mo</span><span data-i18n="common.dpk_tu">Tu</span><span data-i18n="common.dpk_we">We</span><span data-i18n="common.dpk_th">Th</span><span data-i18n="common.dpk_fr">Fr</span><span data-i18n="common.dpk_sa">Sa</span></div><div class="dpk-grid"></div></div></div></div>
       </div>
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(3)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(5)">Next: Schedule Appointment &rarr;</button>
+        <button class="btn-back" onclick="goStep(3)" data-i18n="reg.back_btn">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(5)" data-i18n="reg.s4_next_btn">Next: Schedule Appointment &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 5: Schedule Appointment -->
     <div class="fstep" id="fstep5">
-      <h2 class="fstep-ttl">Schedule Appointment</h2>
-      <p class="fstep-sub">Pick a time that works for you. Availability reflects the doctor's real schedule.</p>
+      <h2 class="fstep-ttl" data-i18n="reg.step5">Schedule Appointment</h2>
+      <p class="fstep-sub" data-i18n="reg.s5_sub">Pick a time that works for you. Availability reflects the doctor's real schedule.</p>
 
       <div class="slotpicker" id="apptSlotPicker">
-        <div class="slotpicker-loading" id="apptSlotLoading">Loading available appointment times&hellip;</div>
+        <div class="slotpicker-loading" id="apptSlotLoading" data-i18n="reg.s5_loading">Loading available appointment times&hellip;</div>
         <div class="slotpicker-fallback" id="apptSlotFallback" style="display:none">
-          <p>We're unable to show real-time availability right now. Our office will call you to confirm your appointment time.</p>
+          <p data-i18n="reg.s5_fallback">We're unable to show real-time availability right now. Our office will call you to confirm your appointment time.</p>
         </div>
         <div class="slotpicker-days" id="apptSlotDays" style="display:none"></div>
         <input type="hidden" name="appointment_date">
@@ -1007,56 +979,56 @@ footer{background:var(--cream)}
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(4)">&larr; Back</button>
-        <button class="btn-nxt" onclick="goStep(6)">Next: Review &amp; Submit &rarr;</button>
+        <button class="btn-back" onclick="goStep(4)" data-i18n="reg.back_btn">&larr; Back</button>
+        <button class="btn-nxt" onclick="goStep(6)" data-i18n="reg.s6_next_btn">Next: Review &amp; Submit &rarr;</button>
       </div>
     </div>
 
     <!-- STEP 6: Review & Submit -->
     <div class="fstep" id="fstep6">
-      <h2 class="fstep-ttl">Review &amp; Submit</h2>
-      <p class="fstep-sub">Please review your information below before submitting. Click Edit on any section to make changes.</p>
+      <h2 class="fstep-ttl" data-i18n="reg.step6">Review &amp; Submit</h2>
+      <p class="fstep-sub" data-i18n="reg.s6_sub">Please review your information below before submitting. Click Edit on any section to make changes.</p>
 
       <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Patient Demographics</div><button class="rv-edit" type="button" onclick="goStep(2)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl" data-i18n="reg.s6_card_demographics">Patient Demographics</div><button class="rv-edit" type="button" onclick="goStep(2)" data-i18n="reg.s6_edit_btn">Edit</button></div>
         <div id="rvDemographics"></div>
       </div>
 
       <div class="rv-card rv-card-compact">
-        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Reason for Appointment</div><button class="rv-edit" type="button" onclick="goStep(1)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="reg.s6_card_reason">Reason for Appointment</span></div><button class="rv-edit" type="button" onclick="goStep(1)" data-i18n="reg.s6_edit_btn">Edit</button></div>
       </div>
 
       <div class="rv-card rv-card-compact">
-        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Consents &amp; Signatures</div><button class="rv-edit" type="button" onclick="goStep(3)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="reg.s6_card_consents">Consents &amp; Signatures</span></div><button class="rv-edit" type="button" onclick="goStep(3)" data-i18n="reg.s6_edit_btn">Edit</button></div>
       </div>
 
       <div class="rv-card rv-card-compact">
-        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Authorization to Release</div><button class="rv-edit" type="button" onclick="goStep(4)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="reg.s6_card_release">Authorization to Release</span></div><button class="rv-edit" type="button" onclick="goStep(4)" data-i18n="reg.s6_edit_btn">Edit</button></div>
       </div>
 
       <div class="rv-card rv-card-compact">
-        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Scheduled Appointment</div><button class="rv-edit" type="button" onclick="goStep(5)">Edit</button></div>
+        <div class="rv-card-hd"><div class="rv-card-ttl"><span class="rv-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="reg.s6_card_scheduled">Scheduled Appointment</span></div><button class="rv-edit" type="button" onclick="goStep(5)" data-i18n="reg.s6_edit_btn">Edit</button></div>
       </div>
 
       <div class="rv-card">
-        <div class="rv-card-hd"><div class="rv-card-ttl">Upload Documents (optional)</div></div>
-        <p style="font-size:13px;color:var(--tl);margin-bottom:16px">If you have insurance cards, referral paperwork, or prior sleep study results, you may upload them here.</p>
+        <div class="rv-card-hd"><div class="rv-card-ttl" data-i18n="reg.s6_upload_ttl">Upload Documents (optional)</div></div>
+        <p style="font-size:13px;color:var(--tl);margin-bottom:16px" data-i18n="reg.s6_upload_note">If you have insurance cards, referral paperwork, or prior sleep study results, you may upload them here.</p>
         <div class="drop-zone" id="regDropZone">
           <input type="file" id="regFileInputDrop" multiple
             accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
           <div class="dz-icon">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           </div>
-          <div class="dz-primary">Drag &amp; drop files here</div>
+          <div class="dz-primary" data-i18n="referral.dropzone_text">Drag &amp; drop files here</div>
           <div class="dz-types">Word &middot; PDF &middot; Excel &middot; PNG &middot; JPEG</div>
         </div>
 
-        <div class="dz-or">or</div>
+        <div class="dz-or" data-i18n="referral.or">or</div>
 
         <div style="text-align:center">
           <label class="btn-browse">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Browse from Device</span>
+            <span data-i18n="referral.browse_btn">Browse from Device</span>
             <input type="file" id="regFileInputBrowse" multiple
               accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
           </label>
@@ -1068,8 +1040,8 @@ footer{background:var(--cream)}
       </div>
 
       <div class="form-nav">
-        <button class="btn-back" onclick="goStep(5)">&larr; Back</button>
-        <button class="btn-sub" onclick="submitForms()">Submit Registration &#10003;</button>
+        <button class="btn-back" onclick="goStep(5)" data-i18n="reg.back_btn">&larr; Back</button>
+        <button class="btn-sub" onclick="submitForms()" data-i18n="reg.submit_btn">Submit Registration &#10003;</button>
       </div>
     </div>
 
@@ -1081,17 +1053,17 @@ footer{background:var(--cream)}
 <!-- Completion page -->
 <div id="donePg" class="done-wrap">
   <div class="done-icon" id="doneIcon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-  <h2 id="doneHeading">Registration Complete!</h2>
+  <h2 id="doneHeading" data-i18n="reg.done_heading">Registration Complete!</h2>
   <div id="normalDoneMsg">
-    <p>Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
-    <p>We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
-    <p><em>Sleep Better. Feel Better. Live Better.</em></p>
+    <p data-i18n="reg.done_p1">Thank you for completing your patient registration. Our team at West Coast Sleep Clinic has received your forms.</p>
+    <p data-i18n="reg.done_p2">We will contact you shortly to confirm your appointment. If you have any questions, please call or text us at <strong>727-472-9112</strong>.</p>
+    <p><em data-i18n="reg.done_p3">Sleep Better. Feel Better. Live Better.</em></p>
   </div>
   <div id="alreadyRegisteredMsg" style="display:none">
-    <p>It looks like a registration was already submitted under this name and date of birth. Please call our office at <strong>727-472-9112</strong> so our team can look into this for you.</p>
+    <p data-i18n="reg.already_registered_p">It looks like a registration was already submitted under this name and date of birth. Please call our office at <strong>727-472-9112</strong> so our team can look into this for you.</p>
   </div>
   <div style="margin-top:36px">
-    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block">Return to Home</a>
+    <a href="/" style="background:var(--dg);color:#fff;border:none;padding:14px 32px;font-size:14px;font-weight:600;letter-spacing:.06em;border-radius:5px;text-decoration:none;display:inline-block" data-i18n="reg.return_home">Return to Home</a>
   </div>
 </div>
 
@@ -1132,15 +1104,16 @@ footer{background:var(--cream)}
 
 <div class="call-fab">
   <div class="call-fab-pop" id="callFabPop">
-    <div class="call-fab-pop-lbl">Call Us</div>
+    <div class="call-fab-pop-lbl" data-i18n="common.callfab_label">Call Us</div>
     <a href="tel:7274729112">727-472-9112</a>
   </div>
-  <button class="call-fab-btn" aria-label="Call Us" onclick="toggleCallFab()">
+  <button class="call-fab-btn" aria-label="Call Us" data-i18n-aria="common.callfab_aria" onclick="toggleCallFab()">
     <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
   </button>
 </div>
 <!-- SHARED:FOOTER:END -->
 
+<script src="i18n.js"></script>
 <script src="storage-client.js"></script>
 <script>
 var EPWORTH_ITEMS = 8;
@@ -1277,12 +1250,12 @@ function renderS1Menu() {
     if (!badge || !container) return;
     var required = container.querySelectorAll('[required]');
     if (required.length === 0 && !S1_ANY_GROUPS[containerId]) {
-      badge.textContent = 'Optional';
+      badge.textContent = t('reg.status_optional');
       badge.className = 's1-menu-status s1-optional';
       return;
     }
     var complete = sectionOk(containerId);
-    badge.textContent = complete ? 'Complete' : 'Incomplete';
+    badge.textContent = complete ? t('reg.status_complete') : t('reg.status_incomplete');
     badge.className = 's1-menu-status ' + (complete ? 's1-complete' : 's1-incomplete');
   });
 }
@@ -1360,6 +1333,7 @@ function markEmptyRequired(container) {
     var fld = el.closest('.fld');
     var reqSpan = fld ? fld.querySelector('.req') : null;
     if (reqSpan) reqSpan.style.display = isEmpty ? '' : 'none';
+    if (fld) fld.classList.toggle('spotlight', isEmpty);
     if (isEmpty) allFilled = false;
   }
   if (!markAnyGroup(container)) allFilled = false;
@@ -1379,6 +1353,7 @@ function markAnyGroup(container) {
       var fld = el ? el.closest('.fld') : null;
       var reqSpan = fld ? fld.querySelector('.req') : null;
       if (reqSpan) reqSpan.style.display = satisfied ? 'none' : '';
+      if (fld) fld.classList.toggle('spotlight', !satisfied);
     });
   });
   return satisfied;
@@ -1543,10 +1518,10 @@ function renderS2() {
     var badge = document.querySelector('[data-s2-status="' + s.container + '"]');
     if (badge) {
       if (required.length === 0) {
-        badge.textContent = 'Optional';
+        badge.textContent = t('reg.status_optional');
         badge.className = 's1-menu-status s1-optional';
       } else {
-        badge.textContent = complete ? 'Complete' : 'Incomplete';
+        badge.textContent = complete ? t('reg.status_complete') : t('reg.status_incomplete');
         badge.className = 's1-menu-status ' + (complete ? 's1-complete' : 's1-incomplete');
       }
     }
@@ -1579,9 +1554,32 @@ function s2ModalNext(idx) {
   }
 }
 
-// Called once, when the patient first arrives at this step from Step 1 —
-// jumps straight into the first not-yet-complete required consent instead
-// of making them find it in the menu themselves.
+// Guards the "Next: Consent to Treat" button: if any required Patient
+// Demographics section (or the home/cell-phone any-group) is still
+// incomplete, opens that section's modal instead of letting the patient
+// advance to Step 3, mirroring openFirstIncompleteS2Modal() below.
+function openFirstIncompleteS1Modal() {
+  for (var i = 0; i < S1_SECTIONS.length; i++) {
+    var s = S1_SECTIONS[i];
+    var container = document.getElementById(s.container);
+    if (!container) continue;
+    var required = container.querySelectorAll('[required]');
+    if ((required.length > 0 || S1_ANY_GROUPS[s.container]) && !sectionOk(s.container)) {
+      openS1Modal(s.modal);
+      return true;
+    }
+  }
+  return false;
+}
+
+// Called when the patient first arrives at this step from Step 2, and also
+// used to guard the "Next: Authorization to Release" button below — jumps
+// straight into the first not-yet-complete required consent (Consent to
+// Treat, Financial Policy, or HIPAA Notice; Text/Telehealth has no
+// unconditionally-required fields so it's skipped) instead of making the
+// patient find it in the menu themselves. Returns true if it had to stop
+// the patient on an incomplete modal, false if every required consent is
+// already done.
 function openFirstIncompleteS2Modal() {
   for (var i = 0; i < S2_SEQUENCE.length; i++) {
     var s = S2_SEQUENCE[i];
@@ -1590,14 +1588,24 @@ function openFirstIncompleteS2Modal() {
     var required = container.querySelectorAll('[required]');
     if (required.length > 0 && !sectionOk(s.container)) {
       openS2Modal(s.modal);
-      return;
+      return true;
     }
   }
+  return false;
 }
 
 function goToConsentsStep() {
+  if (openFirstIncompleteS1Modal()) return;
   goStep(3);
   openFirstIncompleteS2Modal();
+}
+
+// Guards the "Next: Authorization to Release" button, same enforcement as
+// goToConsentsStep() above: won't advance to Step 4 while Consent to Treat,
+// Financial Policy, or HIPAA Notice is still incomplete.
+function goToAuthorizationStep() {
+  if (openFirstIncompleteS2Modal()) return;
+  goStep(4);
 }
 
 // Called by goStep() every time the patient enters Step 5. Re-fetches each
@@ -1662,7 +1670,7 @@ function showSubmitError(msg) {
   errEl.textContent = msg;
   errEl.style.display = 'block';
   var btn = document.querySelector('.btn-sub');
-  if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration ✓'; }
+  if (btn) { btn.disabled = false; btn.textContent = t('reg.submit_btn'); }
 }
 
 function showDonePage(alreadyRegistered) {
@@ -1676,13 +1684,13 @@ function showDonePage(alreadyRegistered) {
   var alreadyMsg = document.getElementById('alreadyRegisteredMsg');
 
   if (alreadyRegistered) {
-    heading.textContent = 'Registration Already on File';
+    heading.textContent = t('reg.already_registered_heading');
     icon.classList.add('notice');
     icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
     normalMsg.style.display = 'none';
     alreadyMsg.style.display = 'block';
   } else {
-    heading.textContent = 'Registration Complete!';
+    heading.textContent = t('reg.done_heading');
     icon.classList.remove('notice');
     icon.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
     normalMsg.style.display = '';
@@ -2126,7 +2134,7 @@ function buildAllConsentPdfFiles() {
 
 function submitForms() {
   var btn = document.querySelector('.btn-sub');
-  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+  if (btn) { btn.disabled = true; btn.textContent = t('reg.submitting'); }
 
   var essTotal = 0;
   if (val('treatment_type') !== 'weight_loss') {
@@ -2278,7 +2286,7 @@ function submitForms() {
       showDonePage(alreadyRegistered);
     })
     .catch(function (err) {
-      showSubmitError('Unable to submit. Please call us at 727-472-9112 or try again. (' + err.message + ')');
+      showSubmitError(t('reg.submit_error_prefix') + err.message + ')');
     });
 }
 
@@ -2514,6 +2522,15 @@ document.getElementById('fstep3').addEventListener('input', renderS2);
 document.getElementById('fstep3').addEventListener('change', renderS2);
 renderS2();
 
+// Both menus' badges are fully JS-owned (deliberately not tagged with
+// data-i18n -- see i18n.js's setLang()) so a language toggle needs to
+// explicitly re-paint them in the new language, using each section's
+// actual current fill state rather than a fixed static string.
+document.addEventListener('i18nchange', function () {
+  renderS1Menu();
+  renderS2();
+});
+
 // ---------------- TREATMENT TYPE: ask immediately on entry ----------------
 openFormModal('modalTreatmentType');
 
@@ -2569,36 +2586,36 @@ function dpkDisplayVal(name) {
 function renderReviewCards() {
   document.getElementById('rvDemographics').innerHTML =
     '<div class="rv-grid">' +
-      rvRow('Name', getPatientName()) +
-      rvRow('Date of Birth', dpkDisplayVal('dob')) +
-      rvRow('Age', val('age')) +
-      rvRow('Sex', getRadioValue('sex')) +
-      rvRow('Driver\'s License/ID #', val('dl')) +
-      rvRow('Address', [val('address'), val('city'), val('state'), val('zip')].filter(Boolean).join(', ')) +
-      rvRow('Home Phone', val('home_phone')) +
-      rvRow('Cell Phone', val('cell_phone')) +
-      rvRow('Email', val('email')) +
-      rvRow('Marital Status', getRadioValue('marital')) +
-      rvRow('Employer', val('employer')) +
-      rvRow('Occupation', val('occupation')) +
-      rvRow('Emergency Contact', val('ec_name')) +
-      rvRow('EC Relationship', val('ec_rel')) +
-      rvRow('EC Phone', val('ec_phone')) +
-      rvRow('Emergency Contact 2', val('ec2_name')) +
-      rvRow('EC2 Relationship', val('ec2_rel')) +
-      rvRow('EC2 Phone', val('ec2_phone')) +
-      rvRow('Primary Insurance', (val('ins1') === 'Other' ? val('ins1_other') : val('ins1'))) +
-      rvRow('Policy Holder', val('ph_name')) +
-      rvRow('Policy Holder DOB', dpkDisplayVal('ph_dob')) +
-      rvRow('Member ID', val('member_id')) +
-      rvRow('Group #', val('group_num')) +
-      rvRow('Secondary Insurance', val('ins2')) +
-      rvRow('Secondary Member ID', val('member_id2')) +
-      rvRow('PCP', val('pcp')) +
-      rvRow('Referring Provider', val('ref_prov')) +
-      rvRow('Pharmacy Name', val('pharm_name')) +
-      rvRow('Pharmacy Address', val('pharm_addr')) +
-      rvRow('Pharmacy Phone', val('pharm_phone')) +
+      rvRow(t('reg.rv_name'), getPatientName()) +
+      rvRow(t('reg.rv_dob'), dpkDisplayVal('dob')) +
+      rvRow(t('reg.rv_age'), val('age')) +
+      rvRow(t('reg.rv_sex'), getRadioValue('sex')) +
+      rvRow(t('reg.rv_dl'), val('dl')) +
+      rvRow(t('reg.rv_address'), [val('address'), val('city'), val('state'), val('zip')].filter(Boolean).join(', ')) +
+      rvRow(t('reg.rv_home_phone'), val('home_phone')) +
+      rvRow(t('reg.rv_cell_phone'), val('cell_phone')) +
+      rvRow(t('reg.rv_email'), val('email')) +
+      rvRow(t('reg.rv_marital'), getRadioValue('marital')) +
+      rvRow(t('reg.rv_employer'), val('employer')) +
+      rvRow(t('reg.rv_occupation'), val('occupation')) +
+      rvRow(t('reg.rv_ec_name'), val('ec_name')) +
+      rvRow(t('reg.rv_ec_rel'), val('ec_rel')) +
+      rvRow(t('reg.rv_ec_phone'), val('ec_phone')) +
+      rvRow(t('reg.rv_ec2_name'), val('ec2_name')) +
+      rvRow(t('reg.rv_ec2_rel'), val('ec2_rel')) +
+      rvRow(t('reg.rv_ec2_phone'), val('ec2_phone')) +
+      rvRow(t('reg.rv_primary_ins'), (val('ins1') === 'Other' ? val('ins1_other') : val('ins1'))) +
+      rvRow(t('reg.rv_policy_holder'), val('ph_name')) +
+      rvRow(t('reg.rv_policy_holder_dob'), dpkDisplayVal('ph_dob')) +
+      rvRow(t('reg.rv_member_id'), val('member_id')) +
+      rvRow(t('reg.rv_group_num'), val('group_num')) +
+      rvRow(t('reg.rv_secondary_ins'), val('ins2')) +
+      rvRow(t('reg.rv_secondary_member_id'), val('member_id2')) +
+      rvRow(t('reg.rv_pcp'), val('pcp')) +
+      rvRow(t('reg.rv_ref_prov'), val('ref_prov')) +
+      rvRow(t('reg.rv_pharm_name'), val('pharm_name')) +
+      rvRow(t('reg.rv_pharm_addr'), val('pharm_addr')) +
+      rvRow(t('reg.rv_pharm_phone'), val('pharm_phone')) +
     '</div>';
 }
 

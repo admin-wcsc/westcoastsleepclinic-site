@@ -65,7 +65,11 @@ function dpkFormatDisplay(parsed) {
   return out;
 }
 
-var DPK_MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+// Read live via t() (not cached) so a language toggle mid-session is
+// reflected the next time any open date picker re-renders its grid.
+function dpkMonthNames() {
+  return [t('common.month1'), t('common.month2'), t('common.month3'), t('common.month4'), t('common.month5'), t('common.month6'), t('common.month7'), t('common.month8'), t('common.month9'), t('common.month10'), t('common.month11'), t('common.month12')];
+}
 
 function DatePicker(wrapperEl) {
   var visible = wrapperEl.querySelector('.dpk-input');
@@ -84,7 +88,7 @@ function DatePicker(wrapperEl) {
   }
 
   function buildGrid() {
-    mtitle.textContent = DPK_MONTH_NAMES[viewMonth] + ' ' + viewYear;
+    mtitle.textContent = dpkMonthNames()[viewMonth] + ' ' + viewYear;
     grid.innerHTML = '';
     var firstDow = new Date(viewYear, viewMonth, 1).getDay();
     var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();

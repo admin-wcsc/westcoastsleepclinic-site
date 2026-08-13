@@ -23,7 +23,11 @@
 // document.querySelector('[name="..."]') like any other field.
 
 var AppointmentSlotPicker = (function () {
-  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  // Read live via t() (not cached) so a language toggle mid-session is
+  // reflected the next time the calendar re-renders.
+  function monthNames() {
+    return [t('common.month1'), t('common.month2'), t('common.month3'), t('common.month4'), t('common.month5'), t('common.month6'), t('common.month7'), t('common.month8'), t('common.month9'), t('common.month10'), t('common.month11'), t('common.month12')];
+  }
 
   var loadingEl, fallbackEl, calEl, dateInput, timeInput, durationInput;
   var calTitle, calGrid, prevBtn, nextBtn, timesWrap, timesHeadingEl, timesListEl;
@@ -56,13 +60,16 @@ var AppointmentSlotPicker = (function () {
     [dateInput, timeInput, durationInput].forEach(function (el) { if (el) el.required = isReady; });
   }
 
-  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  // pad2() itself comes from date-picker.js -- registration.html (the only
+  // page that loads this file) always loads that one first, and both
+  // widgets need the identical zero-pad behavior, so this reuses that
+  // global instead of keeping its own copy in sync.
   function isoOf(y, m, d) { return y + '-' + pad2(m + 1) + '-' + pad2(d); }
   function monthKey(y, m) { return y * 12 + m; }
 
   function formatDateHeading(iso) {
     var d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+    return d.toLocaleDateString(getLang() === 'es' ? 'es' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   }
   function formatTime(hhmm) {
     var parts = hhmm.split(':');
@@ -74,14 +81,14 @@ var AppointmentSlotPicker = (function () {
   function buildSkeleton() {
     calEl.innerHTML =
       '<div class="slotpicker-cal-head">' +
-        '<button type="button" class="slotpicker-cal-nav" data-nav="prev" aria-label="Previous month">&larr;</button>' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="prev" aria-label="' + t('common.dpk_prev_month') + '">&larr;</button>' +
         '<div class="slotpicker-cal-title"></div>' +
-        '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="Next month">&rarr;</button>' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="' + t('common.dpk_next_month') + '">&rarr;</button>' +
       '</div>' +
       '<div class="slotpicker-cal-grid"></div>' +
       '<div class="slotpicker-times-wrap">' +
         '<div class="slotpicker-times-heading"></div>' +
-        '<div class="slotpicker-times-instructions">Swipe up or down to browse available times, then tap one to select it.</div>' +
+        '<div class="slotpicker-times-instructions">' + t('reg.s5_swipe_instructions') + '</div>' +
         '<div class="slotpicker-time-list"></div>' +
       '</div>';
 
@@ -106,15 +113,15 @@ var AppointmentSlotPicker = (function () {
   }
 
   function renderMonth() {
-    calTitle.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+    calTitle.textContent = monthNames()[viewMonth] + ' ' + viewYear;
     prevBtn.disabled = monthKey(viewYear, viewMonth) <= monthKey(minMonth.year, minMonth.month);
     nextBtn.disabled = monthKey(viewYear, viewMonth) >= monthKey(maxMonth.year, maxMonth.month);
 
     calGrid.innerHTML = '';
-    ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(function (l) {
+    ['common.wk_su', 'common.wk_mo', 'common.wk_tu', 'common.wk_we', 'common.wk_th', 'common.wk_fr', 'common.wk_sa'].forEach(function (key) {
       var el = document.createElement('div');
       el.className = 'slotpicker-cal-dow';
-      el.textContent = l;
+      el.textContent = t(key);
       calGrid.appendChild(el);
     });
 

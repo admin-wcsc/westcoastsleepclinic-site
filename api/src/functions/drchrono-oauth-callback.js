@@ -19,16 +19,7 @@
 // deriving it from request.url risks reflecting an internal hostname the
 // SWA proxy uses rather than the public one DrChrono actually redirected to.
 const { app } = require('@azure/functions');
-const crypto = require('crypto');
-const { getContainerClient, fetchWithTimeout, DRCHRONO_BASE_URL, DRCHRONO_TIMEOUT_MS, appendAudit } = require('../shared/drchrono');
-
-function safeEqual(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
-}
+const { getContainerClient, fetchWithTimeout, DRCHRONO_BASE_URL, DRCHRONO_TIMEOUT_MS, appendAudit, safeEqual } = require('../shared/drchrono');
 
 app.http('drchronoOauthCallback', {
   methods: ['GET'],

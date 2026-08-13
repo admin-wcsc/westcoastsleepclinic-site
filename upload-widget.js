@@ -58,7 +58,7 @@ function createUploadWidget(opts) {
     opts.fileInputIds.forEach(function (id) { document.getElementById(id).value = ''; });
     renderFileList();
     if (rejected.length > 0) {
-      showError('Unsupported file type — ' + rejected.join(', ') + '. Accepted types: Word, PDF, Excel, PNG, JPEG.');
+      showError(t('upload.unsupported_prefix') + rejected.join(', ') + t('upload.unsupported_suffix'));
     }
   }
 
@@ -78,14 +78,14 @@ function createUploadWidget(opts) {
           '<div class="file-name">' + escHtml(f.name) + '</div>' +
           '<div class="file-size">' + formatBytes(f.size) + '</div>' +
         '</div>' +
-        '<button class="file-remove" type="button" data-remove-idx="' + idx + '" aria-label="Remove file">' +
+        '<button class="file-remove" type="button" data-remove-idx="' + idx + '" aria-label="' + t('upload.remove_file_aria') + '">' +
           '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button>';
       fileList.appendChild(item);
     });
 
     if (files.length > 0) {
-      var fileWord = files.length === 1 ? 'file selected' : 'files selected';
+      var fileWord = files.length === 1 ? t('upload.file_selected') : t('upload.files_selected');
       fileCountNote.textContent = files.length + ' ' + fileWord;
       fileCountNote.style.display = 'block';
     } else {

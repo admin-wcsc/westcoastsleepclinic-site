@@ -37,21 +37,21 @@
     <span class="relocation-banner-icon" aria-hidden="true">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#7a1f1a" stroke-width="1.4"/><rect x="9.1" y="8.4" width="1.8" height="6" rx="0.9" fill="#7a1f1a"/><rect x="9.1" y="5.2" width="1.8" height="1.8" rx="0.9" fill="#7a1f1a"/></svg>
     </span>
-    <span class="relocation-banner-text">As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span>
+    <span class="relocation-banner-text" data-i18n="banner.text">As of July 24, all patient appointments will be conducted via telemedicine while we relocate our office to better serve you.</span>
     <button type="button" class="relocation-banner-toggle" id="relocationBannerToggle" onclick="toggleRelocationBannerMore()" aria-expanded="false" aria-controls="relocationBannerMore">
-      Read More
+      <span data-i18n="banner.readmore">Read More</span>
       <svg class="relocation-banner-chevron" width="10" height="7" viewBox="0 0 10 7" fill="none" aria-hidden="true"><path d="M1 1.2L5 5.2L9 1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
   <div class="relocation-banner-more" id="relocationBannerMore">
     <div class="relocation-banner-more-in">
-      <p>During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
-      <p>Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
-      <p><strong>Important for Medicare Patients:</strong> Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
-      <p>We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
+      <p data-i18n="banner.p1">During this transition, we remain committed to providing uninterrupted care. You can continue to schedule appointments, discuss your sleep concerns, review test results, and receive treatment recommendations through secure telemedicine visits.</p>
+      <p data-i18n="banner.p2">Once our relocation is complete, we will announce the reopening of our office and begin scheduling in-person appointments.</p>
+      <p data-i18n="banner.p3"><strong>Important for Medicare Patients:</strong> Due to current Medicare telemedicine guidelines, Medicare patient appointments will begin on August 15. You are still encouraged to call our office now to reserve your appointment, and our team will schedule you for the earliest available appointment beginning August 15.</p>
+      <p data-i18n="banner.p4">We appreciate your patience and understanding during this transition and look forward to continuing to care for your sleep health. If you have any questions or would like to schedule an appointment, please contact our office.</p>
       <div class="relocation-banner-more-actions">
-        <button type="button" class="relocation-banner-toggle" id="relocationBannerToggleEnd" onclick="toggleRelocationBannerMore()" aria-expanded="true" aria-controls="relocationBannerMore">
-          Show Less
+        <button type="button" class="relocation-banner-toggle" onclick="toggleRelocationBannerMore()" aria-expanded="true" aria-controls="relocationBannerMore">
+          <span data-i18n="banner.showless">Show Less</span>
           <svg class="relocation-banner-chevron relocation-banner-chevron--up" width="10" height="7" viewBox="0 0 10 7" fill="none" aria-hidden="true"><path d="M1 1.2L5 5.2L9 1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
