@@ -2531,6 +2531,19 @@ document.addEventListener('i18nchange', function () {
   renderS2();
 });
 
+// ---------------- BEDTIME/WAKE TIME: open picker on any click ----------------
+// Native <input type="time"> only opens its picker when the browser's own
+// small clock icon is clicked; clicking elsewhere in the field just places
+// a text cursor. showPicker() opens it from anywhere in the field instead.
+// Guarded (support + try/catch) since showPicker() isn't universal yet.
+document.querySelectorAll('input[type="time"]').forEach(function (el) {
+  el.addEventListener('click', function () {
+    if (typeof el.showPicker === 'function') {
+      try { el.showPicker(); } catch (e) {}
+    }
+  });
+});
+
 // ---------------- TREATMENT TYPE: ask immediately on entry ----------------
 openFormModal('modalTreatmentType');
 
