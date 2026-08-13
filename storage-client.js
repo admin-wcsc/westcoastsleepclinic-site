@@ -59,7 +59,16 @@ var StorageClient = (function () {
     });
   }
 
+  // Reads open appointment slots for the given treatment type. Always
+  // resolves (never rejects on "no slots" or "not ready yet") -- the
+  // response's own available/stale/slots fields say why, per
+  // availability.js's contract.
+  function getAvailability(treatmentType) {
+    return request('/availability?treatment_type=' + encodeURIComponent(treatmentType));
+  }
+
   return {
-    submitIntake: submitIntake
+    submitIntake: submitIntake,
+    getAvailability: getAvailability
   };
 })();

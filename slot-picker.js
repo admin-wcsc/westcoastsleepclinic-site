@@ -1,0 +1,232 @@
+// ---------------- APPOINTMENT SLOT PICKER ----------------
+// Single-instance widget -- there's only ever one Schedule Appointment step
+// in the wizard, unlike signatures/date-pickers which repeat per
+// consent/field -- so this targets fixed element IDs directly rather than
+// the multi-instance auto-wire-by-CSS-class convention date-picker.js/
+// signature-pad.js/upload-widget.js use. One deliberate difference from
+// every other widget in this file family: treatment_type isn't known until
+// Step 1 is complete, so this can't fetch on page load like they do -- the
+// page calls AppointmentSlotPicker.refresh(treatmentType) explicitly when
+// the patient reaches the Schedule Appointment step.
+//
+// Calendar-style: a month grid where only dates with real open slots are
+// clickable. Picking one reveals that day's open times as a compact,
+// height-constrained scrollable list (swipe/scroll up-down, tap to select)
+// rather than dumping everything on the page at once -- went through a
+// horizontal-scroll-strip version and a Morning/Afternoon/Evening grouped
+// grid first, both replaced after feedback that they still felt like too
+// much for something this simple.
+//
+// Hidden inputs (appointment_date/appointment_time/appointment_duration_minutes)
+// hold the canonical value, same convention as every other widget here --
+// existing required-field/payload code just reads them via
+// document.querySelector('[name="..."]') like any other field.
+
+var AppointmentSlotPicker = (function () {
+  // Read live via t() (not cached) so a language toggle mid-session is
+  // reflected the next time the calendar re-renders.
+  function monthNames() {
+    return [t('common.month1'), t('common.month2'), t('common.month3'), t('common.month4'), t('common.month5'), t('common.month6'), t('common.month7'), t('common.month8'), t('common.month9'), t('common.month10'), t('common.month11'), t('common.month12')];
+  }
+
+  var loadingEl, fallbackEl, calEl, dateInput, timeInput, durationInput;
+  var calTitle, calGrid, prevBtn, nextBtn, timesWrap, timesHeadingEl, timesListEl;
+  var slotsByDate = {};
+  var minMonth, maxMonth; // {year, month} bounds derived from the actual slots
+  var viewYear, viewMonth;
+  var selectedDate = null;
+  var selectedTimeBtn = null;
+
+  function els() {
+    if (!loadingEl) {
+      loadingEl = document.getElementById('apptSlotLoading');
+      fallbackEl = document.getElementById('apptSlotFallback');
+      calEl = document.getElementById('apptSlotDays');
+      dateInput = document.querySelector('[name="appointment_date"]');
+      timeInput = document.querySelector('[name="appointment_time"]');
+      durationInput = document.querySelector('[name="appointment_duration_minutes"]');
+    }
+  }
+
+  function showState(state) {
+    loadingEl.style.display = state === 'loading' ? '' : 'none';
+    fallbackEl.style.display = state === 'fallback' ? '' : 'none';
+    calEl.style.display = state === 'calendar' ? '' : 'none';
+    // Only meaningful to require a slot when there's a real calendar to pick
+    // from -- matches how Step 4 (Authorization to Release) already leaves
+    // its own plain, non-modal step ungated beyond the `required` attribute
+    // itself, no separate JS blocking logic.
+    var isReady = state === 'calendar';
+    [dateInput, timeInput, durationInput].forEach(function (el) { if (el) el.required = isReady; });
+  }
+
+  // pad2() itself comes from date-picker.js -- registration.html (the only
+  // page that loads this file) always loads that one first, and both
+  // widgets need the identical zero-pad behavior, so this reuses that
+  // global instead of keeping its own copy in sync.
+  function isoOf(y, m, d) { return y + '-' + pad2(m + 1) + '-' + pad2(d); }
+  function monthKey(y, m) { return y * 12 + m; }
+
+  function formatDateHeading(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString(getLang() === 'es' ? 'es' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+  function formatTime(hhmm) {
+    var parts = hhmm.split(':');
+    var h = parseInt(parts[0], 10);
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12 || 12;
+    return h12 + ':' + parts[1] + ' ' + ampm;
+  }
+  function buildSkeleton() {
+    calEl.innerHTML =
+      '<div class="slotpicker-cal-head">' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="prev" aria-label="' + t('common.dpk_prev_month') + '">&larr;</button>' +
+        '<div class="slotpicker-cal-title"></div>' +
+        '<button type="button" class="slotpicker-cal-nav" data-nav="next" aria-label="' + t('common.dpk_next_month') + '">&rarr;</button>' +
+      '</div>' +
+      '<div class="slotpicker-cal-grid"></div>' +
+      '<div class="slotpicker-times-wrap">' +
+        '<div class="slotpicker-times-heading"></div>' +
+        '<div class="slotpicker-times-instructions">' + t('reg.s5_swipe_instructions') + '</div>' +
+        '<div class="slotpicker-time-list"></div>' +
+      '</div>';
+
+    calTitle = calEl.querySelector('.slotpicker-cal-title');
+    calGrid = calEl.querySelector('.slotpicker-cal-grid');
+    prevBtn = calEl.querySelector('[data-nav="prev"]');
+    nextBtn = calEl.querySelector('[data-nav="next"]');
+    timesWrap = calEl.querySelector('.slotpicker-times-wrap');
+    timesHeadingEl = calEl.querySelector('.slotpicker-times-heading');
+    timesListEl = calEl.querySelector('.slotpicker-time-list');
+
+    prevBtn.addEventListener('click', function () {
+      if (prevBtn.disabled) return;
+      viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      renderMonth();
+    });
+    nextBtn.addEventListener('click', function () {
+      if (nextBtn.disabled) return;
+      viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      renderMonth();
+    });
+  }
+
+  function renderMonth() {
+    calTitle.textContent = monthNames()[viewMonth] + ' ' + viewYear;
+    prevBtn.disabled = monthKey(viewYear, viewMonth) <= monthKey(minMonth.year, minMonth.month);
+    nextBtn.disabled = monthKey(viewYear, viewMonth) >= monthKey(maxMonth.year, maxMonth.month);
+
+    calGrid.innerHTML = '';
+    ['common.wk_su', 'common.wk_mo', 'common.wk_tu', 'common.wk_we', 'common.wk_th', 'common.wk_fr', 'common.wk_sa'].forEach(function (key) {
+      var el = document.createElement('div');
+      el.className = 'slotpicker-cal-dow';
+      el.textContent = t(key);
+      calGrid.appendChild(el);
+    });
+
+    var firstDow = new Date(viewYear, viewMonth, 1).getDay();
+    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    for (var k = 0; k < firstDow; k++) {
+      var blank = document.createElement('div');
+      blank.className = 'slotpicker-cal-day other';
+      calGrid.appendChild(blank);
+    }
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var iso = isoOf(viewYear, viewMonth, d);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slotpicker-cal-day';
+      btn.textContent = d;
+      if (slotsByDate[iso]) {
+        btn.classList.add('has-slots');
+        if (iso === selectedDate) btn.classList.add('selected');
+        btn.addEventListener('click', function (isoForClick) {
+          return function () { selectDate(isoForClick); };
+        }(iso));
+      } else {
+        btn.disabled = true;
+      }
+      calGrid.appendChild(btn);
+    }
+  }
+
+  function selectDate(iso) {
+    selectedDate = iso;
+    selectedTimeBtn = null;
+    dateInput.value = '';
+    timeInput.value = '';
+    durationInput.value = '';
+    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+    renderMonth();
+    renderTimeList(iso);
+  }
+
+  function renderTimeList(iso) {
+    timesHeadingEl.textContent = formatDateHeading(iso);
+    timesListEl.innerHTML = '';
+    timesListEl.scrollTop = 0;
+
+    slotsByDate[iso].forEach(function (slot) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-btn';
+      btn.textContent = formatTime(slot.time);
+      btn.addEventListener('click', function () { selectSlot(btn, slot); });
+      timesListEl.appendChild(btn);
+    });
+
+    // Class, not inline style: on desktop this only flips visibility (the
+    // wrap already occupies its grid cell while hidden, so revealing it
+    // never changes the calendar's overall height); on mobile CSS maps the
+    // same class to display so the stacked layout still grows naturally.
+    timesWrap.classList.add('is-visible');
+  }
+
+  function selectSlot(btn, slot) {
+    if (selectedTimeBtn) selectedTimeBtn.classList.remove('slot-btn-selected');
+    selectedTimeBtn = btn;
+    btn.classList.add('slot-btn-selected');
+    dateInput.value = slot.date;
+    timeInput.value = slot.time;
+    durationInput.value = slot.durationMinutes;
+    dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function refresh(treatmentType) {
+    els();
+    selectedDate = null;
+    selectedTimeBtn = null;
+    dateInput.value = '';
+    timeInput.value = '';
+    durationInput.value = '';
+    showState('loading');
+    StorageClient.getAvailability(treatmentType).then(function (result) {
+      if (!result || !result.available || !Array.isArray(result.slots) || result.slots.length === 0) {
+        showState('fallback');
+        return;
+      }
+
+      slotsByDate = {};
+      result.slots.forEach(function (s) { (slotsByDate[s.date] = slotsByDate[s.date] || []).push(s); });
+
+      var dates = Object.keys(slotsByDate).sort();
+      var first = new Date(dates[0] + 'T00:00:00');
+      var last = new Date(dates[dates.length - 1] + 'T00:00:00');
+      minMonth = { year: first.getFullYear(), month: first.getMonth() };
+      maxMonth = { year: last.getFullYear(), month: last.getMonth() };
+      viewYear = minMonth.year;
+      viewMonth = minMonth.month;
+
+      buildSkeleton();
+      renderMonth();
+      showState('calendar');
+    }).catch(function () {
+      showState('fallback');
+    });
+  }
+
+  return { refresh: refresh };
+})();

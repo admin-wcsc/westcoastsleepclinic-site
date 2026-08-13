@@ -11,3 +11,7 @@ function toggleMobNav() {
   nav.style.top = header.getBoundingClientRect().bottom + 'px';
   nav.classList.toggle('open');
 }
+
+function toggleCallFab() {
+  document.getElementById('callFabPop').classList.toggle('open');
+}
