@@ -304,7 +304,6 @@ var I18N_DICT = {
   "reg.s1_next_btn": { en: "Next: Patient Demographics &rarr;", es: "Siguiente: Datos Demográficos &rarr;" },
 
   // ── STEP 2: Patient Demographics ──
-  "reg.s2_sub": { en: "Please fill in your personal and insurance information completely.", es: "Complete su información personal y de seguro en su totalidad." },
   "reg.req_note": { en: "<span>*</span> Indicates a required field", es: "<span>*</span> Indica un campo obligatorio" },
   "reg.status_incomplete": { en: "Incomplete", es: "Incompleto" },
   "reg.status_complete": { en: "Complete", es: "Completo" },
