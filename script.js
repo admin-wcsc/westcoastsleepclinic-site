@@ -15,14 +15,26 @@ function positionMobNav() {
   nav.style.top = header.getBoundingClientRect().bottom + 'px';
 }
 
+// Registered on document only while the menu is open, and ignores clicks on
+// the menu itself or the hamburger button (which already toggles it) -- so a
+// tap anywhere else on the page closes it.
+function closeMobNavOnOutsideClick(e) {
+  var nav = document.getElementById('mobNav');
+  var hamburger = document.querySelector('.hamburger');
+  if (nav.contains(e.target) || hamburger.contains(e.target)) return;
+  toggleMobNav();
+}
+
 function toggleMobNav() {
   var nav = document.getElementById('mobNav');
   var isOpen = nav.classList.toggle('open');
   if (isOpen) {
     positionMobNav();
     window.addEventListener('scroll', positionMobNav);
+    document.addEventListener('click', closeMobNavOnOutsideClick);
   } else {
     window.removeEventListener('scroll', positionMobNav);
+    document.removeEventListener('click', closeMobNavOnOutsideClick);
   }
 }
 
