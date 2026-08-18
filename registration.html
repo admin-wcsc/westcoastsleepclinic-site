@@ -2188,6 +2188,100 @@ function buildAllConsentPdfFiles() {
   return files;
 }
 
+// Builds a copy of the Patient Demographics form (Patient Details +
+// Emergency Contact) as a PDF. DrChrono's API doesn't accept several of
+// these fields directly, so this rides the same files/ ->
+// Create_Document_in_DrChrono pipeline every other generated PDF here
+// already uses to land it on the patient's chart as an attachment. Name
+// and DOB aren't repeated in the body -- startPdfDoc()'s header already
+// shows both.
+function buildDemographicsPdf() {
+  var pdf = startPdfDoc('Patient Demographics');
+
+  writePdfFieldGrid(pdf, [
+    ['Age', val('age')],
+    ['Sex', getRadioValue('sex')],
+    ["Driver's License/ID #", val('dl')],
+    ['Marital Status', getRadioValue('marital')],
+    ['Employer', val('employer')],
+    ['Occupation', val('occupation')]
+  ]);
+  writePdfQaRow(pdf, 'Address', [val('address'), val('city'), val('state'), val('zip')].filter(Boolean).join(', '));
+  writePdfFieldGrid(pdf, [
+    ['Home Phone', val('home_phone')],
+    ['Cell Phone', val('cell_phone')]
+  ]);
+  writePdfQaRow(pdf, 'Email Address', val('email'));
+
+  writePdfSectionHeading(pdf, 'Emergency Contact 1');
+  writePdfFieldGrid(pdf, [
+    ['Contact Name', val('ec_name')],
+    ['Relationship', val('ec_rel')],
+    ['Contact Phone', val('ec_phone')]
+  ]);
+
+  writePdfSectionHeading(pdf, 'Emergency Contact 2 (Optional)');
+  writePdfFieldGrid(pdf, [
+    ['Contact Name', val('ec2_name')],
+    ['Relationship', val('ec2_rel')],
+    ['Contact Phone', val('ec2_phone')]
+  ]);
+
+  return pdf.doc.output('blob');
+}
+
+// Always generated (unlike the questionnaire/release PDFs, Patient
+// Demographics applies to every treatment type and isn't gated on a
+// signature) -- only skipped if the jsPDF CDN failed to load, same
+// reliability posture as every other PDF builder here.
+function buildDemographicsPdfFile() {
+  if (!window.jspdf) return [];
+  return [blobToFile(buildDemographicsPdf(), 'patient-demographics-form.pdf')];
+}
+
+// Builds a copy of the Insurance Information + Preferred Pharmacy modals
+// as a PDF, for the same reason and via the same pipeline as
+// buildDemographicsPdf() above.
+function buildInsurancePharmacyPdf() {
+  var pdf = startPdfDoc('Insurance & Pharmacy Information');
+
+  writePdfSectionHeading(pdf, 'Primary Insurance');
+  writePdfFieldGrid(pdf, [
+    ['Primary Insurance Company', (val('ins1') === 'Other' ? val('ins1_other') : val('ins1'))],
+    ['Policy Holder/Payee Name', val('ph_name')],
+    ['Policy Holder Date of Birth', dpkDisplayVal('ph_dob')],
+    ['Relation to Patient', val('ph_rel')],
+    ['Member ID #', val('member_id')],
+    ['Group #', val('group_num')]
+  ]);
+
+  writePdfSectionHeading(pdf, 'Secondary Insurance');
+  writePdfFieldGrid(pdf, [
+    ['Secondary Insurance', val('ins2')],
+    ['Secondary Member ID #', val('member_id2')]
+  ]);
+
+  writePdfSectionHeading(pdf, 'Care Team');
+  writePdfFieldGrid(pdf, [
+    ['Primary Care Provider (PCP)', val('pcp')],
+    ['Referring Provider', val('ref_prov')]
+  ]);
+
+  writePdfSectionHeading(pdf, 'Preferred Pharmacy');
+  writePdfFieldGrid(pdf, [
+    ['Pharmacy Name', val('pharm_name')],
+    ['Pharmacy Address', val('pharm_addr')],
+    ['Pharmacy Phone', val('pharm_phone')]
+  ]);
+
+  return pdf.doc.output('blob');
+}
+
+function buildInsurancePharmacyPdfFile() {
+  if (!window.jspdf) return [];
+  return [blobToFile(buildInsurancePharmacyPdf(), 'insurance-pharmacy-form.pdf')];
+}
+
 function submitForms() {
   var btn = document.querySelector('.btn-sub');
   if (btn) { btn.disabled = true; btn.textContent = t('reg.submitting'); }
@@ -2332,7 +2426,7 @@ function submitForms() {
     submitted_at:            new Date().toISOString()
   };
 
-  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()).concat(buildQuestionnairePdfFile()).concat(buildReleasePdfFile()))
+  StorageClient.submitIntake('registration', payload, regUpload.getFiles().concat(buildAllConsentPdfFiles()).concat(buildQuestionnairePdfFile()).concat(buildReleasePdfFile()).concat(buildDemographicsPdfFile()).concat(buildInsurancePharmacyPdfFile()))
     .then(function (result) {
       // mergedIntoType === 'registration' means this name + DOB already had
       // a registration on file before this submission — as opposed to
