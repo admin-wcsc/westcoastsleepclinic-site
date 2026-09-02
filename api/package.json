@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/functions/*.js",
   "scripts": {
-    "test": "echo \"No tests yet...\""
+    "test": "node --test"
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
